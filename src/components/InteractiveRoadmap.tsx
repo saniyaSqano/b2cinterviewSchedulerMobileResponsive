@@ -154,13 +154,14 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-8 relative overflow-hidden">
+    <div className="h-screen flex flex-col p-4 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-xl"></div>
       <div className="absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-br from-pink-400/20 to-orange-400/20 rounded-full blur-xl"></div>
       
-      <div className="relative z-10 h-full">
-        <div className="relative h-96 w-full mb-8">
+      <div className="relative z-10 flex-1 flex flex-col">
+        {/* Roadmap container - takes most of the space */}
+        <div className="flex-1 relative mb-4">
           {/* Enhanced SVG with colorful gradients */}
           <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
             <defs>
@@ -220,7 +221,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                 <div
                   onClick={() => isClickable && onStepClick(index)}
                   className={`
-                    relative transition-all duration-200 cursor-pointer
+                    relative cursor-pointer
                     ${isClickable ? 'hover:scale-105' : 'cursor-not-allowed'}
                   `}
                 >
@@ -241,7 +242,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
 
                   {/* Enhanced Colorful Step Info Card */}
                   <div className={`
-                    text-center min-w-max max-w-48 p-4 rounded-2xl transition-all duration-200 backdrop-blur-md border
+                    text-center min-w-max max-w-48 p-4 rounded-2xl backdrop-blur-md border
                     ${isHovered 
                       ? 'bg-white/95 shadow-2xl border-purple-300' 
                       : 'bg-white/85 border-white/30'
@@ -272,19 +273,19 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
           })}
         </div>
 
-        {/* Enhanced Colorful Progress Section */}
-        <div className="bg-white/95 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-white/50">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+        {/* Fixed Progress Section at bottom */}
+        <div className="bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-white/50 mt-auto">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-base font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
               Progress Journey
             </span>
-            <span className="text-sm font-semibold text-white bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-2 rounded-full shadow-lg">
+            <span className="text-xs font-semibold text-white bg-gradient-to-r from-purple-500 to-pink-500 px-3 py-1 rounded-full shadow-lg">
               {completedLevels.length} of {roadmapSteps.length} completed
             </span>
           </div>
-          <div className="w-full bg-gradient-to-r from-gray-200 to-gray-300 rounded-full h-5 overflow-hidden shadow-inner">
+          <div className="w-full bg-gradient-to-r from-gray-200 to-gray-300 rounded-full h-4 overflow-hidden shadow-inner">
             <div
-              className="bg-gradient-to-r from-emerald-500 via-blue-500 via-purple-500 to-pink-500 h-5 rounded-full transition-all duration-1000 ease-out relative shadow-lg"
+              className="bg-gradient-to-r from-emerald-500 via-blue-500 via-purple-500 to-pink-500 h-4 rounded-full relative shadow-lg"
               style={{ width: `${(completedLevels.length / roadmapSteps.length) * 100}%` }}
             >
               <div className="absolute inset-0 bg-white/30 rounded-full"></div>
@@ -293,21 +294,21 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
         </div>
 
         {/* Enhanced Colorful Legend */}
-        <div className="flex justify-center space-x-6 mt-6 text-sm">
-          <div className="flex items-center space-x-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white px-4 py-2 rounded-xl shadow-lg">
-            <CheckCircle className="w-4 h-4" />
+        <div className="flex justify-center space-x-4 mt-4 text-xs">
+          <div className="flex items-center space-x-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white px-3 py-1 rounded-xl shadow-lg">
+            <CheckCircle className="w-3 h-3" />
             <span className="font-semibold">Completed</span>
           </div>
-          <div className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-xl shadow-lg">
-            <Circle className="w-4 h-4" />
+          <div className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-1 rounded-xl shadow-lg">
+            <Circle className="w-3 h-3" />
             <span className="font-semibold">Current</span>
           </div>
-          <div className="flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-violet-600 text-white px-4 py-2 rounded-xl shadow-lg">
-            <Circle className="w-4 h-4" />
+          <div className="flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-violet-600 text-white px-3 py-1 rounded-xl shadow-lg">
+            <Circle className="w-3 h-3" />
             <span className="font-semibold">Available</span>
           </div>
-          <div className="flex items-center space-x-2 bg-gradient-to-r from-gray-400 to-gray-500 text-white px-4 py-2 rounded-xl shadow-lg">
-            <Lock className="w-4 h-4" />
+          <div className="flex items-center space-x-2 bg-gradient-to-r from-gray-400 to-gray-500 text-white px-3 py-1 rounded-xl shadow-lg">
+            <Lock className="w-3 h-3" />
             <span className="font-semibold">Locked</span>
           </div>
         </div>

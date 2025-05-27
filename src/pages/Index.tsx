@@ -92,15 +92,15 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 relative overflow-hidden">
       <ParticleBackground />
       
       <div className="relative z-10">
-        <div className="text-center pt-16 pb-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+        <div className="text-center pt-8 pb-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-4">
             Start your Proctor Journey
           </h1>
-          <p className="text-lg text-gray-700 max-w-2xl mx-auto mb-8">
+          <p className="text-base text-gray-700 max-w-2xl mx-auto mb-4">
             Master your skills through our comprehensive learning platform
           </p>
         </div>
