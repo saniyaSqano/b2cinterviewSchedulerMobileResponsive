@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Video, VideoOff, Mic, MicOff } from 'lucide-react';
 import Level3CongratulationsScreen from './Level3CongratulationsScreen';
@@ -23,8 +24,10 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
   const [isVideoOn, setIsVideoOn] = useState(false);
   const [isMicOn, setIsMicOn] = useState(true);
   const [cameraError, setCameraError] = useState<string | null>(null);
+  const [isStartingCamera, setIsStartingCamera] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   const questions = [
     "Hi there! I'm excited to meet you. Could you please introduce yourself and tell me a bit about your background?",
@@ -36,41 +39,68 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
   ];
 
   useEffect(() => {
-    if (!showCongratulations && isVideoOn) {
-      startCamera();
-    }
-    return () => {
-      stopCamera();
-    };
-  }, [showCongratulations, isVideoOn]);
-
-  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  useEffect(() => {
+    return () => {
+      console.log('Cleaning up camera stream...');
+      stopCamera();
+    };
+  }, []);
+
   const startCamera = async () => {
     try {
+      setIsStartingCamera(true);
       setCameraError(null);
-      console.log('Starting camera...');
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+      console.log('Attempting to start camera...');
+      
+      // Stop any existing stream first
+      stopCamera();
+      
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: {
+          width: { ideal: 640 },
+          height: { ideal: 480 }
+        }, 
+        audio: false 
+      });
+      
+      streamRef.current = stream;
+      
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        setIsVideoOn(true);
-        console.log('Camera started successfully');
+        console.log('Camera stream assigned to video element');
+        
+        // Wait for the video to load before setting state
+        videoRef.current.onloadedmetadata = () => {
+          console.log('Video metadata loaded, camera started successfully');
+          setIsVideoOn(true);
+          setIsStartingCamera(false);
+        };
       }
     } catch (error) {
       console.error('Error accessing camera:', error);
-      setCameraError('Unable to access camera. Please check your permissions.');
+      setCameraError('Unable to access camera. Please check your permissions and try again.');
       setIsVideoOn(false);
+      setIsStartingCamera(false);
     }
   };
 
   const stopCamera = () => {
-    if (videoRef.current && videoRef.current.srcObject) {
-      const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
-      tracks.forEach(track => track.stop());
+    console.log('Stopping camera...');
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => {
+        console.log('Stopping track:', track.kind);
+        track.stop();
+      });
+      streamRef.current = null;
+    }
+    
+    if (videoRef.current) {
       videoRef.current.srcObject = null;
     }
+    
     setIsVideoOn(false);
   };
 
@@ -83,20 +113,23 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
   };
 
   const handleProceedToInterview = async () => {
-    console.log('Proceeding to interview, starting camera...');
+    console.log('Proceeding to interview...');
     setShowCongratulations(false);
     
-    // Start camera immediately when proceeding
+    // Start camera immediately
+    console.log('Starting camera for interview...');
     await startCamera();
     
-    // Start with the first question
-    const firstQuestion: Message = {
-      id: Date.now(),
-      text: questions[0],
-      sender: 'ai',
-      timestamp: new Date()
-    };
-    setMessages([firstQuestion]);
+    // Start with the first question after a short delay
+    setTimeout(() => {
+      const firstQuestion: Message = {
+        id: Date.now(),
+        text: questions[0],
+        sender: 'ai',
+        timestamp: new Date()
+      };
+      setMessages([firstQuestion]);
+    }, 1000);
   };
 
   const handleSendMessage = () => {
@@ -140,13 +173,6 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
-
   if (showCongratulations) {
     return (
       <Level3CongratulationsScreen
@@ -182,10 +208,15 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
             <div className="bg-white/90 rounded-2xl p-4 h-full flex flex-col">
               <h3 className="text-sm font-semibold text-gray-700 mb-3">Your Video</h3>
               <div className="flex-1 bg-gray-900 rounded-xl overflow-hidden relative">
-                {cameraError ? (
+                {isStartingCamera ? (
+                  <div className="w-full h-full flex flex-col items-center justify-center text-center p-4">
+                    <div className="animate-spin w-8 h-8 border-4 border-pink-500 border-t-transparent rounded-full mb-2"></div>
+                    <p className="text-white text-sm">Starting camera...</p>
+                  </div>
+                ) : cameraError ? (
                   <div className="w-full h-full flex flex-col items-center justify-center text-center p-4">
                     <VideoOff className="w-12 h-12 text-red-400 mb-2" />
-                    <p className="text-red-400 text-sm">{cameraError}</p>
+                    <p className="text-red-400 text-sm mb-2">{cameraError}</p>
                     <button
                       onClick={startCamera}
                       className="mt-2 px-3 py-1 bg-pink-500 text-white text-xs rounded-full hover:bg-pink-600 transition-colors"
@@ -198,11 +229,19 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
                     ref={videoRef}
                     autoPlay
                     muted
+                    playsInline
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <VideoOff className="w-12 h-12 text-gray-400" />
+                  <div className="w-full h-full flex flex-col items-center justify-center text-center p-4">
+                    <VideoOff className="w-12 h-12 text-gray-400 mb-2" />
+                    <p className="text-gray-400 text-sm mb-2">Camera is off</p>
+                    <button
+                      onClick={startCamera}
+                      className="px-3 py-1 bg-pink-500 text-white text-xs rounded-full hover:bg-pink-600 transition-colors"
+                    >
+                      Start Camera
+                    </button>
                   </div>
                 )}
               </div>
@@ -211,11 +250,12 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
               <div className="flex justify-center space-x-3 mt-4">
                 <button
                   onClick={toggleVideo}
+                  disabled={isStartingCamera}
                   className={`p-3 rounded-full transition-colors ${
                     isVideoOn 
                       ? 'bg-gray-200 hover:bg-gray-300' 
                       : 'bg-red-500 hover:bg-red-600 text-white'
-                  }`}
+                  } ${isStartingCamera ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   {isVideoOn ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
                 </button>
@@ -315,46 +355,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
                   />
                 </div>
                 <button
-                  onClick={() => {
-                    if (!currentInput.trim()) return;
-
-                    const userMessage: Message = {
-                      id: Date.now(),
-                      text: currentInput,
-                      sender: 'user',
-                      timestamp: new Date()
-                    };
-
-                    setMessages(prev => [...prev, userMessage]);
-                    setCurrentInput('');
-
-                    // Check if we need to ask the next question
-                    if (currentQuestionIndex < questions.length - 1) {
-                      setTimeout(() => {
-                        const nextQuestionIndex = currentQuestionIndex + 1;
-                        const nextQuestion: Message = {
-                          id: Date.now() + 1,
-                          text: questions[nextQuestionIndex],
-                          sender: 'ai',
-                          timestamp: new Date()
-                        };
-                        setMessages(prev => [...prev, nextQuestion]);
-                        setCurrentQuestionIndex(nextQuestionIndex);
-                      }, 1500);
-                    } else {
-                      // All questions completed
-                      setTimeout(() => {
-                        const completionMessage: Message = {
-                          id: Date.now() + 1,
-                          text: "Fantastic! You've completed the Pitch Yourself challenge beautifully. Your responses show great self-awareness and motivation. You're ready for the next level!",
-                          sender: 'ai',
-                          timestamp: new Date()
-                        };
-                        setMessages(prev => [...prev, completionMessage]);
-                        setIsComplete(true);
-                      }, 1500);
-                    }
-                  }}
+                  onClick={handleSendMessage}
                   disabled={!currentInput.trim()}
                   className="p-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full hover:from-pink-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
                 >
