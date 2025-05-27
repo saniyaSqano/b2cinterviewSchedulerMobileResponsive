@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Video, VideoOff, Mic, MicOff } from 'lucide-react';
 import Level3CongratulationsScreen from './Level3CongratulationsScreen';
@@ -21,8 +20,9 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
   const [currentInput, setCurrentInput] = useState('');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
-  const [isVideoOn, setIsVideoOn] = useState(true);
+  const [isVideoOn, setIsVideoOn] = useState(false);
   const [isMicOn, setIsMicOn] = useState(true);
+  const [cameraError, setCameraError] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -50,12 +50,18 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
 
   const startCamera = async () => {
     try {
+      setCameraError(null);
+      console.log('Starting camera...');
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        setIsVideoOn(true);
+        console.log('Camera started successfully');
       }
     } catch (error) {
       console.error('Error accessing camera:', error);
+      setCameraError('Unable to access camera. Please check your permissions.');
+      setIsVideoOn(false);
     }
   };
 
@@ -63,20 +69,25 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
     if (videoRef.current && videoRef.current.srcObject) {
       const tracks = (videoRef.current.srcObject as MediaStream).getTracks();
       tracks.forEach(track => track.stop());
+      videoRef.current.srcObject = null;
     }
+    setIsVideoOn(false);
   };
 
   const toggleVideo = () => {
-    setIsVideoOn(!isVideoOn);
-    if (!isVideoOn) {
-      startCamera();
-    } else {
+    if (isVideoOn) {
       stopCamera();
+    } else {
+      startCamera();
     }
   };
 
-  const handleProceedToInterview = () => {
+  const handleProceedToInterview = async () => {
+    console.log('Proceeding to interview, starting camera...');
     setShowCongratulations(false);
+    
+    // Start camera immediately when proceeding
+    await startCamera();
     
     // Start with the first question
     const firstQuestion: Message = {
@@ -171,7 +182,18 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
             <div className="bg-white/90 rounded-2xl p-4 h-full flex flex-col">
               <h3 className="text-sm font-semibold text-gray-700 mb-3">Your Video</h3>
               <div className="flex-1 bg-gray-900 rounded-xl overflow-hidden relative">
-                {isVideoOn ? (
+                {cameraError ? (
+                  <div className="w-full h-full flex flex-col items-center justify-center text-center p-4">
+                    <VideoOff className="w-12 h-12 text-red-400 mb-2" />
+                    <p className="text-red-400 text-sm">{cameraError}</p>
+                    <button
+                      onClick={startCamera}
+                      className="mt-2 px-3 py-1 bg-pink-500 text-white text-xs rounded-full hover:bg-pink-600 transition-colors"
+                    >
+                      Try Again
+                    </button>
+                  </div>
+                ) : isVideoOn ? (
                   <video
                     ref={videoRef}
                     autoPlay
@@ -281,14 +303,58 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
                   <textarea
                     value={currentInput}
                     onChange={(e) => setCurrentInput(e.target.value)}
-                    onKeyPress={handleKeyPress}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSendMessage();
+                      }
+                    }}
                     placeholder="Share your thoughts here..."
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                     rows={2}
                   />
                 </div>
                 <button
-                  onClick={handleSendMessage}
+                  onClick={() => {
+                    if (!currentInput.trim()) return;
+
+                    const userMessage: Message = {
+                      id: Date.now(),
+                      text: currentInput,
+                      sender: 'user',
+                      timestamp: new Date()
+                    };
+
+                    setMessages(prev => [...prev, userMessage]);
+                    setCurrentInput('');
+
+                    // Check if we need to ask the next question
+                    if (currentQuestionIndex < questions.length - 1) {
+                      setTimeout(() => {
+                        const nextQuestionIndex = currentQuestionIndex + 1;
+                        const nextQuestion: Message = {
+                          id: Date.now() + 1,
+                          text: questions[nextQuestionIndex],
+                          sender: 'ai',
+                          timestamp: new Date()
+                        };
+                        setMessages(prev => [...prev, nextQuestion]);
+                        setCurrentQuestionIndex(nextQuestionIndex);
+                      }, 1500);
+                    } else {
+                      // All questions completed
+                      setTimeout(() => {
+                        const completionMessage: Message = {
+                          id: Date.now() + 1,
+                          text: "Fantastic! You've completed the Pitch Yourself challenge beautifully. Your responses show great self-awareness and motivation. You're ready for the next level!",
+                          sender: 'ai',
+                          timestamp: new Date()
+                        };
+                        setMessages(prev => [...prev, completionMessage]);
+                        setIsComplete(true);
+                      }, 1500);
+                    }
+                  }}
                   disabled={!currentInput.trim()}
                   className="p-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full hover:from-pink-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
                 >
