@@ -105,13 +105,13 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
     
     switch (status) {
       case 'completed':
-        return `${baseClasses} bg-green-500 border-green-300 shadow-green-200`;
+        return `${baseClasses} bg-gradient-to-br from-emerald-500 to-green-600 border-emerald-300 shadow-emerald-200`;
       case 'current':
-        return `${baseClasses} bg-blue-600 border-blue-300 shadow-blue-200 ring-4 ring-blue-200`;
+        return `${baseClasses} bg-gradient-to-br from-blue-500 to-indigo-600 border-blue-300 shadow-blue-200 ring-4 ring-blue-200 animate-pulse`;
       case 'available':
-        return `${baseClasses} bg-white border-gray-300 shadow-gray-200 hover:shadow-xl hover:border-blue-400 ${isHovered ? 'scale-110 border-blue-400' : ''}`;
+        return `${baseClasses} bg-gradient-to-br from-purple-500 to-violet-600 border-purple-300 shadow-purple-200 hover:shadow-xl hover:border-purple-400 ${isHovered ? 'scale-110 border-purple-400' : ''}`;
       default:
-        return `${baseClasses} bg-gray-100 border-gray-200 shadow-gray-100`;
+        return `${baseClasses} bg-gradient-to-br from-gray-300 to-gray-400 border-gray-200 shadow-gray-100`;
     }
   };
 
@@ -122,7 +122,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
       case 'current':
         return 'text-white';
       case 'available':
-        return 'text-gray-800';
+        return 'text-white';
       default:
         return 'text-gray-400';
     }
@@ -167,47 +167,61 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
   };
 
   return (
-    <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl p-8 relative overflow-hidden shadow-lg">
+    <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-3xl p-8 relative overflow-hidden shadow-2xl border border-purple-200">
+      {/* Decorative background elements */}
+      <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-xl"></div>
+      <div className="absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-br from-pink-400/20 to-orange-400/20 rounded-full blur-xl"></div>
+      
       <div className="relative z-10">
         <div className="relative h-96 w-full mb-8">
-          {/* Enhanced SVG with better path styling */}
+          {/* Enhanced SVG with colorful gradients */}
           <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-            {/* Background path with gradient */}
             <defs>
               <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#e5e7eb" />
-                <stop offset="100%" stopColor="#d1d5db" />
+                <stop offset="0%" stopColor="#e0e7ff" />
+                <stop offset="50%" stopColor="#c7d2fe" />
+                <stop offset="100%" stopColor="#ddd6fe" />
               </linearGradient>
               <linearGradient id="completedPathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#3b82f6" />
-                <stop offset="50%" stopColor="#1d4ed8" />
-                <stop offset="100%" stopColor="#3b82f6" />
+                <stop offset="0%" stopColor="#10b981" />
+                <stop offset="30%" stopColor="#3b82f6" />
+                <stop offset="60%" stopColor="#8b5cf6" />
+                <stop offset="100%" stopColor="#f59e0b" />
               </linearGradient>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                <feMerge> 
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
             </defs>
             
             <path
               d={drawPath()}
               stroke="url(#pathGradient)"
-              strokeWidth="3"
+              strokeWidth="4"
               fill="none"
-              strokeDasharray="12,6"
+              strokeDasharray="15,8"
               strokeLinecap="round"
+              opacity="0.7"
             />
             
-            {/* Completed path with enhanced styling */}
+            {/* Completed path with enhanced coloring */}
             {completedLevels.length > 0 && (
               <path
                 d={getCompletedPath()}
                 stroke="url(#completedPathGradient)"
-                strokeWidth="4"
+                strokeWidth="6"
                 fill="none"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                filter="url(#glow)"
               />
             )}
           </svg>
 
-          {/* Steps with enhanced positioning and styling */}
+          {/* Steps with enhanced colorful styling */}
           {roadmapSteps.map((step, index) => {
             const status = getStepStatus(index);
             const isClickable = status === 'current' || status === 'available' || status === 'completed';
@@ -231,28 +245,40 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                     ${isClickable ? 'hover:scale-105' : 'cursor-not-allowed'}
                   `}
                 >
-                  {/* Enhanced Step Circle */}
+                  {/* Enhanced Colorful Step Circle */}
                   <div className={`
-                    w-16 h-16 rounded-full flex items-center justify-center mb-3 relative
+                    w-20 h-20 rounded-full flex items-center justify-center mb-4 relative
                     ${getStatusColors(status, isHovered)}
                   `}>
                     {getStepIcon(step, status)}
                     
-                    {/* Pulse effect for current step */}
+                    {/* Enhanced glow effect */}
                     {status === 'current' && (
-                      <div className="absolute inset-0 rounded-full bg-blue-400 opacity-75 animate-ping"></div>
+                      <div className="absolute inset-0 rounded-full bg-blue-400/50 animate-ping"></div>
+                    )}
+                    
+                    {/* Sparkle effect for completed steps */}
+                    {status === 'completed' && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full animate-bounce">
+                        <Star className="w-3 h-3 text-white m-0.5" />
+                      </div>
                     )}
                   </div>
 
-                  {/* Enhanced Step Info Card */}
+                  {/* Enhanced Colorful Step Info Card */}
                   <div className={`
-                    text-center min-w-max max-w-48 p-3 rounded-xl transition-all duration-300 backdrop-blur-sm
-                    ${isHovered ? 'bg-white/95 shadow-xl scale-105 border border-gray-200' : 'bg-white/80'}
+                    text-center min-w-max max-w-48 p-4 rounded-2xl transition-all duration-300 backdrop-blur-md border
+                    ${isHovered 
+                      ? 'bg-white/95 shadow-2xl scale-105 border-purple-300' 
+                      : 'bg-white/85 border-white/30'
+                    }
                   `}>
-                    <div className="text-xs font-semibold text-blue-600 mb-1 tracking-wide">
+                    <div className="text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-1 tracking-wide uppercase">
                       {step.subtitle}
                     </div>
-                    <div className={`text-sm font-bold mb-2 ${getTextColors(status === 'locked' ? 'locked' : 'available')}`}>
+                    <div className={`text-sm font-bold mb-2 ${
+                      status === 'locked' ? 'text-gray-400' : 'text-gray-800'
+                    }`}>
                       {step.title}
                     </div>
                     <div className="text-xs text-gray-600 leading-relaxed">
@@ -260,10 +286,10 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                     </div>
                   </div>
 
-                  {/* Enhanced connection indicators */}
+                  {/* Colorful connection indicators */}
                   {index < roadmapSteps.length - 1 && status !== 'locked' && (
-                    <div className="absolute top-8 left-14 opacity-60">
-                      <ArrowRight className="w-5 h-5 text-blue-500" />
+                    <div className="absolute top-10 left-16 opacity-70">
+                      <ArrowRight className="w-6 h-6 text-purple-500 drop-shadow-lg" />
                     </div>
                   )}
                 </div>
@@ -272,41 +298,43 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
           })}
         </div>
 
-        {/* Enhanced Progress Section */}
-        <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-md border border-gray-100">
+        {/* Enhanced Colorful Progress Section */}
+        <div className="bg-white/95 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-white/50">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-lg font-semibold text-gray-800">Progress</span>
-            <span className="text-sm font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+            <span className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+              Progress Journey
+            </span>
+            <span className="text-sm font-semibold text-white bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-2 rounded-full shadow-lg">
               {completedLevels.length} of {roadmapSteps.length} completed
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+          <div className="w-full bg-gradient-to-r from-gray-200 to-gray-300 rounded-full h-5 overflow-hidden shadow-inner">
             <div
-              className="bg-gradient-to-r from-blue-500 to-blue-600 h-4 rounded-full transition-all duration-700 ease-out relative"
+              className="bg-gradient-to-r from-emerald-500 via-blue-500 via-purple-500 to-pink-500 h-5 rounded-full transition-all duration-1000 ease-out relative shadow-lg"
               style={{ width: `${(completedLevels.length / roadmapSteps.length) * 100}%` }}
             >
-              <div className="absolute inset-0 bg-white/20 rounded-full animate-pulse"></div>
+              <div className="absolute inset-0 bg-white/30 rounded-full animate-pulse"></div>
             </div>
           </div>
         </div>
 
-        {/* Enhanced Legend */}
-        <div className="flex justify-center space-x-8 mt-6 text-sm">
-          <div className="flex items-center space-x-2 bg-white/70 px-3 py-2 rounded-lg">
-            <CheckCircle className="w-4 h-4 text-green-600" />
-            <span className="text-gray-700 font-medium">Completed</span>
+        {/* Enhanced Colorful Legend */}
+        <div className="flex justify-center space-x-6 mt-6 text-sm">
+          <div className="flex items-center space-x-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white px-4 py-2 rounded-xl shadow-lg">
+            <CheckCircle className="w-4 h-4" />
+            <span className="font-semibold">Completed</span>
           </div>
-          <div className="flex items-center space-x-2 bg-white/70 px-3 py-2 rounded-lg">
-            <Circle className="w-4 h-4 text-blue-600" />
-            <span className="text-gray-700 font-medium">Current</span>
+          <div className="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-xl shadow-lg">
+            <Circle className="w-4 h-4" />
+            <span className="font-semibold">Current</span>
           </div>
-          <div className="flex items-center space-x-2 bg-white/70 px-3 py-2 rounded-lg">
-            <Circle className="w-4 h-4 text-gray-400" />
-            <span className="text-gray-700 font-medium">Available</span>
+          <div className="flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-violet-600 text-white px-4 py-2 rounded-xl shadow-lg">
+            <Circle className="w-4 h-4" />
+            <span className="font-semibold">Available</span>
           </div>
-          <div className="flex items-center space-x-2 bg-white/70 px-3 py-2 rounded-lg">
-            <Lock className="w-4 h-4 text-gray-300" />
-            <span className="text-gray-700 font-medium">Locked</span>
+          <div className="flex items-center space-x-2 bg-gradient-to-r from-gray-400 to-gray-500 text-white px-4 py-2 rounded-xl shadow-lg">
+            <Lock className="w-4 h-4" />
+            <span className="font-semibold">Locked</span>
           </div>
         </div>
       </div>
