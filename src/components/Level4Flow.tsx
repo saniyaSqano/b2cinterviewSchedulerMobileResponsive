@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Video, VideoOff, Mic, MicOff, Shield, AlertTriangle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Video, VideoOff, Mic, MicOff, Shield, AlertTriangle, CheckCircle, X } from 'lucide-react';
 import Level4CongratulationsScreen from './Level4CongratulationsScreen';
 
 interface Level4FlowProps {
@@ -230,6 +230,13 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
               <h2 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-600">
                 Level 4 - Self Practice
               </h2>
+              <button
+                onClick={onBack}
+                className="p-2 rounded-full bg-red-500 hover:bg-red-600 text-white transition-colors shadow-lg"
+                title="End Interview"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
           </div>
 

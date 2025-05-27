@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Video, VideoOff, Mic, MicOff } from 'lucide-react';
+import { ArrowLeft, Video, VideoOff, Mic, MicOff, X } from 'lucide-react';
 import Level3CongratulationsScreen from './Level3CongratulationsScreen';
 
 interface Level3FlowProps {
@@ -203,6 +203,13 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
               <h2 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600">
                 Level 3 - Video Interview
               </h2>
+              <button
+                onClick={onBack}
+                className="p-2 rounded-full bg-red-500 hover:bg-red-600 text-white transition-colors shadow-lg"
+                title="End Interview"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
           </div>
 

@@ -1,6 +1,5 @@
-
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Video, VideoOff, Mic, MicOff, Shield, AlertTriangle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Video, VideoOff, Mic, MicOff, Shield, AlertTriangle, CheckCircle, X } from 'lucide-react';
 import Level5CongratulationsScreen from './Level5CongratulationsScreen';
 
 interface Level5FlowProps {
@@ -234,9 +233,18 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
               <h2 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">
                 Level 5 - AI Proctored Interview
               </h2>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium text-red-600">RECORDING</span>
+              <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm font-medium text-red-600">RECORDING</span>
+                </div>
+                <button
+                  onClick={onBack}
+                  className="p-2 rounded-full bg-red-500 hover:bg-red-600 text-white transition-colors shadow-lg"
+                  title="End Interview"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
             </div>
           </div>
