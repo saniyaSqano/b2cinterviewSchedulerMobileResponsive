@@ -5,7 +5,7 @@ import ChatFlow from '../components/ChatFlow';
 import Level3Flow from '../components/Level3Flow';
 import Level4Flow from '../components/Level4Flow';
 import Level5Flow from '../components/Level5Flow';
-import InteractiveRoadmap from '../components/InteractiveRoadmap';
+import LearningCard from '../components/LearningCard';
 
 const Index = () => {
   const [currentLevel, setCurrentLevel] = useState(0);
@@ -47,6 +47,12 @@ const Index = () => {
       subtitle: "Level 5",
       description: "Demonstrate your newly acquired skills in an AI-proctored interview environment",
       icon: 'user' as const
+    },
+    {
+      title: "GameOn",
+      subtitle: "Level 6",
+      description: "Compete with others and showcase your skills in gamified challenges and competitions",
+      icon: 'graduation-cap' as const
     }
   ];
 
@@ -76,6 +82,12 @@ const Index = () => {
 
     if (index === 4) {
       setShowLevel5(true);
+      return;
+    }
+
+    if (index === 5) {
+      // GameOn - placeholder for now
+      console.log('GameOn feature coming soon!');
       return;
     }
     
@@ -187,7 +199,7 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 relative overflow-hidden">
       <ParticleBackground />
       
-      <div className="relative z-10 h-screen flex flex-col">
+      <div className="relative z-10 min-h-screen flex flex-col">
         <div className="bg-gradient-to-br from-indigo-50/80 via-purple-50/80 to-pink-50/80 backdrop-blur-md text-center pt-6 pb-4">
           <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-4">
             Start your Proctor Journey
@@ -197,12 +209,23 @@ const Index = () => {
           </p>
         </div>
 
-        <div className="flex-1">
-          <InteractiveRoadmap
-            currentLevel={currentLevel}
-            completedLevels={completedLevels}
-            onStepClick={handleCardClick}
-          />
+        <div className="flex-1 p-6">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {learningSteps.map((step, index) => (
+                <LearningCard
+                  key={index}
+                  title={step.title}
+                  subtitle={step.subtitle}
+                  description={step.description}
+                  icon={step.icon}
+                  isCompleted={completedLevels.includes(index)}
+                  isActive={index === currentLevel}
+                  onClick={() => handleCardClick(index)}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
