@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Upload, Calendar, Clock, FileText } from 'lucide-react';
 import { Button } from './ui/button';
@@ -7,6 +6,7 @@ import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import ParticleBackground from './ParticleBackground';
+import MCQTest from './MCQTest';
 
 interface AssessmentFlowProps {
   onBack: () => void;
@@ -35,6 +35,7 @@ interface FormData {
 const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [showTest, setShowTest] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
     email: '',
@@ -94,8 +95,31 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack }) => {
 
   const handleStartTest = () => {
     console.log('Starting test with data:', formData);
-    alert('Test started! (This would redirect to the actual test interface)');
+    setShowTest(true);
   };
+
+  const handleTestComplete = (results: any) => {
+    console.log('Test completed with results:', results);
+    alert('Test completed successfully!');
+    setShowTest(false);
+    onBack();
+  };
+
+  const handleBackFromTest = () => {
+    setShowTest(false);
+  };
+
+  // If showing test, render MCQ component
+  if (showTest) {
+    return (
+      <MCQTest
+        totalQuestions={formData.totalQuestions - formData.codingQuestions} // Only MCQs for now
+        timeFrame={formData.timeFrame}
+        onBack={handleBackFromTest}
+        onComplete={handleTestComplete}
+      />
+    );
+  }
 
   const renderStep1 = () => (
     <div className={`max-w-2xl mx-auto text-center space-y-8 transition-all duration-500 ease-in-out ${
