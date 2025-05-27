@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Video, VideoOff, Mic, MicOff, Shield, AlertTriangle, CheckCircle, X } from 'lucide-react';
 import Level5CongratulationsScreen from './Level5CongratulationsScreen';
+import InterviewReport from './InterviewReport';
 
 interface Level5FlowProps {
   onBack: () => void;
@@ -23,6 +24,7 @@ interface Message {
 
 const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
   const [showCongratulations, setShowCongratulations] = useState(true);
+  const [showReport, setShowReport] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentInput, setCurrentInput] = useState('');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -206,6 +208,47 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
     }
   };
 
+  // Mock candidate details and skill assessment for demonstration
+  const candidateDetails = {
+    fullName: userName,
+    email: "candidate@example.com",
+    phoneNumber: "+1 (555) 123-4567",
+    skills: "React, TypeScript, Node.js, Python",
+    experience: "3+ years in full-stack development"
+  };
+
+  const skillAssessment = {
+    programming: 85,
+    framework: 78,
+    testing: 72,
+    confidence: 88,
+    leadership: 75,
+    communication: 92,
+    adaptability: 80
+  };
+
+  const handleEndInterview = () => {
+    console.log('Ending AI proctored interview and generating report...');
+    stopCamera();
+    setShowReport(true);
+  };
+
+  const handleBackFromReport = () => {
+    setShowReport(false);
+    onBack();
+  };
+
+  if (showReport) {
+    return (
+      <InterviewReport
+        candidateDetails={candidateDetails}
+        skillAssessment={skillAssessment}
+        violationLogs={violationLogs}
+        onBack={handleBackFromReport}
+      />
+    );
+  }
+
   if (showCongratulations) {
     return (
       <Level5CongratulationsScreen
@@ -239,7 +282,7 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
                   <span className="text-sm font-medium text-red-600">RECORDING</span>
                 </div>
                 <button
-                  onClick={onBack}
+                  onClick={handleEndInterview}
                   className="p-2 rounded-full bg-red-500 hover:bg-red-600 text-white transition-colors shadow-lg"
                   title="End Interview"
                 >
@@ -462,10 +505,10 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
                 <p className="text-green-800 font-semibold mb-2 text-sm">🎉 Interview Complete! 🎉</p>
                 <p className="text-xs text-green-700 mb-3">Congratulations! You've completed all levels.</p>
                 <button
-                  onClick={onBack}
+                  onClick={handleEndInterview}
                   className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-full hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg text-sm"
                 >
-                  Return to Dashboard
+                  View Report
                 </button>
               </div>
             </div>
