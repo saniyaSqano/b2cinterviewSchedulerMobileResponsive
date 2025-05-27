@@ -3,6 +3,8 @@ import React from 'react';
 import { CheckCircle, XCircle, Lightbulb, Clock, TrendingUp, Award, RotateCcw } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from './ui/chart';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 
 interface TestReportProps {
   results: {
@@ -31,9 +33,31 @@ const TestReport: React.FC<TestReportProps> = ({ results, onBack, onRetakeTest }
     return `${minutes}m ${remainingSeconds}s`;
   };
 
+  // Chart data
+  const pieChartData = [
+    { name: 'Correct', value: results.correctAnswers, fill: '#22c55e' },
+    { name: 'Wrong', value: results.wrongAnswers, fill: '#ef4444' },
+    { name: 'Unanswered', value: results.totalQuestions - results.answeredQuestions, fill: '#94a3b8' }
+  ];
+
+  const barChartData = [
+    { name: 'Accuracy', value: accuracy, fill: '#22c55e' },
+    { name: 'Time Usage', value: timeEfficiency, fill: '#3b82f6' },
+    { name: 'Hint Usage', value: hintUsageRate, fill: '#a855f7' }
+  ];
+
+  const chartConfig = {
+    correct: { label: 'Correct', color: '#22c55e' },
+    wrong: { label: 'Wrong', color: '#ef4444' },
+    unanswered: { label: 'Unanswered', color: '#94a3b8' },
+    accuracy: { label: 'Accuracy Rate', color: '#22c55e' },
+    timeUsage: { label: 'Time Utilization', color: '#3b82f6' },
+    hintUsage: { label: 'Hint Usage', color: '#a855f7' }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 relative overflow-hidden">
-      <div className="absolute inset-0 bg-white/70 backdrop-blur-sm"></div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 relative overflow-hidden">
+      <div className="absolute inset-0 bg-white/30 backdrop-blur-sm"></div>
       
       <div className="relative z-10 container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
@@ -59,7 +83,7 @@ const TestReport: React.FC<TestReportProps> = ({ results, onBack, onRetakeTest }
           </div>
 
           {/* Score Card */}
-          <Card className="bg-white/80 backdrop-blur border-gray-200 shadow-lg mb-8 animate-fade-in" style={{ animationDelay: '200ms' }}>
+          <Card className="bg-white border-gray-200 shadow-lg mb-8 animate-fade-in" style={{ animationDelay: '200ms' }}>
             <CardHeader className="text-center">
               <CardTitle className="text-gray-800 text-3xl">
                 Your Score: <span className={results.passed ? 'text-green-600' : 'text-red-600'}>
@@ -85,7 +109,7 @@ const TestReport: React.FC<TestReportProps> = ({ results, onBack, onRetakeTest }
           {/* Detailed Results */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {/* Questions Breakdown */}
-            <Card className="bg-white/80 backdrop-blur border-gray-200 shadow-lg animate-fade-in" style={{ animationDelay: '400ms' }}>
+            <Card className="bg-white border-gray-200 shadow-lg animate-fade-in" style={{ animationDelay: '400ms' }}>
               <CardHeader>
                 <CardTitle className="text-gray-800 flex items-center gap-2">
                   <CheckCircle className="w-5 h-5" />
@@ -117,7 +141,7 @@ const TestReport: React.FC<TestReportProps> = ({ results, onBack, onRetakeTest }
             </Card>
 
             {/* Time Analysis */}
-            <Card className="bg-white/80 backdrop-blur border-gray-200 shadow-lg animate-fade-in" style={{ animationDelay: '600ms' }}>
+            <Card className="bg-white border-gray-200 shadow-lg animate-fade-in" style={{ animationDelay: '600ms' }}>
               <CardHeader>
                 <CardTitle className="text-gray-800 flex items-center gap-2">
                   <Clock className="w-5 h-5" />
@@ -150,8 +174,8 @@ const TestReport: React.FC<TestReportProps> = ({ results, onBack, onRetakeTest }
             </Card>
           </div>
 
-          {/* Analytics */}
-          <Card className="bg-white/80 backdrop-blur border-gray-200 shadow-lg mb-8 animate-fade-in" style={{ animationDelay: '800ms' }}>
+          {/* Performance Analytics with Charts */}
+          <Card className="bg-white border-gray-200 shadow-lg mb-8 animate-fade-in" style={{ animationDelay: '800ms' }}>
             <CardHeader>
               <CardTitle className="text-gray-800 flex items-center gap-2">
                 <TrendingUp className="w-5 h-5" />
@@ -159,28 +183,76 @@ const TestReport: React.FC<TestReportProps> = ({ results, onBack, onRetakeTest }
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-green-600 mb-2">{accuracy.toFixed(1)}%</div>
-                  <div className="text-gray-700">Accuracy Rate</div>
-                  <div className="text-xs text-gray-500 mt-1">Correct answers / Total answered</div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Questions Distribution Pie Chart */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-700 text-center">Questions Distribution</h3>
+                  <ChartContainer config={chartConfig} className="h-64">
+                    <PieChart>
+                      <Pie
+                        data={pieChartData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={90}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {pieChartData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
+                      </Pie>
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                    </PieChart>
+                  </ChartContainer>
+                  <div className="flex justify-center gap-4 text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <span>Correct</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                      <span>Wrong</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-slate-400 rounded-full"></div>
+                      <span>Unanswered</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-blue-600 mb-2">{timeEfficiency.toFixed(1)}%</div>
-                  <div className="text-gray-700">Time Utilization</div>
-                  <div className="text-xs text-gray-500 mt-1">Time used / Total time</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-purple-600 mb-2">{hintUsageRate.toFixed(1)}%</div>
-                  <div className="text-gray-700">Hint Usage</div>
-                  <div className="text-xs text-gray-500 mt-1">Hints used / Total questions</div>
+
+                {/* Performance Metrics Bar Chart */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-gray-700 text-center">Performance Metrics</h3>
+                  <ChartContainer config={chartConfig} className="h-64">
+                    <BarChart data={barChartData}>
+                      <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                      <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Bar dataKey="value" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ChartContainer>
+                  <div className="grid grid-cols-3 gap-2 text-center text-sm">
+                    <div>
+                      <div className="text-green-600 font-bold">{accuracy.toFixed(1)}%</div>
+                      <div className="text-gray-500">Accuracy</div>
+                    </div>
+                    <div>
+                      <div className="text-blue-600 font-bold">{timeEfficiency.toFixed(1)}%</div>
+                      <div className="text-gray-500">Time Usage</div>
+                    </div>
+                    <div>
+                      <div className="text-purple-600 font-bold">{hintUsageRate.toFixed(1)}%</div>
+                      <div className="text-gray-500">Hint Usage</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Performance Insights */}
-          <Card className="bg-white/80 backdrop-blur border-gray-200 shadow-lg mb-8 animate-fade-in" style={{ animationDelay: '1000ms' }}>
+          <Card className="bg-white border-gray-200 shadow-lg mb-8 animate-fade-in" style={{ animationDelay: '1000ms' }}>
             <CardHeader>
               <CardTitle className="text-gray-800 flex items-center gap-2">
                 <Lightbulb className="w-5 h-5" />

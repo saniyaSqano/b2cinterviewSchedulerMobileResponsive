@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Lightbulb, Clock, CheckCircle } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import ParticleBackground from './ParticleBackground';
 
 interface MCQQuestion {
   id: number;
@@ -118,16 +117,15 @@ const MCQTest: React.FC<MCQTestProps> = ({ totalQuestions, timeFrame, onBack, on
 
   if (isComplete) {
     return (
-      <div className="min-h-screen bg-black relative overflow-hidden">
-        <ParticleBackground />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 relative overflow-hidden">
         <div className="relative z-10 container mx-auto px-4 py-8 flex items-center justify-center min-h-screen">
-          <Card className="bg-slate-900 border-slate-700 max-w-2xl w-full animate-fade-in">
+          <Card className="bg-white border-gray-200 max-w-2xl w-full animate-fade-in shadow-lg">
             <CardHeader className="text-center">
               <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-              <CardTitle className="text-white text-2xl">Test Completed!</CardTitle>
+              <CardTitle className="text-gray-800 text-2xl">Test Completed!</CardTitle>
             </CardHeader>
             <CardContent className="text-center space-y-4">
-              <p className="text-slate-300">Processing your results...</p>
+              <p className="text-gray-600">Processing your results...</p>
             </CardContent>
           </Card>
         </div>
@@ -136,27 +134,25 @@ const MCQTest: React.FC<MCQTestProps> = ({ totalQuestions, timeFrame, onBack, on
   }
 
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden">
-      <ParticleBackground />
-      
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 relative overflow-hidden">
       <div className="relative z-10 container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <Button
             onClick={onBack}
             variant="ghost"
-            className="text-slate-300 hover:text-white hover:bg-slate-800"
+            className="text-gray-600 hover:text-gray-800 hover:bg-gray-100"
           >
             <ChevronLeft className="w-4 h-4 mr-2" />
             Exit Test
           </Button>
           
-          <div className="flex items-center gap-4 text-white">
+          <div className="flex items-center gap-4 text-gray-800">
             <div className="flex items-center gap-2">
               <Clock className="w-5 h-5" />
               <span className="text-xl font-mono">{formatTime(timeRemaining)}</span>
             </div>
-            <div className="text-sm text-slate-400">
+            <div className="text-sm text-gray-500">
               Question {currentQuestion + 1} of {questions.length}
             </div>
           </div>
@@ -164,7 +160,7 @@ const MCQTest: React.FC<MCQTestProps> = ({ totalQuestions, timeFrame, onBack, on
 
         {/* Progress Bar */}
         <div className="mb-8">
-          <div className="w-full bg-slate-700 rounded-full h-2">
+          <div className="w-full bg-gray-200 rounded-full h-2">
             <div 
               className="bg-purple-500 h-2 rounded-full transition-all duration-300"
               style={{ width: `${progress}%` }}
@@ -174,9 +170,9 @@ const MCQTest: React.FC<MCQTestProps> = ({ totalQuestions, timeFrame, onBack, on
 
         {/* Question Card */}
         <div className="max-w-4xl mx-auto">
-          <Card className="bg-slate-900 border-slate-700 animate-fade-in">
+          <Card className="bg-white border-gray-200 animate-fade-in shadow-lg">
             <CardHeader>
-              <CardTitle className="text-white text-xl">
+              <CardTitle className="text-gray-800 text-xl">
                 {currentQuestionData.question}
               </CardTitle>
             </CardHeader>
@@ -188,8 +184,8 @@ const MCQTest: React.FC<MCQTestProps> = ({ totalQuestions, timeFrame, onBack, on
                     key={index}
                     className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-300 hover:scale-105 ${
                       selectedAnswers[currentQuestion] === index
-                        ? 'border-purple-500 bg-purple-500/10'
-                        : 'border-slate-600 hover:border-purple-500'
+                        ? 'border-purple-500 bg-purple-50'
+                        : 'border-gray-300 hover:border-purple-500 hover:bg-gray-50'
                     }`}
                     onClick={() => handleAnswerSelect(index)}
                   >
@@ -197,47 +193,47 @@ const MCQTest: React.FC<MCQTestProps> = ({ totalQuestions, timeFrame, onBack, on
                       <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
                         selectedAnswers[currentQuestion] === index
                           ? 'border-purple-500 bg-purple-500'
-                          : 'border-slate-500'
+                          : 'border-gray-400'
                       }`}>
                         {selectedAnswers[currentQuestion] === index && (
                           <div className="w-3 h-3 bg-white rounded-full" />
                         )}
                       </div>
-                      <span className="text-white text-lg">{option}</span>
+                      <span className="text-gray-800 text-lg">{option}</span>
                     </div>
                   </div>
                 ))}
               </div>
 
               {/* Hint */}
-              <div className="border-t border-slate-700 pt-6">
+              <div className="border-t border-gray-200 pt-6">
                 <Button
                   onClick={handleShowHint}
                   variant="ghost"
                   className={`transition-all duration-300 ${
                     hintsUsed.has(currentQuestion)
-                      ? 'text-purple-300 hover:text-purple-200'
-                      : 'text-purple-400 hover:text-purple-300'
-                  } hover:bg-purple-500/10`}
+                      ? 'text-purple-600 hover:text-purple-700'
+                      : 'text-purple-500 hover:text-purple-600'
+                  } hover:bg-purple-50`}
                 >
                   <Lightbulb className="w-4 h-4 mr-2" />
                   {showHint ? 'Hide Hint' : 'Show Hint'}
                   {hintsUsed.has(currentQuestion) && <span className="ml-2 text-xs">(Used)</span>}
                 </Button>
                 {showHint && (
-                  <div className="mt-4 p-4 bg-purple-500/10 border border-purple-500/20 rounded-lg animate-fade-in">
-                    <p className="text-purple-300">{currentQuestionData.hint}</p>
+                  <div className="mt-4 p-4 bg-purple-50 border border-purple-200 rounded-lg animate-fade-in">
+                    <p className="text-purple-700">{currentQuestionData.hint}</p>
                   </div>
                 )}
               </div>
 
               {/* Navigation */}
-              <div className="flex justify-between items-center pt-6 border-t border-slate-700">
+              <div className="flex justify-between items-center pt-6 border-t border-gray-200">
                 <Button
                   onClick={handlePrevious}
                   disabled={currentQuestion === 0}
                   variant="ghost"
-                  className="text-slate-400 hover:text-white disabled:opacity-50"
+                  className="text-gray-500 hover:text-gray-700 disabled:opacity-50"
                 >
                   <ChevronLeft className="w-4 h-4 mr-2" />
                   Previous
@@ -252,7 +248,7 @@ const MCQTest: React.FC<MCQTestProps> = ({ totalQuestions, timeFrame, onBack, on
                           ? 'bg-purple-500 scale-110'
                           : selectedAnswers[index] !== undefined
                           ? 'bg-green-500'
-                          : 'bg-slate-600'
+                          : 'bg-gray-300'
                       }`}
                     />
                   ))}
