@@ -56,7 +56,8 @@ const Index = () => {
       return;
     }
 
-    if (index <= currentLevel) {
+    // Allow clicking on completed levels, current level, or if it's level 1 (Chat with AI) and assessment is completed
+    if (index <= currentLevel || (index === 1 && completedLevels.includes(0))) {
       console.log(`Starting ${learningSteps[index].title}`);
       
       if (index === 0) {

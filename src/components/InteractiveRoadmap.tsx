@@ -80,6 +80,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
     if (completedLevels.includes(index)) return 'completed';
     if (index === currentLevel) return 'current';
     if (index <= currentLevel) return 'available';
+    if (index === 1 && completedLevels.includes(0)) return 'available';
     return 'locked';
   };
 
