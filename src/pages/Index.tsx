@@ -57,8 +57,21 @@ const Index = () => {
     }
   };
 
+  const handleTestPassed = () => {
+    // Mark assessment as completed and unlock next level
+    if (!completedLevels.includes(0)) {
+      setCompletedLevels(prev => [...prev, 0]);
+      setCurrentLevel(1); // Unlock Level 2
+    }
+  };
+
   if (showAssessment) {
-    return <AssessmentFlow onBack={() => setShowAssessment(false)} />;
+    return (
+      <AssessmentFlow 
+        onBack={() => setShowAssessment(false)}
+        onTestPassed={handleTestPassed}
+      />
+    );
   }
 
   return (

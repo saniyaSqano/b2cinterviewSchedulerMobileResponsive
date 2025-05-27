@@ -24,7 +24,8 @@ const MCQTest: React.FC<MCQTestProps> = ({ totalQuestions, timeFrame, onBack, on
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});
   const [showHint, setShowHint] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(timeFrame * 60); // Convert to seconds
+  const [hintsUsed, setHintsUsed] = useState<Set<number>>(new Set());
+  const [timeRemaining, setTimeRemaining] = useState(timeFrame * 60);
   const [isComplete, setIsComplete] = useState(false);
 
   // Sample MCQ questions - in a real app, these would come from an API
@@ -66,6 +67,13 @@ const MCQTest: React.FC<MCQTestProps> = ({ totalQuestions, timeFrame, onBack, on
     }));
   };
 
+  const handleShowHint = () => {
+    if (!showHint) {
+      setHintsUsed(prev => new Set(prev).add(currentQuestion));
+    }
+    setShowHint(!showHint);
+  };
+
   const handlePrevious = () => {
     if (currentQuestion > 0) {
       setCurrentQuestion(prev => prev - 1);
@@ -82,14 +90,26 @@ const MCQTest: React.FC<MCQTestProps> = ({ totalQuestions, timeFrame, onBack, on
 
   const handleSubmitTest = () => {
     setIsComplete(true);
+    const correctAnswers = Object.entries(selectedAnswers).filter(
+      ([questionIndex, answer]) => questions[parseInt(questionIndex)].correctAnswer === answer
+    ).length;
+    
+    const wrongAnswers = Object.keys(selectedAnswers).length - correctAnswers;
+    const score = Math.round((correctAnswers / questions.length) * 100);
+    const passed = score >= 70;
+    
     const results = {
       totalQuestions: questions.length,
       answeredQuestions: Object.keys(selectedAnswers).length,
-      correctAnswers: Object.entries(selectedAnswers).filter(
-        ([questionIndex, answer]) => questions[parseInt(questionIndex)].correctAnswer === answer
-      ).length,
-      timeUsed: (timeFrame * 60) - timeRemaining
+      correctAnswers,
+      wrongAnswers,
+      hintsUsed: hintsUsed.size,
+      timeUsed: (timeFrame * 60) - timeRemaining,
+      totalTime: timeFrame * 60,
+      score,
+      passed
     };
+    
     onComplete(results);
   };
 
@@ -107,10 +127,7 @@ const MCQTest: React.FC<MCQTestProps> = ({ totalQuestions, timeFrame, onBack, on
               <CardTitle className="text-white text-2xl">Test Completed!</CardTitle>
             </CardHeader>
             <CardContent className="text-center space-y-4">
-              <p className="text-slate-300">Your test has been submitted successfully.</p>
-              <Button onClick={onBack} className="bg-purple-600 hover:bg-purple-700">
-                Back to Dashboard
-              </Button>
+              <p className="text-slate-300">Processing your results...</p>
             </CardContent>
           </Card>
         </div>
@@ -195,12 +212,17 @@ const MCQTest: React.FC<MCQTestProps> = ({ totalQuestions, timeFrame, onBack, on
               {/* Hint */}
               <div className="border-t border-slate-700 pt-6">
                 <Button
-                  onClick={() => setShowHint(!showHint)}
+                  onClick={handleShowHint}
                   variant="ghost"
-                  className="text-purple-400 hover:text-purple-300 hover:bg-purple-500/10"
+                  className={`transition-all duration-300 ${
+                    hintsUsed.has(currentQuestion)
+                      ? 'text-purple-300 hover:text-purple-200'
+                      : 'text-purple-400 hover:text-purple-300'
+                  } hover:bg-purple-500/10`}
                 >
                   <Lightbulb className="w-4 h-4 mr-2" />
                   {showHint ? 'Hide Hint' : 'Show Hint'}
+                  {hintsUsed.has(currentQuestion) && <span className="ml-2 text-xs">(Used)</span>}
                 </Button>
                 {showHint && (
                   <div className="mt-4 p-4 bg-purple-500/10 border border-purple-500/20 rounded-lg animate-fade-in">

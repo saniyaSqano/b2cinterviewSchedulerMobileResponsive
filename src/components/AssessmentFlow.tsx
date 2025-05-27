@@ -7,9 +7,11 @@ import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import ParticleBackground from './ParticleBackground';
 import MCQTest from './MCQTest';
+import TestReport from './TestReport';
 
 interface AssessmentFlowProps {
   onBack: () => void;
+  onTestPassed?: () => void;
 }
 
 interface FormData {
@@ -32,10 +34,12 @@ interface FormData {
   scheduledDate?: string;
 }
 
-const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack }) => {
+const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack, onTestPassed }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showTest, setShowTest] = useState(false);
+  const [showReport, setShowReport] = useState(false);
+  const [testResults, setTestResults] = useState<any>(null);
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
     email: '',
@@ -100,14 +104,38 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack }) => {
 
   const handleTestComplete = (results: any) => {
     console.log('Test completed with results:', results);
-    alert('Test completed successfully!');
+    setTestResults(results);
     setShowTest(false);
-    onBack();
+    setShowReport(true);
   };
 
   const handleBackFromTest = () => {
     setShowTest(false);
   };
+
+  const handleBackFromReport = () => {
+    setShowReport(false);
+    if (testResults?.passed && onTestPassed) {
+      onTestPassed();
+    }
+    onBack();
+  };
+
+  const handleRetakeTest = () => {
+    setShowReport(false);
+    setShowTest(true);
+  };
+
+  // If showing test report, render TestReport component
+  if (showReport && testResults) {
+    return (
+      <TestReport
+        results={testResults}
+        onBack={handleBackFromReport}
+        onRetakeTest={handleRetakeTest}
+      />
+    );
+  }
 
   // If showing test, render MCQ component
   if (showTest) {
