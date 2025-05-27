@@ -196,22 +196,33 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 relative overflow-hidden">
       <ParticleBackground />
       
       <div className="relative z-10 min-h-screen flex flex-col">
-        <div className="bg-gradient-to-br from-indigo-50/80 via-purple-50/80 to-pink-50/80 backdrop-blur-md text-center pt-6 pb-4">
-          <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-4">
-            Start your Proctor Journey
-          </h1>
-          <p className="text-base text-gray-700 max-w-2xl mx-auto mb-4">
-            Master your skills through our comprehensive learning platform
-          </p>
+        <div className="bg-white/95 backdrop-blur-sm border-b border-gray-200 text-center py-12">
+          <div className="max-w-4xl mx-auto px-6">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+              Professional Development Platform
+            </h1>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+              Advance your career through our comprehensive skill assessment and development program
+            </p>
+          </div>
         </div>
 
-        <div className="flex-1 p-6">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="flex-1 py-16 px-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+                Your Learning Journey
+              </h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Progress through each level to build and demonstrate your professional capabilities
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {learningSteps.map((step, index) => (
                 <LearningCard
                   key={index}
