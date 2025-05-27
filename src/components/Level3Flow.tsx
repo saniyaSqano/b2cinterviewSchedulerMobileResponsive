@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Video, VideoOff, Mic, MicOff } from 'lucide-react';
 import Level3CongratulationsScreen from './Level3CongratulationsScreen';
@@ -60,24 +59,25 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
       
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: {
-          width: { ideal: 640 },
-          height: { ideal: 480 }
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          facingMode: 'user'
         }, 
         audio: false 
       });
       
+      console.log('Got camera stream:', stream);
       streamRef.current = stream;
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         console.log('Camera stream assigned to video element');
         
-        // Wait for the video to load before setting state
-        videoRef.current.onloadedmetadata = () => {
-          console.log('Video metadata loaded, camera started successfully');
-          setIsVideoOn(true);
-          setIsStartingCamera(false);
-        };
+        // Ensure video plays and update state immediately
+        await videoRef.current.play();
+        setIsVideoOn(true);
+        setIsStartingCamera(false);
+        console.log('Camera started successfully');
       }
     } catch (error) {
       console.error('Error accessing camera:', error);
@@ -105,6 +105,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
   };
 
   const toggleVideo = () => {
+    console.log('Toggle video clicked, current state:', isVideoOn);
     if (isVideoOn) {
       stopCamera();
     } else {
@@ -116,20 +117,22 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
     console.log('Proceeding to interview...');
     setShowCongratulations(false);
     
-    // Start camera immediately
-    console.log('Starting camera for interview...');
-    await startCamera();
-    
-    // Start with the first question after a short delay
-    setTimeout(() => {
-      const firstQuestion: Message = {
-        id: Date.now(),
-        text: questions[0],
-        sender: 'ai',
-        timestamp: new Date()
-      };
-      setMessages([firstQuestion]);
-    }, 1000);
+    // Start camera immediately with a slight delay to ensure UI is ready
+    setTimeout(async () => {
+      console.log('Starting camera for interview...');
+      await startCamera();
+      
+      // Start with the first question after camera starts
+      setTimeout(() => {
+        const firstQuestion: Message = {
+          id: Date.now(),
+          text: questions[0],
+          sender: 'ai',
+          timestamp: new Date()
+        };
+        setMessages([firstQuestion]);
+      }, 1000);
+    }, 500);
   };
 
   const handleSendMessage = () => {
@@ -186,8 +189,8 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 relative overflow-hidden">
       <div className="relative z-10 h-screen flex">
-        {/* Left Side - Video Feed */}
-        <div className="w-1/3 bg-gradient-to-br from-pink-100/80 to-purple-100/80 backdrop-blur-md border-r border-white/20 flex flex-col">
+        {/* Left Side - Video Feed (60%) */}
+        <div className="w-3/5 bg-gradient-to-br from-pink-100/80 to-purple-100/80 backdrop-blur-md border-r border-white/20 flex flex-col">
           {/* Video Header */}
           <div className="p-4 border-b border-white/20">
             <div className="flex items-center justify-between">
@@ -204,22 +207,22 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
           </div>
 
           {/* Your Video Feed */}
-          <div className="flex-1 p-4">
-            <div className="bg-white/90 rounded-2xl p-4 h-full flex flex-col">
-              <h3 className="text-sm font-semibold text-gray-700 mb-3">Your Video</h3>
+          <div className="flex-1 p-6">
+            <div className="bg-white/90 rounded-2xl p-6 h-full flex flex-col">
+              <h3 className="text-lg font-semibold text-gray-700 mb-4">Your Video</h3>
               <div className="flex-1 bg-gray-900 rounded-xl overflow-hidden relative">
                 {isStartingCamera ? (
                   <div className="w-full h-full flex flex-col items-center justify-center text-center p-4">
-                    <div className="animate-spin w-8 h-8 border-4 border-pink-500 border-t-transparent rounded-full mb-2"></div>
-                    <p className="text-white text-sm">Starting camera...</p>
+                    <div className="animate-spin w-12 h-12 border-4 border-pink-500 border-t-transparent rounded-full mb-4"></div>
+                    <p className="text-white text-lg">Starting camera...</p>
                   </div>
                 ) : cameraError ? (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-center p-4">
-                    <VideoOff className="w-12 h-12 text-red-400 mb-2" />
-                    <p className="text-red-400 text-sm mb-2">{cameraError}</p>
+                  <div className="w-full h-full flex flex-col items-center justify-center text-center p-6">
+                    <VideoOff className="w-16 h-16 text-red-400 mb-4" />
+                    <p className="text-red-400 text-lg mb-4">{cameraError}</p>
                     <button
                       onClick={startCamera}
-                      className="mt-2 px-3 py-1 bg-pink-500 text-white text-xs rounded-full hover:bg-pink-600 transition-colors"
+                      className="mt-4 px-6 py-3 bg-pink-500 text-white text-lg rounded-full hover:bg-pink-600 transition-colors"
                     >
                       Try Again
                     </button>
@@ -233,12 +236,12 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-center p-4">
-                    <VideoOff className="w-12 h-12 text-gray-400 mb-2" />
-                    <p className="text-gray-400 text-sm mb-2">Camera is off</p>
+                  <div className="w-full h-full flex flex-col items-center justify-center text-center p-6">
+                    <VideoOff className="w-16 h-16 text-gray-400 mb-4" />
+                    <p className="text-gray-400 text-lg mb-4">Camera is off</p>
                     <button
                       onClick={startCamera}
-                      className="px-3 py-1 bg-pink-500 text-white text-xs rounded-full hover:bg-pink-600 transition-colors"
+                      className="px-6 py-3 bg-pink-500 text-white text-lg rounded-full hover:bg-pink-600 transition-colors"
                     >
                       Start Camera
                     </button>
@@ -247,55 +250,55 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
               </div>
               
               {/* Video Controls */}
-              <div className="flex justify-center space-x-3 mt-4">
+              <div className="flex justify-center space-x-4 mt-6">
                 <button
                   onClick={toggleVideo}
                   disabled={isStartingCamera}
-                  className={`p-3 rounded-full transition-colors ${
+                  className={`p-4 rounded-full transition-colors ${
                     isVideoOn 
                       ? 'bg-gray-200 hover:bg-gray-300' 
                       : 'bg-red-500 hover:bg-red-600 text-white'
                   } ${isStartingCamera ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  {isVideoOn ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
+                  {isVideoOn ? <Video className="w-6 h-6" /> : <VideoOff className="w-6 h-6" />}
                 </button>
                 <button
                   onClick={() => setIsMicOn(!isMicOn)}
-                  className={`p-3 rounded-full transition-colors ${
+                  className={`p-4 rounded-full transition-colors ${
                     isMicOn 
                       ? 'bg-gray-200 hover:bg-gray-300' 
                       : 'bg-red-500 hover:bg-red-600 text-white'
                   }`}
                 >
-                  {isMicOn ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
+                  {isMicOn ? <Mic className="w-6 h-6" /> : <MicOff className="w-6 h-6" />}
                 </button>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right Side - AI Coach and Chat */}
-        <div className="flex-1 flex flex-col">
+        {/* Right Side - AI Coach and Chat (30%) */}
+        <div className="w-2/5 flex flex-col">
           {/* AI Coach Area */}
-          <div className="bg-gradient-to-r from-pink-100/80 to-purple-100/80 backdrop-blur-md p-6 border-b border-white/20">
-            <div className="flex items-center space-x-4">
+          <div className="bg-gradient-to-r from-pink-100/80 to-purple-100/80 backdrop-blur-md p-4 border-b border-white/20">
+            <div className="flex items-center space-x-3">
               {/* Cartoon Lady Avatar */}
               <div className="relative">
-                <div className="w-20 h-20 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
-                  <div className="text-3xl">👩‍💼</div>
+                <div className="w-16 h-16 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
+                  <div className="text-2xl">👩‍💼</div>
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                 </div>
               </div>
               
               <div>
-                <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600">
+                <h3 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600">
                   AI Interview Coach
                 </h3>
-                <p className="text-sm text-gray-600">Your friendly interview companion</p>
-                <div className="flex items-center space-x-2 mt-1">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <p className="text-xs text-gray-600">Your friendly interview companion</p>
+                <div className="flex items-center space-x-1 mt-1">
+                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
                   <span className="text-xs text-green-600 font-medium">Online</span>
                 </div>
               </div>
@@ -303,14 +306,14 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
           </div>
 
           {/* Chat Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-3 space-y-3">
             {messages.map((message) => (
               <div
                 key={message.id}
                 className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-md px-4 py-3 rounded-2xl ${
+                  className={`max-w-xs px-3 py-2 rounded-2xl text-sm ${
                     message.sender === 'user'
                       ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white'
                       : 'bg-white/90 backdrop-blur-md text-gray-800 shadow-lg'
@@ -318,10 +321,10 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
                 >
                   <div className="flex items-start space-x-2">
                     {message.sender === 'ai' && (
-                      <div className="text-lg">👩‍💼</div>
+                      <div className="text-base">👩‍💼</div>
                     )}
                     <div>
-                      <p className="text-sm leading-relaxed">{message.text}</p>
+                      <p className="leading-relaxed">{message.text}</p>
                       <p className={`text-xs mt-1 ${
                         message.sender === 'user' ? 'text-purple-100' : 'text-gray-500'
                       }`}>
@@ -337,8 +340,8 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
 
           {/* Input Area */}
           {!isComplete && (
-            <div className="bg-white/90 backdrop-blur-md border-t border-white/20 p-4">
-              <div className="flex items-end space-x-3">
+            <div className="bg-white/90 backdrop-blur-md border-t border-white/20 p-3">
+              <div className="flex items-end space-x-2">
                 <div className="flex-1">
                   <textarea
                     value={currentInput}
@@ -350,16 +353,16 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
                       }
                     }}
                     placeholder="Share your thoughts here..."
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl resize-none focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent text-sm"
                     rows={2}
                   />
                 </div>
                 <button
                   onClick={handleSendMessage}
                   disabled={!currentInput.trim()}
-                  className="p-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full hover:from-pink-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
+                  className="p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full hover:from-pink-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
                 >
-                  <ArrowLeft className="w-5 h-5 rotate-180" />
+                  <ArrowLeft className="w-4 h-4 rotate-180" />
                 </button>
               </div>
             </div>
@@ -367,12 +370,12 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
 
           {/* Completion Area */}
           {isComplete && (
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-t border-green-200 p-4">
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-t border-green-200 p-3">
               <div className="text-center">
-                <p className="text-green-800 font-semibold mb-2">Level 3 Complete! 🎉</p>
+                <p className="text-green-800 font-semibold mb-2 text-sm">Level 3 Complete! 🎉</p>
                 <button
                   onClick={onBack}
-                  className="px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-full hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg"
+                  className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-full hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg text-sm"
                 >
                   Continue to Next Level
                 </button>
@@ -381,7 +384,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
           )}
 
           {/* Progress Indicator */}
-          <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md rounded-full px-3 py-1 shadow-lg">
+          <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md rounded-full px-2 py-1 shadow-lg">
             <p className="text-xs font-medium text-gray-700">
               Question {Math.min(currentQuestionIndex + 1, questions.length)} of {questions.length}
             </p>
