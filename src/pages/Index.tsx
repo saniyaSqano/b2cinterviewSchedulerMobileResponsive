@@ -43,12 +43,6 @@ const Index = () => {
       subtitle: "Level 5",
       description: "Demonstrate your newly acquired skills in an AI-proctored interview environment",
       icon: 'user' as const
-    },
-    {
-      title: "Game on",
-      subtitle: "Level 6",
-      description: "Unlock exciting challenges and compete with others to showcase your mastered skills",
-      icon: 'graduation-cap' as const
     }
   ];
 
