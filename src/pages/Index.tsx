@@ -1,7 +1,9 @@
+
 import React, { useState } from 'react';
 import ParticleBackground from '../components/ParticleBackground';
 import AssessmentFlow from '../components/AssessmentFlow';
 import ChatFlow from '../components/ChatFlow';
+import Level3Flow from '../components/Level3Flow';
 import InteractiveRoadmap from '../components/InteractiveRoadmap';
 
 const Index = () => {
@@ -9,6 +11,7 @@ const Index = () => {
   const [completedLevels, setCompletedLevels] = useState<number[]>([]);
   const [showAssessment, setShowAssessment] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const [showLevel3, setShowLevel3] = useState(false);
   const [assessmentScore] = useState(70);
 
   const learningSteps = [
@@ -63,6 +66,11 @@ const Index = () => {
       setShowChat(true);
       return;
     }
+
+    if (index === 2) {
+      setShowLevel3(true);
+      return;
+    }
     
     // Simulate completion after 2 seconds for other levels
     setTimeout(() => {
@@ -89,6 +97,13 @@ const Index = () => {
     }
   };
 
+  const handleLevel3Completed = () => {
+    if (!completedLevels.includes(2)) {
+      setCompletedLevels(prev => [...prev, 2]);
+      setCurrentLevel(3);
+    }
+  };
+
   if (showAssessment) {
     return (
       <AssessmentFlow 
@@ -107,6 +122,18 @@ const Index = () => {
         }}
         userName="Revati"
         assessmentScore={assessmentScore}
+      />
+    );
+  }
+
+  if (showLevel3) {
+    return (
+      <Level3Flow 
+        onBack={() => {
+          setShowLevel3(false);
+          handleLevel3Completed();
+        }}
+        userName="Revati"
       />
     );
   }
