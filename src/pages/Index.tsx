@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import ParticleBackground from '../components/ParticleBackground';
 import AssessmentFlow from '../components/AssessmentFlow';
+import ChatFlow from '../components/ChatFlow';
 import InteractiveRoadmap from '../components/InteractiveRoadmap';
 
 const Index = () => {
   const [currentLevel, setCurrentLevel] = useState(0);
   const [completedLevels, setCompletedLevels] = useState<number[]>([]);
   const [showAssessment, setShowAssessment] = useState(false);
+  const [showChat, setShowChat] = useState(false);
+  const [assessmentScore] = useState(70); // Store the assessment score
 
   const learningSteps = [
     {
@@ -61,6 +64,11 @@ const Index = () => {
         return;
       }
       
+      if (index === 1) {
+        setShowChat(true);
+        return;
+      }
+      
       // Simulate completion after 2 seconds for other levels
       setTimeout(() => {
         if (!completedLevels.includes(index)) {
@@ -81,11 +89,32 @@ const Index = () => {
     }
   };
 
+  const handleChatCompleted = () => {
+    // Mark chat as completed and unlock next level
+    if (!completedLevels.includes(1)) {
+      setCompletedLevels(prev => [...prev, 1]);
+      setCurrentLevel(2); // Unlock Level 3 (Pitch Yourself)
+    }
+  };
+
   if (showAssessment) {
     return (
       <AssessmentFlow 
         onBack={() => setShowAssessment(false)}
         onTestPassed={handleTestPassed}
+      />
+    );
+  }
+
+  if (showChat) {
+    return (
+      <ChatFlow 
+        onBack={() => {
+          setShowChat(false);
+          handleChatCompleted();
+        }}
+        userName="Revati"
+        assessmentScore={assessmentScore}
       />
     );
   }
