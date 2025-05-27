@@ -1,11 +1,104 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React, { useState } from 'react';
+import LearningCard from '../components/LearningCard';
+import ParticleBackground from '../components/ParticleBackground';
 
 const Index = () => {
+  const [currentLevel, setCurrentLevel] = useState(0);
+  const [completedLevels, setCompletedLevels] = useState<number[]>([]);
+
+  const learningSteps = [
+    {
+      title: "Assessment",
+      subtitle: "Level 1",
+      description: "Take our comprehensive assessment to evaluate your current skills and identify areas for improvement",
+      icon: 'graduation-cap' as const
+    },
+    {
+      title: "Pitch Yourself",
+      subtitle: "Level 2", 
+      description: "Learn to create compelling personal pitches and develop your professional presentation skills",
+      icon: 'user' as const
+    },
+    {
+      title: "Self Practice",
+      subtitle: "Level 3",
+      description: "Practice your skills with interactive exercises and real-world scenarios at your own pace",
+      icon: 'graduation-cap' as const
+    },
+    {
+      title: "AI Proctored Interview",
+      subtitle: "Level 4",
+      description: "Complete your journey with an AI-proctored interview to demonstrate your newly acquired skills",
+      icon: 'user' as const
+    }
+  ];
+
+  const handleCardClick = (index: number) => {
+    if (index <= currentLevel) {
+      console.log(`Starting ${learningSteps[index].title}`);
+      
+      // Simulate completion after 2 seconds
+      setTimeout(() => {
+        if (!completedLevels.includes(index)) {
+          setCompletedLevels(prev => [...prev, index]);
+          if (index === currentLevel && currentLevel < learningSteps.length - 1) {
+            setCurrentLevel(prev => prev + 1);
+          }
+        }
+      }, 2000);
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-black relative overflow-hidden">
+      <ParticleBackground />
+      
+      <div className="relative z-10 container mx-auto px-4 py-16">
+        <div className="text-center mb-16">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 animate-fade-in">
+            Select your learning journey
+          </h1>
+          <p className="text-xl text-slate-300 max-w-2xl mx-auto animate-fade-in delay-300">
+            We'll personalize your learning experience based on your progress through each level
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          {learningSteps.map((step, index) => (
+            <div key={step.title} className="animate-fade-in" style={{ animationDelay: `${index * 200}ms` }}>
+              <LearningCard
+                title={step.title}
+                subtitle={step.subtitle}
+                description={step.description}
+                icon={step.icon}
+                isActive={index === currentLevel}
+                isCompleted={completedLevels.includes(index)}
+                onClick={() => handleCardClick(index)}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-12 text-center">
+          <div className="flex justify-center space-x-3 mb-6">
+            {learningSteps.map((_, index) => (
+              <div
+                key={index}
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                  completedLevels.includes(index)
+                    ? 'bg-green-500'
+                    : index === currentLevel
+                    ? 'bg-blue-500'
+                    : 'bg-slate-600'
+                }`}
+              />
+            ))}
+          </div>
+          <p className="text-slate-400 text-sm">
+            Progress: {completedLevels.length} of {learningSteps.length} levels completed
+          </p>
+        </div>
       </div>
     </div>
   );
