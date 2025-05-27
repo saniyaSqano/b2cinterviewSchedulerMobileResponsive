@@ -10,6 +10,7 @@ interface Level5ProctoredCameraProps {
   cameraError: string | null;
   onStartCamera: () => void;
   isStartingCamera: boolean;
+  videoRef?: React.RefObject<HTMLVideoElement>;
 }
 
 const Level5ProctoredCamera: React.FC<Level5ProctoredCameraProps> = ({
@@ -19,9 +20,11 @@ const Level5ProctoredCamera: React.FC<Level5ProctoredCameraProps> = ({
   onToggleMic,
   cameraError,
   onStartCamera,
-  isStartingCamera
+  isStartingCamera,
+  videoRef
 }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const localVideoRef = useRef<HTMLVideoElement>(null);
+  const activeVideoRef = videoRef || localVideoRef;
 
   return (
     <div className="bg-white/90 rounded-2xl p-4 h-4/5 flex flex-col mb-4">
@@ -51,7 +54,7 @@ const Level5ProctoredCamera: React.FC<Level5ProctoredCameraProps> = ({
           </div>
         ) : isVideoOn ? (
           <video
-            ref={videoRef}
+            ref={activeVideoRef}
             autoPlay
             muted
             playsInline
