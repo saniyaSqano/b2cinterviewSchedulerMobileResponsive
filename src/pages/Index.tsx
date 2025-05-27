@@ -1,5 +1,5 @@
+
 import React, { useState } from 'react';
-import LearningCard from '../components/LearningCard';
 import ParticleBackground from '../components/ParticleBackground';
 import AssessmentFlow from '../components/AssessmentFlow';
 import InteractiveRoadmap from '../components/InteractiveRoadmap';
@@ -8,7 +8,6 @@ const Index = () => {
   const [currentLevel, setCurrentLevel] = useState(0);
   const [completedLevels, setCompletedLevels] = useState<number[]>([]);
   const [showAssessment, setShowAssessment] = useState(false);
-  const [viewMode, setViewMode] = useState<'cards' | 'roadmap'>('cards');
 
   const learningSteps = [
     {
@@ -104,79 +103,13 @@ const Index = () => {
           <p className="text-lg text-gray-700 max-w-2xl mx-auto mb-8">
             Master your skills through our comprehensive learning platform
           </p>
-          
-          {/* View mode toggle */}
-          <div className="flex justify-center space-x-4 mb-8">
-            <button
-              onClick={() => setViewMode('cards')}
-              className={`px-4 py-2 rounded-lg transition-all duration-200 ${
-                viewMode === 'cards'
-                  ? 'bg-blue-500 text-white shadow-lg'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
-            >
-              Card View
-            </button>
-            <button
-              onClick={() => setViewMode('roadmap')}
-              className={`px-4 py-2 rounded-lg transition-all duration-200 ${
-                viewMode === 'roadmap'
-                  ? 'bg-blue-500 text-white shadow-lg'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
-            >
-              Roadmap View
-            </button>
-          </div>
         </div>
 
-        {viewMode === 'roadmap' ? (
-          <InteractiveRoadmap
-            currentLevel={currentLevel}
-            completedLevels={completedLevels}
-            onStepClick={handleCardClick}
-          />
-        ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-              {learningSteps.map((step, index) => (
-                <div key={step.title} className="animate-fade-in" style={{ animationDelay: `${index * 200}ms` }}>
-                  <LearningCard
-                    title={step.title}
-                    subtitle={step.subtitle}
-                    description={step.description}
-                    icon={step.icon}
-                    isActive={index === currentLevel}
-                    isCompleted={completedLevels.includes(index)}
-                    onClick={() => handleCardClick(index)}
-                  />
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-16 text-center">
-              <div className="flex justify-center space-x-3 mb-6">
-                {learningSteps.map((_, index) => (
-                  <div
-                    key={index}
-                    className={`w-4 h-4 rounded-full transition-all duration-300 ${
-                      completedLevels.includes(index)
-                        ? 'bg-green-500 shadow-lg'
-                        : index === currentLevel
-                        ? 'bg-blue-500 shadow-lg'
-                        : index === learningSteps.length - 1
-                        ? 'bg-gray-200'
-                        : 'bg-gray-300'
-                    }`}
-                  />
-                ))}
-              </div>
-              <p className="text-gray-700 text-sm">
-                Progress: {completedLevels.length} of {learningSteps.length} levels completed
-              </p>
-            </div>
-          </>
-        )}
+        <InteractiveRoadmap
+          currentLevel={currentLevel}
+          completedLevels={completedLevels}
+          onStepClick={handleCardClick}
+        />
       </div>
     </div>
   );
