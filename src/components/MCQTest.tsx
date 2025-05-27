@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Lightbulb, Clock, CheckCircle } from 'lucide-react';
 import { Button } from './ui/button';
@@ -16,7 +15,7 @@ interface MCQTestProps {
   totalQuestions: number;
   timeFrame: number;
   onBack: () => void;
-  onComplete: (results: any) => void;
+  onComplete: (results: any, questions: MCQQuestion[]) => void;
 }
 
 const MCQTest: React.FC<MCQTestProps> = ({ totalQuestions, timeFrame, onBack, onComplete }) => {
@@ -109,7 +108,7 @@ const MCQTest: React.FC<MCQTestProps> = ({ totalQuestions, timeFrame, onBack, on
       passed
     };
     
-    onComplete(results);
+    onComplete(results, questions);
   };
 
   const currentQuestionData = questions[currentQuestion];

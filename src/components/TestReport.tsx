@@ -1,10 +1,18 @@
-
 import React from 'react';
-import { CheckCircle, XCircle, Lightbulb, Clock, TrendingUp, Award, RotateCcw, User, Mail, Phone } from 'lucide-react';
+import { CheckCircle, XCircle, Lightbulb, Clock, TrendingUp, Award, RotateCcw, User, Mail, Phone, FileText } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from './ui/chart';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
+
+interface MCQQuestion {
+  id: number;
+  question: string;
+  options: string[];
+  hint: string;
+  correctAnswer: number;
+}
 
 interface TestReportProps {
   results: {
@@ -18,6 +26,7 @@ interface TestReportProps {
     score: number;
     passed: boolean;
   };
+  questions?: MCQQuestion[];
   candidateDetails?: {
     fullName: string;
     email: string;
@@ -29,7 +38,7 @@ interface TestReportProps {
   onRetakeTest: () => void;
 }
 
-const TestReport: React.FC<TestReportProps> = ({ results, candidateDetails, onBack, onRetakeTest }) => {
+const TestReport: React.FC<TestReportProps> = ({ results, questions, candidateDetails, onBack, onRetakeTest }) => {
   const accuracy = results.answeredQuestions > 0 ? (results.correctAnswers / results.answeredQuestions * 100) : 0;
   const timeEfficiency = (results.timeUsed / results.totalTime * 100);
   const hintUsageRate = results.totalQuestions > 0 ? (results.hintsUsed / results.totalQuestions * 100) : 0;
@@ -222,6 +231,40 @@ const TestReport: React.FC<TestReportProps> = ({ results, candidateDetails, onBa
               </CardContent>
             </Card>
           </div>
+
+          {/* Questions and Correct Answers */}
+          {questions && questions.length > 0 && (
+            <Card className="bg-white border-gray-200 shadow-lg animate-fade-in" style={{ animationDelay: '900ms' }}>
+              <CardHeader>
+                <CardTitle className="text-gray-900 flex items-center gap-2">
+                  <FileText className="w-5 h-5" />
+                  Questions & Correct Answers
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-16">Q#</TableHead>
+                      <TableHead>Question</TableHead>
+                      <TableHead className="w-48">Correct Answer</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {questions.map((question, index) => (
+                      <TableRow key={question.id}>
+                        <TableCell className="font-medium">{index + 1}</TableCell>
+                        <TableCell className="text-gray-700">{question.question}</TableCell>
+                        <TableCell className="text-green-600 font-medium">
+                          {question.options[question.correctAnswer]}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Performance Analytics with Charts */}
           <Card className="bg-white border-gray-200 shadow-lg animate-fade-in" style={{ animationDelay: '1000ms' }}>
