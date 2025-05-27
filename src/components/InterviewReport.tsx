@@ -1,8 +1,10 @@
 
 import React from 'react';
-import { ArrowLeft, User, Code, Shield, Star, Users, MessageCircle, Zap, AlertTriangle, CheckCircle, Award, XCircle } from 'lucide-react';
+import { ArrowLeft, User, Code, Shield, Star, Users, MessageCircle, Zap, AlertTriangle, CheckCircle, Award, XCircle, TrendingUp, BarChart3 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from './ui/chart';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 
 interface ViolationLog {
   id: number;
@@ -79,10 +81,10 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
   const ResultIcon = finalResult.icon;
 
   const getSkillLevel = (score: number) => {
-    if (score >= 80) return { level: 'Excellent', color: 'text-green-600' };
-    if (score >= 60) return { level: 'Good', color: 'text-blue-600' };
-    if (score >= 40) return { level: 'Average', color: 'text-yellow-600' };
-    return { level: 'Needs Improvement', color: 'text-red-600' };
+    if (score >= 80) return { level: 'Excellent', color: 'text-green-600', bgColor: 'bg-green-100' };
+    if (score >= 60) return { level: 'Good', color: 'text-blue-600', bgColor: 'bg-blue-100' };
+    if (score >= 40) return { level: 'Average', color: 'text-yellow-600', bgColor: 'bg-yellow-100' };
+    return { level: 'Needs Improvement', color: 'text-red-600', bgColor: 'bg-red-100' };
   };
 
   const formatTimestamp = (timestamp: Date) => {
@@ -100,84 +102,221 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
      skillAssessment.adaptability) / 7
   );
 
+  // Prepare data for charts
+  const skillsData = [
+    { skill: 'Programming', score: skillAssessment.programming, fullMark: 100 },
+    { skill: 'Framework', score: skillAssessment.framework, fullMark: 100 },
+    { skill: 'Testing', score: skillAssessment.testing, fullMark: 100 },
+    { skill: 'Confidence', score: skillAssessment.confidence, fullMark: 100 },
+    { skill: 'Leadership', score: skillAssessment.leadership, fullMark: 100 },
+    { skill: 'Communication', score: skillAssessment.communication, fullMark: 100 },
+    { skill: 'Adaptability', score: skillAssessment.adaptability, fullMark: 100 }
+  ];
+
+  const violationData = [
+    { name: 'No Violations', value: Math.max(0, 10 - errorViolations - warningViolations), fill: '#22c55e' },
+    { name: 'Warnings', value: warningViolations, fill: '#eab308' },
+    { name: 'Errors', value: errorViolations, fill: '#ef4444' }
+  ];
+
+  const performanceMetrics = [
+    { category: 'Technical Skills', score: Math.round((skillAssessment.programming + skillAssessment.framework + skillAssessment.testing) / 3) },
+    { category: 'Soft Skills', score: Math.round((skillAssessment.confidence + skillAssessment.leadership + skillAssessment.communication + skillAssessment.adaptability) / 4) },
+    { category: 'Compliance', score: Math.max(0, 100 - (errorViolations * 20 + warningViolations * 5)) }
+  ];
+
+  const chartConfig = {
+    score: { label: 'Score', color: '#3b82f6' },
+    violations: { label: 'Violations', color: '#ef4444' },
+    performance: { label: 'Performance', color: '#22c55e' }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-6xl mx-auto space-y-8">
+        <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between animate-fade-in">
             <button
               onClick={onBack}
-              className="p-2 rounded-full bg-white hover:bg-gray-50 transition-colors shadow-lg border"
+              className="p-3 rounded-full bg-white hover:bg-gray-50 transition-colors shadow-lg border border-gray-200"
             >
               <ArrowLeft className="w-5 h-5 text-gray-700" />
             </button>
-            <h1 className="text-3xl font-bold text-gray-900">AI Proctored Interview Report</h1>
-            <div className="w-10"></div>
+            <div className="text-center">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+                AI Proctored Interview Report
+              </h1>
+              <p className="text-gray-600 mt-2">Comprehensive Analysis & Assessment</p>
+            </div>
+            <div className="w-12"></div>
           </div>
 
           {/* Final Result Card */}
-          <Card className={`${finalResult.bgColor} ${finalResult.borderColor} border-2 shadow-lg`}>
+          <Card className={`${finalResult.bgColor} ${finalResult.borderColor} border-2 shadow-xl animate-fade-in`} style={{ animationDelay: '200ms' }}>
             <CardHeader className="text-center">
-              <div className="flex justify-center mb-4">
-                <div className={`w-16 h-16 rounded-full ${finalResult.bgColor} border-2 ${finalResult.borderColor} flex items-center justify-center`}>
-                  <ResultIcon className={`w-8 h-8 ${finalResult.color}`} />
+              <div className="flex justify-center mb-6">
+                <div className={`w-20 h-20 rounded-full ${finalResult.bgColor} border-4 ${finalResult.borderColor} flex items-center justify-center shadow-lg`}>
+                  <ResultIcon className={`w-10 h-10 ${finalResult.color}`} />
                 </div>
               </div>
-              <CardTitle className={`text-2xl ${finalResult.color}`}>
+              <CardTitle className={`text-3xl ${finalResult.color} mb-4`}>
                 {finalResult.message}
               </CardTitle>
+              <div className="grid grid-cols-3 gap-6 mt-6">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-indigo-600">{averageScore}%</div>
+                  <div className="text-gray-600">Overall Score</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-red-500">{errorViolations}</div>
+                  <div className="text-gray-600">Critical Issues</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-yellow-500">{warningViolations}</div>
+                  <div className="text-gray-600">Warnings</div>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent className="text-center">
-              <p className="text-gray-700">
-                Overall Assessment Score: <span className="font-bold text-xl">{averageScore}%</span>
-              </p>
-              <p className="text-sm text-gray-600 mt-2">
-                Violations: {errorViolations} errors, {warningViolations} warnings
-              </p>
+          </Card>
+
+          {/* Analytics Dashboard */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            {/* Skills Radar Chart */}
+            <Card className="bg-white shadow-xl animate-fade-in xl:col-span-2" style={{ animationDelay: '400ms' }}>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <TrendingUp className="w-6 h-6 text-indigo-600" />
+                  Skills Assessment Radar
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer config={chartConfig} className="h-80">
+                  <RadarChart data={skillsData}>
+                    <PolarGrid />
+                    <PolarAngleAxis dataKey="skill" className="text-sm" />
+                    <PolarRadiusAxis angle={90} domain={[0, 100]} className="text-xs" />
+                    <Radar 
+                      name="Skills" 
+                      dataKey="score" 
+                      stroke="#3b82f6" 
+                      fill="#3b82f6" 
+                      fillOpacity={0.3}
+                      strokeWidth={3}
+                    />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                  </RadarChart>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+
+            {/* Violation Pie Chart */}
+            <Card className="bg-white shadow-xl animate-fade-in" style={{ animationDelay: '600ms' }}>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <Shield className="w-6 h-6 text-purple-600" />
+                  Compliance Analysis
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer config={chartConfig} className="h-64">
+                  <PieChart>
+                    <Pie
+                      data={violationData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={40}
+                      outerRadius={80}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      {violationData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Pie>
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                  </PieChart>
+                </ChartContainer>
+                <div className="flex justify-center gap-4 text-sm mt-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span>Clean</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                    <span>Warnings</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                    <span>Errors</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Performance Metrics Bar Chart */}
+          <Card className="bg-white shadow-xl animate-fade-in" style={{ animationDelay: '800ms' }}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <BarChart3 className="w-6 h-6 text-green-600" />
+                Performance Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer config={chartConfig} className="h-64">
+                <BarChart data={performanceMetrics}>
+                  <XAxis dataKey="category" className="text-sm" />
+                  <YAxis domain={[0, 100]} className="text-sm" />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="score" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ChartContainer>
             </CardContent>
           </Card>
 
-          {/* Candidate Details and Skill Assessment */}
+          {/* Candidate Details and Detailed Skills */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Candidate Details */}
-            <Card className="bg-white shadow-lg">
+            <Card className="bg-white shadow-xl animate-fade-in" style={{ animationDelay: '1000ms' }}>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <User className="w-5 h-5" />
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <User className="w-6 h-6 text-blue-600" />
                   Candidate Information
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <p className="text-sm text-gray-500">Full Name</p>
-                  <p className="font-semibold">{candidateDetails.fullName}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Email</p>
-                  <p className="font-semibold">{candidateDetails.email}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Phone</p>
-                  <p className="font-semibold">{candidateDetails.phoneNumber}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Skills</p>
-                  <p className="font-semibold">{candidateDetails.skills}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Experience</p>
-                  <p className="font-semibold">{candidateDetails.experience}</p>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-gray-500 mb-1">Full Name</p>
+                    <p className="font-semibold text-lg">{candidateDetails.fullName}</p>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-gray-500 mb-1">Email</p>
+                    <p className="font-semibold">{candidateDetails.email}</p>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-gray-500 mb-1">Phone</p>
+                    <p className="font-semibold">{candidateDetails.phoneNumber}</p>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-gray-500 mb-1">Skills</p>
+                    <p className="font-semibold">{candidateDetails.skills}</p>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <p className="text-sm text-gray-500 mb-1">Experience</p>
+                    <p className="font-semibold">{candidateDetails.experience}</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Skill Assessment */}
-            <Card className="bg-white shadow-lg">
+            {/* Detailed Skill Assessment */}
+            <Card className="bg-white shadow-xl animate-fade-in" style={{ animationDelay: '1200ms' }}>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Star className="w-5 h-5" />
-                  Skill Assessment
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <Star className="w-6 h-6 text-yellow-600" />
+                  Detailed Skill Breakdown
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -193,21 +332,24 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
                   const skillLevel = getSkillLevel(skill.score);
                   const SkillIcon = skill.icon;
                   return (
-                    <div key={skill.name} className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <SkillIcon className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm">{skill.name}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-20 bg-gray-200 rounded-full h-2">
-                          <div 
-                            className="bg-blue-500 h-2 rounded-full transition-all duration-500"
-                            style={{ width: `${skill.score}%` }}
-                          />
+                    <div key={skill.name} className="p-4 bg-gray-50 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-3">
+                          <SkillIcon className="w-5 h-5 text-gray-600" />
+                          <span className="font-medium">{skill.name}</span>
                         </div>
-                        <span className={`text-sm font-semibold ${skillLevel.color}`}>
-                          {skill.score}%
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg font-bold">{skill.score}%</span>
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${skillLevel.bgColor} ${skillLevel.color}`}>
+                            {skillLevel.level}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-3">
+                        <div 
+                          className="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all duration-1000"
+                          style={{ width: `${skill.score}%` }}
+                        />
                       </div>
                     </div>
                   );
@@ -217,64 +359,76 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
           </div>
 
           {/* Violation Results */}
-          <Card className="bg-white shadow-lg">
+          <Card className="bg-white shadow-xl animate-fade-in" style={{ animationDelay: '1400ms' }}>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="w-5 h-5" />
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <Shield className="w-6 h-6 text-red-600" />
                 Proctoring Violation Report
               </CardTitle>
             </CardHeader>
             <CardContent>
               {violationLogs.length === 0 ? (
-                <div className="text-center py-8">
-                  <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
-                  <p className="text-green-600 font-semibold">No violations detected during the interview</p>
-                  <p className="text-gray-500 text-sm">Excellent proctoring compliance</p>
+                <div className="text-center py-12">
+                  <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-6" />
+                  <p className="text-green-600 font-bold text-xl mb-2">Perfect Compliance Record</p>
+                  <p className="text-gray-500">No violations detected during the interview</p>
+                  <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
+                    <p className="text-green-700 font-medium">🏆 Excellent proctoring compliance demonstrates integrity and professionalism</p>
+                  </div>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center mb-4">
-                    <h4 className="font-semibold">Violation Summary</h4>
-                    <div className="flex gap-4">
-                      <span className="text-red-600 font-medium">
-                        {errorViolations} Errors
-                      </span>
-                      <span className="text-yellow-600 font-medium">
-                        {warningViolations} Warnings
-                      </span>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div className="text-center p-4 bg-red-50 rounded-lg border border-red-200">
+                      <div className="text-2xl font-bold text-red-600">{errorViolations}</div>
+                      <div className="text-red-600 font-medium">Critical Errors</div>
+                    </div>
+                    <div className="text-center p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                      <div className="text-2xl font-bold text-yellow-600">{warningViolations}</div>
+                      <div className="text-yellow-600 font-medium">Warnings</div>
+                    </div>
+                    <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="text-2xl font-bold text-blue-600">{violationLogs.length}</div>
+                      <div className="text-blue-600 font-medium">Total Events</div>
+                    </div>
+                    <div className="text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="text-2xl font-bold text-gray-600">{Math.max(0, 100 - (errorViolations * 20 + warningViolations * 5))}%</div>
+                      <div className="text-gray-600 font-medium">Compliance</div>
                     </div>
                   </div>
                   
-                  <div className="max-h-64 overflow-y-auto space-y-2">
+                  <div className="max-h-80 overflow-y-auto space-y-3">
                     {violationLogs.map((log) => (
                       <div
                         key={log.id}
-                        className={`flex items-start gap-3 p-3 rounded-lg border ${
+                        className={`flex items-start gap-4 p-4 rounded-lg border-l-4 ${
                           log.type === 'error' 
-                            ? 'bg-red-50 border-red-200' 
-                            : 'bg-yellow-50 border-yellow-200'
+                            ? 'bg-red-50 border-red-500 border-l-red-500' 
+                            : 'bg-yellow-50 border-yellow-500 border-l-yellow-500'
                         }`}
                       >
-                        <AlertTriangle className={`w-4 h-4 mt-0.5 ${
+                        <AlertTriangle className={`w-5 h-5 mt-0.5 ${
                           log.type === 'error' ? 'text-red-500' : 'text-yellow-500'
                         }`} />
                         <div className="flex-1">
-                          <p className={`text-sm font-medium ${
-                            log.type === 'error' ? 'text-red-800' : 'text-yellow-800'
-                          }`}>
-                            {log.message}
-                          </p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            {formatTimestamp(log.timestamp)}
+                          <div className="flex items-center justify-between mb-2">
+                            <p className={`font-semibold ${
+                              log.type === 'error' ? 'text-red-800' : 'text-yellow-800'
+                            }`}>
+                              {log.message}
+                            </p>
+                            <span className={`text-xs px-3 py-1 rounded-full font-medium ${
+                              log.type === 'error' 
+                                ? 'bg-red-200 text-red-800' 
+                                : 'bg-yellow-200 text-yellow-800'
+                            }`}>
+                              {log.type.toUpperCase()}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-500">
+                            📅 {formatTimestamp(log.timestamp)}
                           </p>
                         </div>
-                        <span className={`text-xs px-2 py-1 rounded ${
-                          log.type === 'error' 
-                            ? 'bg-red-200 text-red-800' 
-                            : 'bg-yellow-200 text-yellow-800'
-                        }`}>
-                          {log.type.toUpperCase()}
-                        </span>
                       </div>
                     ))}
                   </div>
@@ -284,19 +438,34 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
           </Card>
 
           {/* Action Buttons */}
-          <div className="flex justify-center gap-4">
+          <div className="flex justify-center gap-6 animate-fade-in" style={{ animationDelay: '1600ms' }}>
             <Button
               onClick={onBack}
-              className="px-8 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-full"
+              className="px-8 py-4 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white rounded-full text-lg font-medium shadow-lg transform hover:scale-105 transition-all duration-200"
             >
               Back to Dashboard
             </Button>
             <Button
               onClick={() => window.print()}
               variant="outline"
-              className="px-8 py-3 rounded-full"
+              className="px-8 py-4 rounded-full text-lg font-medium border-2 border-indigo-300 text-indigo-600 hover:bg-indigo-50 shadow-lg transform hover:scale-105 transition-all duration-200"
             >
-              Print Report
+              📄 Print Report
+            </Button>
+            <Button
+              onClick={() => {
+                const element = document.createElement('a');
+                const file = new Blob([JSON.stringify({ candidateDetails, skillAssessment, violationLogs, finalResult, averageScore }, null, 2)], { type: 'application/json' });
+                element.href = URL.createObjectURL(file);
+                element.download = `interview-report-${candidateDetails.fullName.replace(/\s+/g, '-')}.json`;
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+              }}
+              variant="outline"
+              className="px-8 py-4 rounded-full text-lg font-medium border-2 border-green-300 text-green-600 hover:bg-green-50 shadow-lg transform hover:scale-105 transition-all duration-200"
+            >
+              💾 Export Data
             </Button>
           </div>
         </div>
