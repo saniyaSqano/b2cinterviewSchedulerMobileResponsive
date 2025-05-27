@@ -80,7 +80,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
   const getStepStatus = (index: number): StepStatus => {
     if (completedLevels.includes(index)) return 'completed';
     if (index === currentLevel) return 'current';
-    if (index < currentLevel) return 'available';
+    if (index <= currentLevel) return 'available';
     if (index === roadmapSteps.length - 1) return 'locked';
     return 'locked';
   };
@@ -102,17 +102,17 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
   };
 
   const getStatusColors = (status: StepStatus, isHovered: boolean) => {
-    const baseClasses = 'transition-all duration-300 border-4';
+    const baseClasses = 'transition-colors duration-200 border-4';
     
     switch (status) {
       case 'completed':
-        return `${baseClasses} bg-gradient-to-br from-green-500 to-green-600 border-green-300 shadow-xl ${isHovered ? 'shadow-2xl scale-110' : ''}`;
+        return `${baseClasses} bg-green-500 border-green-300 shadow-lg`;
       case 'current':
-        return `${baseClasses} bg-gradient-to-br from-blue-500 to-purple-600 border-blue-300 shadow-xl animate-pulse ${isHovered ? 'shadow-2xl scale-110' : ''}`;
+        return `${baseClasses} bg-blue-600 border-blue-300 shadow-lg`;
       case 'available':
-        return `${baseClasses} bg-gradient-to-br from-white to-gray-50 border-gray-300 shadow-lg hover:shadow-xl ${isHovered ? 'scale-110 border-blue-400' : ''}`;
+        return `${baseClasses} bg-white border-gray-300 shadow-md hover:shadow-lg ${isHovered ? 'border-blue-400' : ''}`;
       default:
-        return `${baseClasses} bg-gray-100 border-gray-200 shadow-sm ${isHovered ? 'scale-105' : ''}`;
+        return `${baseClasses} bg-gray-100 border-gray-200 shadow-sm`;
     }
   };
 
@@ -164,60 +164,41 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
   };
 
   return (
-    <div className="bg-gradient-to-br from-indigo-50 via-white to-purple-50 rounded-3xl p-12 relative overflow-hidden shadow-2xl">
-      {/* Enhanced Background Elements */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full blur-xl"></div>
-        <div className="absolute top-32 right-20 w-24 h-24 bg-gradient-to-br from-green-400 to-blue-500 rounded-full blur-lg"></div>
-        <div className="absolute bottom-20 left-1/3 w-20 h-20 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full blur-lg"></div>
-        <div className="absolute bottom-32 right-1/4 w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full blur-md"></div>
-      </div>
-
+    <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl p-8 relative overflow-hidden shadow-lg">
       <div className="relative z-10">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-gray-800 mb-3">
             Your Learning Journey
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Navigate through each level to master your skills and unlock new challenges
           </p>
         </div>
 
-        <div className="relative h-96 w-full mb-8">
-          {/* Enhanced Path */}
+        <div className="relative h-96 w-full mb-6">
+          {/* Path */}
           <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
             {/* Background path */}
             <path
               d={drawPath()}
               stroke="#e5e7eb"
-              strokeWidth="1"
+              strokeWidth="2"
               fill="none"
-              strokeDasharray="5,5"
-              className="opacity-50"
+              strokeDasharray="8,4"
             />
             
             {/* Completed path */}
             {completedLevels.length > 0 && (
               <path
                 d={getCompletedPath()}
-                stroke="url(#gradient)"
-                strokeWidth="2"
+                stroke="#3b82f6"
+                strokeWidth="3"
                 fill="none"
-                className="drop-shadow-sm"
               />
             )}
-            
-            {/* Gradient definition */}
-            <defs>
-              <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#3B82F6" />
-                <stop offset="50%" stopColor="#8B5CF6" />
-                <stop offset="100%" stopColor="#10B981" />
-              </linearGradient>
-            </defs>
           </svg>
 
-          {/* Enhanced Steps */}
+          {/* Steps */}
           {roadmapSteps.map((step, index) => {
             const status = getStepStatus(index);
             const isClickable = status === 'current' || status === 'available' || status === 'completed';
@@ -237,58 +218,38 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                 <div
                   onClick={() => isClickable && onStepClick(index)}
                   className={`
-                    relative transition-all duration-500 transform
-                    ${isClickable ? 'cursor-pointer hover:scale-110' : 'cursor-not-allowed'}
-                    ${isHovered ? 'z-50' : 'z-10'}
+                    relative transition-all duration-200
+                    ${isClickable ? 'cursor-pointer' : 'cursor-not-allowed'}
                   `}
                 >
-                  {/* Enhanced Step Circle */}
+                  {/* Step Circle */}
                   <div className={`
-                    w-20 h-20 rounded-full flex items-center justify-center mb-3 relative
+                    w-16 h-16 rounded-full flex items-center justify-center mb-2 relative
                     ${getStatusColors(status, isHovered)}
                   `}>
                     {getStepIcon(step, status)}
-                    
-                    {/* Ripple effect for current step */}
-                    {status === 'current' && (
-                      <>
-                        <div className="absolute inset-0 rounded-full bg-blue-400 opacity-25 animate-ping"></div>
-                        <div className="absolute inset-0 rounded-full bg-purple-400 opacity-20 animate-ping" style={{ animationDelay: '1s' }}></div>
-                      </>
-                    )}
-                    
-                    {/* Glow effect for completed steps */}
-                    {status === 'completed' && (
-                      <div className="absolute inset-0 rounded-full bg-green-400 opacity-30 blur-lg"></div>
-                    )}
                   </div>
 
-                  {/* Enhanced Step Info with tooltip-like appearance */}
+                  {/* Step Info */}
                   <div className={`
-                    text-center min-w-max max-w-48 p-3 rounded-xl transition-all duration-300
-                    ${isHovered ? 'bg-white shadow-2xl scale-105 border border-gray-200' : 'bg-transparent'}
+                    text-center min-w-max max-w-40 p-2 rounded-lg transition-all duration-200
+                    ${isHovered ? 'bg-white shadow-lg' : 'bg-transparent'}
                   `}>
-                    <div className={`text-sm font-semibold mb-1 transition-colors duration-300 ${
-                      isHovered ? 'text-blue-600' : 'text-gray-500'
-                    }`}>
+                    <div className="text-xs font-medium text-gray-500 mb-1">
                       {step.subtitle}
                     </div>
-                    <div className={`text-lg font-bold mb-2 transition-colors duration-300 ${getTextColors(status)}`}>
+                    <div className={`text-sm font-bold mb-1 ${getTextColors(status)}`}>
                       {step.title}
                     </div>
-                    <div className={`text-sm transition-all duration-300 ${
-                      isHovered ? 'text-gray-700 opacity-100' : 'text-gray-600 opacity-75'
-                    }`}>
+                    <div className="text-xs text-gray-600">
                       {step.description}
                     </div>
                   </div>
 
-                  {/* Connection indicators */}
-                  {index < roadmapSteps.length - 1 && status !== 'locked' && (
-                    <div className="absolute top-10 left-16 opacity-60">
-                      <ArrowRight className={`w-5 h-5 transition-colors duration-300 ${
-                        completedLevels.includes(index) ? 'text-green-500' : 'text-gray-400'
-                      }`} />
+                  {/* Connection arrow */}
+                  {index < roadmapSteps.length - 1 && (
+                    <div className="absolute top-8 left-12 opacity-40">
+                      <ArrowRight className="w-4 h-4 text-gray-400" />
                     </div>
                   )}
                 </div>
@@ -297,45 +258,39 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
           })}
         </div>
 
-        {/* Enhanced Progress Section */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/50">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-lg font-semibold text-gray-800">Journey Progress</span>
-            <span className="text-lg text-gray-600 font-medium">
+        {/* Progress Section */}
+        <div className="bg-white rounded-lg p-4 shadow-sm border">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-base font-medium text-gray-700">Progress</span>
+            <span className="text-sm text-gray-500">
               {completedLevels.length} of {roadmapSteps.length} completed
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+          <div className="w-full bg-gray-200 rounded-full h-3">
             <div
-              className="bg-gradient-to-r from-blue-500 via-purple-500 to-green-500 h-4 rounded-full transition-all duration-1000 relative overflow-hidden"
+              className="bg-blue-600 h-3 rounded-full transition-all duration-500"
               style={{ width: `${(completedLevels.length / roadmapSteps.length) * 100}%` }}
-            >
-              <div className="absolute inset-0 bg-white/30 animate-pulse"></div>
-            </div>
-          </div>
-          <div className="flex justify-between text-sm text-gray-500 mt-2">
-            <span>Beginner</span>
-            <span>Expert</span>
+            />
           </div>
         </div>
 
-        {/* Enhanced Legend */}
-        <div className="flex justify-center space-x-8 mt-8 text-sm">
-          <div className="flex items-center space-x-2 bg-white/50 rounded-full px-4 py-2">
-            <CheckCircle className="w-5 h-5 text-green-600" />
-            <span className="text-gray-700 font-medium">Completed</span>
+        {/* Legend */}
+        <div className="flex justify-center space-x-6 mt-6 text-sm">
+          <div className="flex items-center space-x-2">
+            <CheckCircle className="w-4 h-4 text-green-600" />
+            <span className="text-gray-600">Completed</span>
           </div>
-          <div className="flex items-center space-x-2 bg-white/50 rounded-full px-4 py-2">
-            <Circle className="w-5 h-5 text-blue-600" />
-            <span className="text-gray-700 font-medium">Current</span>
+          <div className="flex items-center space-x-2">
+            <Circle className="w-4 h-4 text-blue-600" />
+            <span className="text-gray-600">Current</span>
           </div>
-          <div className="flex items-center space-x-2 bg-white/50 rounded-full px-4 py-2">
-            <Circle className="w-5 h-5 text-gray-400" />
-            <span className="text-gray-700 font-medium">Available</span>
+          <div className="flex items-center space-x-2">
+            <Circle className="w-4 h-4 text-gray-400" />
+            <span className="text-gray-600">Available</span>
           </div>
-          <div className="flex items-center space-x-2 bg-white/50 rounded-full px-4 py-2">
-            <Lock className="w-5 h-5 text-gray-300" />
-            <span className="text-gray-700 font-medium">Locked</span>
+          <div className="flex items-center space-x-2">
+            <Lock className="w-4 h-4 text-gray-300" />
+            <span className="text-gray-600">Locked</span>
           </div>
         </div>
       </div>
