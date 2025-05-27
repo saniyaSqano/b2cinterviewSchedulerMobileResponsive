@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { CheckCircle, Circle, Lock, MapPin, ArrowRight, Star, Zap, Target } from 'lucide-react';
+import { CheckCircle, Circle, Lock, Target, Zap, Star, ArrowRight } from 'lucide-react';
 
 interface RoadmapStep {
   id: number;
@@ -32,7 +32,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
       title: "Assessment",
       subtitle: "Level 1",
       description: "Start your journey with a comprehensive skill evaluation",
-      position: { x: 15, y: 85 },
+      position: { x: 10, y: 85 },
       icon: "target"
     },
     {
@@ -40,7 +40,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
       title: "Chat with AI",
       subtitle: "Level 2",
       description: "Get personalized feedback from our AI mentor",
-      position: { x: 30, y: 65 },
+      position: { x: 25, y: 65 },
       icon: "zap"
     },
     {
@@ -48,7 +48,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
       title: "Pitch Yourself",
       subtitle: "Level 3",
       description: "Master the art of professional presentation",
-      position: { x: 50, y: 45 },
+      position: { x: 45, y: 45 },
       icon: "star"
     },
     {
@@ -56,7 +56,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
       title: "Self Practice",
       subtitle: "Level 4",
       description: "Refine your skills through guided practice",
-      position: { x: 70, y: 35 },
+      position: { x: 65, y: 30 },
       icon: "target"
     },
     {
@@ -64,7 +64,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
       title: "AI Proctored Interview",
       subtitle: "Level 5",
       description: "Demonstrate mastery in realistic scenarios",
-      position: { x: 85, y: 55 },
+      position: { x: 80, y: 50 },
       icon: "zap"
     },
     {
@@ -72,7 +72,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
       title: "Game on",
       subtitle: "Level 6",
       description: "Compete and showcase your expertise",
-      position: { x: 90, y: 25 },
+      position: { x: 90, y: 20 },
       icon: "star"
     }
   ];
@@ -81,7 +81,6 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
     if (completedLevels.includes(index)) return 'completed';
     if (index === currentLevel) return 'current';
     if (index <= currentLevel) return 'available';
-    if (index === roadmapSteps.length - 1) return 'locked';
     return 'locked';
   };
 
@@ -102,17 +101,17 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
   };
 
   const getStatusColors = (status: StepStatus, isHovered: boolean) => {
-    const baseClasses = 'transition-colors duration-200 border-4';
+    const baseClasses = 'transition-all duration-300 border-4 shadow-lg';
     
     switch (status) {
       case 'completed':
-        return `${baseClasses} bg-green-500 border-green-300 shadow-lg`;
+        return `${baseClasses} bg-green-500 border-green-300 shadow-green-200`;
       case 'current':
-        return `${baseClasses} bg-blue-600 border-blue-300 shadow-lg`;
+        return `${baseClasses} bg-blue-600 border-blue-300 shadow-blue-200 ring-4 ring-blue-200`;
       case 'available':
-        return `${baseClasses} bg-white border-gray-300 shadow-md hover:shadow-lg ${isHovered ? 'border-blue-400' : ''}`;
+        return `${baseClasses} bg-white border-gray-300 shadow-gray-200 hover:shadow-xl hover:border-blue-400 ${isHovered ? 'scale-110 border-blue-400' : ''}`;
       default:
-        return `${baseClasses} bg-gray-100 border-gray-200 shadow-sm`;
+        return `${baseClasses} bg-gray-100 border-gray-200 shadow-gray-100`;
     }
   };
 
@@ -136,9 +135,11 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
         pathData += `M ${step.position.x} ${step.position.y}`;
       } else {
         const prevStep = roadmapSteps[index - 1];
-        const midX = (prevStep.position.x + step.position.x) / 2;
-        const midY = (prevStep.position.y + step.position.y) / 2;
-        pathData += ` Q ${midX} ${midY - 5} ${step.position.x} ${step.position.y}`;
+        const controlX1 = prevStep.position.x + (step.position.x - prevStep.position.x) * 0.3;
+        const controlY1 = prevStep.position.y + (step.position.y - prevStep.position.y) * 0.3;
+        const controlX2 = prevStep.position.x + (step.position.x - prevStep.position.x) * 0.7;
+        const controlY2 = prevStep.position.y + (step.position.y - prevStep.position.y) * 0.7;
+        pathData += ` C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${step.position.x} ${step.position.y}`;
       }
     });
     return pathData;
@@ -155,9 +156,11 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
         pathData += `M ${step.position.x} ${step.position.y}`;
       } else {
         const prevStep = roadmapSteps[index - 1];
-        const midX = (prevStep.position.x + step.position.x) / 2;
-        const midY = (prevStep.position.y + step.position.y) / 2;
-        pathData += ` Q ${midX} ${midY - 5} ${step.position.x} ${step.position.y}`;
+        const controlX1 = prevStep.position.x + (step.position.x - prevStep.position.x) * 0.3;
+        const controlY1 = prevStep.position.y + (step.position.y - prevStep.position.y) * 0.3;
+        const controlX2 = prevStep.position.x + (step.position.x - prevStep.position.x) * 0.7;
+        const controlY2 = prevStep.position.y + (step.position.y - prevStep.position.y) * 0.7;
+        pathData += ` C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${step.position.x} ${step.position.y}`;
       }
     });
     return pathData;
@@ -166,39 +169,45 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
   return (
     <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl p-8 relative overflow-hidden shadow-lg">
       <div className="relative z-10">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-800 mb-3">
-            Your Learning Journey
-          </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Navigate through each level to master your skills and unlock new challenges
-          </p>
-        </div>
-
-        <div className="relative h-96 w-full mb-6">
-          {/* Path */}
+        <div className="relative h-96 w-full mb-8">
+          {/* Enhanced SVG with better path styling */}
           <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-            {/* Background path */}
+            {/* Background path with gradient */}
+            <defs>
+              <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#e5e7eb" />
+                <stop offset="100%" stopColor="#d1d5db" />
+              </linearGradient>
+              <linearGradient id="completedPathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#3b82f6" />
+                <stop offset="50%" stopColor="#1d4ed8" />
+                <stop offset="100%" stopColor="#3b82f6" />
+              </linearGradient>
+            </defs>
+            
             <path
               d={drawPath()}
-              stroke="#e5e7eb"
-              strokeWidth="2"
+              stroke="url(#pathGradient)"
+              strokeWidth="3"
               fill="none"
-              strokeDasharray="8,4"
+              strokeDasharray="12,6"
+              strokeLinecap="round"
             />
             
-            {/* Completed path */}
+            {/* Completed path with enhanced styling */}
             {completedLevels.length > 0 && (
               <path
                 d={getCompletedPath()}
-                stroke="#3b82f6"
-                strokeWidth="3"
+                stroke="url(#completedPathGradient)"
+                strokeWidth="4"
                 fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
             )}
           </svg>
 
-          {/* Steps */}
+          {/* Steps with enhanced positioning and styling */}
           {roadmapSteps.map((step, index) => {
             const status = getStepStatus(index);
             const isClickable = status === 'current' || status === 'available' || status === 'completed';
@@ -218,38 +227,43 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                 <div
                   onClick={() => isClickable && onStepClick(index)}
                   className={`
-                    relative transition-all duration-200
-                    ${isClickable ? 'cursor-pointer' : 'cursor-not-allowed'}
+                    relative transition-all duration-300 cursor-pointer
+                    ${isClickable ? 'hover:scale-105' : 'cursor-not-allowed'}
                   `}
                 >
-                  {/* Step Circle */}
+                  {/* Enhanced Step Circle */}
                   <div className={`
-                    w-16 h-16 rounded-full flex items-center justify-center mb-2 relative
+                    w-16 h-16 rounded-full flex items-center justify-center mb-3 relative
                     ${getStatusColors(status, isHovered)}
                   `}>
                     {getStepIcon(step, status)}
+                    
+                    {/* Pulse effect for current step */}
+                    {status === 'current' && (
+                      <div className="absolute inset-0 rounded-full bg-blue-400 opacity-75 animate-ping"></div>
+                    )}
                   </div>
 
-                  {/* Step Info */}
+                  {/* Enhanced Step Info Card */}
                   <div className={`
-                    text-center min-w-max max-w-40 p-2 rounded-lg transition-all duration-200
-                    ${isHovered ? 'bg-white shadow-lg' : 'bg-transparent'}
+                    text-center min-w-max max-w-48 p-3 rounded-xl transition-all duration-300 backdrop-blur-sm
+                    ${isHovered ? 'bg-white/95 shadow-xl scale-105 border border-gray-200' : 'bg-white/80'}
                   `}>
-                    <div className="text-xs font-medium text-gray-500 mb-1">
+                    <div className="text-xs font-semibold text-blue-600 mb-1 tracking-wide">
                       {step.subtitle}
                     </div>
-                    <div className={`text-sm font-bold mb-1 ${getTextColors(status)}`}>
+                    <div className={`text-sm font-bold mb-2 ${getTextColors(status === 'locked' ? 'locked' : 'available')}`}>
                       {step.title}
                     </div>
-                    <div className="text-xs text-gray-600">
+                    <div className="text-xs text-gray-600 leading-relaxed">
                       {step.description}
                     </div>
                   </div>
 
-                  {/* Connection arrow */}
-                  {index < roadmapSteps.length - 1 && (
-                    <div className="absolute top-8 left-12 opacity-40">
-                      <ArrowRight className="w-4 h-4 text-gray-400" />
+                  {/* Enhanced connection indicators */}
+                  {index < roadmapSteps.length - 1 && status !== 'locked' && (
+                    <div className="absolute top-8 left-14 opacity-60">
+                      <ArrowRight className="w-5 h-5 text-blue-500" />
                     </div>
                   )}
                 </div>
@@ -258,39 +272,41 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
           })}
         </div>
 
-        {/* Progress Section */}
-        <div className="bg-white rounded-lg p-4 shadow-sm border">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-base font-medium text-gray-700">Progress</span>
-            <span className="text-sm text-gray-500">
+        {/* Enhanced Progress Section */}
+        <div className="bg-white/90 backdrop-blur-sm rounded-xl p-6 shadow-md border border-gray-100">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-lg font-semibold text-gray-800">Progress</span>
+            <span className="text-sm font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
               {completedLevels.length} of {roadmapSteps.length} completed
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-3">
+          <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
             <div
-              className="bg-blue-600 h-3 rounded-full transition-all duration-500"
+              className="bg-gradient-to-r from-blue-500 to-blue-600 h-4 rounded-full transition-all duration-700 ease-out relative"
               style={{ width: `${(completedLevels.length / roadmapSteps.length) * 100}%` }}
-            />
+            >
+              <div className="absolute inset-0 bg-white/20 rounded-full animate-pulse"></div>
+            </div>
           </div>
         </div>
 
-        {/* Legend */}
-        <div className="flex justify-center space-x-6 mt-6 text-sm">
-          <div className="flex items-center space-x-2">
+        {/* Enhanced Legend */}
+        <div className="flex justify-center space-x-8 mt-6 text-sm">
+          <div className="flex items-center space-x-2 bg-white/70 px-3 py-2 rounded-lg">
             <CheckCircle className="w-4 h-4 text-green-600" />
-            <span className="text-gray-600">Completed</span>
+            <span className="text-gray-700 font-medium">Completed</span>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 bg-white/70 px-3 py-2 rounded-lg">
             <Circle className="w-4 h-4 text-blue-600" />
-            <span className="text-gray-600">Current</span>
+            <span className="text-gray-700 font-medium">Current</span>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 bg-white/70 px-3 py-2 rounded-lg">
             <Circle className="w-4 h-4 text-gray-400" />
-            <span className="text-gray-600">Available</span>
+            <span className="text-gray-700 font-medium">Available</span>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 bg-white/70 px-3 py-2 rounded-lg">
             <Lock className="w-4 h-4 text-gray-300" />
-            <span className="text-gray-600">Locked</span>
+            <span className="text-gray-700 font-medium">Locked</span>
           </div>
         </div>
       </div>
