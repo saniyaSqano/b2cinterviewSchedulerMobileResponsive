@@ -32,7 +32,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
       title: "Assessment",
       subtitle: "Level 1",
       description: "Start your journey with a comprehensive skill evaluation",
-      position: { x: 10, y: 85 },
+      position: { x: 15, y: 85 },
       icon: "target"
     },
     {
@@ -40,7 +40,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
       title: "Chat with AI",
       subtitle: "Level 2",
       description: "Get personalized feedback from our AI mentor",
-      position: { x: 25, y: 65 },
+      position: { x: 30, y: 65 },
       icon: "zap"
     },
     {
@@ -56,7 +56,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
       title: "Self Practice",
       subtitle: "Level 4",
       description: "Refine your skills through guided practice",
-      position: { x: 65, y: 30 },
+      position: { x: 60, y: 30 },
       icon: "target"
     },
     {
@@ -64,7 +64,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
       title: "AI Proctored Interview",
       subtitle: "Level 5",
       description: "Demonstrate mastery in realistic scenarios",
-      position: { x: 80, y: 50 },
+      position: { x: 75, y: 50 },
       icon: "zap"
     },
     {
@@ -72,7 +72,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
       title: "Game on",
       subtitle: "Level 6",
       description: "Compete and showcase your expertise",
-      position: { x: 90, y: 20 },
+      position: { x: 85, y: 20 },
       icon: "star"
     }
   ];
@@ -101,30 +101,17 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
   };
 
   const getStatusColors = (status: StepStatus, isHovered: boolean) => {
-    const baseClasses = 'transition-all duration-300 border-4 shadow-lg';
+    const baseClasses = 'transition-all duration-200 border-4 shadow-lg';
     
     switch (status) {
       case 'completed':
         return `${baseClasses} bg-gradient-to-br from-emerald-500 to-green-600 border-emerald-300 shadow-emerald-200`;
       case 'current':
-        return `${baseClasses} bg-gradient-to-br from-blue-500 to-indigo-600 border-blue-300 shadow-blue-200 ring-4 ring-blue-200 animate-pulse`;
+        return `${baseClasses} bg-gradient-to-br from-blue-500 to-indigo-600 border-blue-300 shadow-blue-200 ring-4 ring-blue-200`;
       case 'available':
-        return `${baseClasses} bg-gradient-to-br from-purple-500 to-violet-600 border-purple-300 shadow-purple-200 hover:shadow-xl hover:border-purple-400 ${isHovered ? 'scale-110 border-purple-400' : ''}`;
+        return `${baseClasses} bg-gradient-to-br from-purple-500 to-violet-600 border-purple-300 shadow-purple-200 ${isHovered ? 'shadow-xl border-purple-400' : ''}`;
       default:
         return `${baseClasses} bg-gradient-to-br from-gray-300 to-gray-400 border-gray-200 shadow-gray-100`;
-    }
-  };
-
-  const getTextColors = (status: StepStatus) => {
-    switch (status) {
-      case 'completed':
-        return 'text-white';
-      case 'current':
-        return 'text-white';
-      case 'available':
-        return 'text-white';
-      default:
-        return 'text-gray-400';
     }
   };
 
@@ -167,12 +154,12 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
   };
 
   return (
-    <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-3xl p-8 relative overflow-hidden shadow-2xl border border-purple-200">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-8 relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-xl"></div>
       <div className="absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-br from-pink-400/20 to-orange-400/20 rounded-full blur-xl"></div>
       
-      <div className="relative z-10">
+      <div className="relative z-10 h-full">
         <div className="relative h-96 w-full mb-8">
           {/* Enhanced SVG with colorful gradients */}
           <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -188,13 +175,6 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                 <stop offset="60%" stopColor="#8b5cf6" />
                 <stop offset="100%" stopColor="#f59e0b" />
               </linearGradient>
-              <filter id="glow">
-                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                <feMerge> 
-                  <feMergeNode in="coloredBlur"/>
-                  <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-              </filter>
             </defs>
             
             <path
@@ -216,7 +196,6 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                 fill="none"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                filter="url(#glow)"
               />
             )}
           </svg>
@@ -241,7 +220,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                 <div
                   onClick={() => isClickable && onStepClick(index)}
                   className={`
-                    relative transition-all duration-300 cursor-pointer
+                    relative transition-all duration-200 cursor-pointer
                     ${isClickable ? 'hover:scale-105' : 'cursor-not-allowed'}
                   `}
                 >
@@ -252,14 +231,9 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                   `}>
                     {getStepIcon(step, status)}
                     
-                    {/* Enhanced glow effect */}
-                    {status === 'current' && (
-                      <div className="absolute inset-0 rounded-full bg-blue-400/50 animate-ping"></div>
-                    )}
-                    
                     {/* Sparkle effect for completed steps */}
                     {status === 'completed' && (
-                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full animate-bounce">
+                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full">
                         <Star className="w-3 h-3 text-white m-0.5" />
                       </div>
                     )}
@@ -267,9 +241,9 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
 
                   {/* Enhanced Colorful Step Info Card */}
                   <div className={`
-                    text-center min-w-max max-w-48 p-4 rounded-2xl transition-all duration-300 backdrop-blur-md border
+                    text-center min-w-max max-w-48 p-4 rounded-2xl transition-all duration-200 backdrop-blur-md border
                     ${isHovered 
-                      ? 'bg-white/95 shadow-2xl scale-105 border-purple-300' 
+                      ? 'bg-white/95 shadow-2xl border-purple-300' 
                       : 'bg-white/85 border-white/30'
                     }
                   `}>
@@ -313,7 +287,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
               className="bg-gradient-to-r from-emerald-500 via-blue-500 via-purple-500 to-pink-500 h-5 rounded-full transition-all duration-1000 ease-out relative shadow-lg"
               style={{ width: `${(completedLevels.length / roadmapSteps.length) * 100}%` }}
             >
-              <div className="absolute inset-0 bg-white/30 rounded-full animate-pulse"></div>
+              <div className="absolute inset-0 bg-white/30 rounded-full"></div>
             </div>
           </div>
         </div>

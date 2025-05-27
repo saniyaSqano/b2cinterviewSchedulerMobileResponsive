@@ -95,9 +95,9 @@ const Index = () => {
     <div className="min-h-screen bg-white relative overflow-hidden">
       <ParticleBackground />
       
-      <div className="relative z-10 container mx-auto px-4 py-16">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 animate-fade-in">
+      <div className="relative z-10">
+        <div className="text-center pt-16 pb-8">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
             Start your Proctor Journey
           </h1>
           <p className="text-lg text-gray-700 max-w-2xl mx-auto mb-8">
