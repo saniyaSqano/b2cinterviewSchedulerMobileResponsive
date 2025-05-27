@@ -2,10 +2,12 @@
 import React, { useState } from 'react';
 import LearningCard from '../components/LearningCard';
 import ParticleBackground from '../components/ParticleBackground';
+import AssessmentFlow from '../components/AssessmentFlow';
 
 const Index = () => {
   const [currentLevel, setCurrentLevel] = useState(0);
   const [completedLevels, setCompletedLevels] = useState<number[]>([]);
+  const [showAssessment, setShowAssessment] = useState(false);
 
   const learningSteps = [
     {
@@ -38,7 +40,12 @@ const Index = () => {
     if (index <= currentLevel) {
       console.log(`Starting ${learningSteps[index].title}`);
       
-      // Simulate completion after 2 seconds
+      if (index === 0) {
+        setShowAssessment(true);
+        return;
+      }
+      
+      // Simulate completion after 2 seconds for other levels
       setTimeout(() => {
         if (!completedLevels.includes(index)) {
           setCompletedLevels(prev => [...prev, index]);
@@ -50,6 +57,10 @@ const Index = () => {
     }
   };
 
+  if (showAssessment) {
+    return <AssessmentFlow onBack={() => setShowAssessment(false)} />;
+  }
+
   return (
     <div className="min-h-screen bg-black relative overflow-hidden">
       <ParticleBackground />
@@ -57,11 +68,8 @@ const Index = () => {
       <div className="relative z-10 container mx-auto px-4 py-16">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 animate-fade-in">
-            Select your learning journey
+            Start your Proctor Journey
           </h1>
-          <p className="text-xl text-slate-300 max-w-2xl mx-auto animate-fade-in delay-300">
-            We'll personalize your learning experience based on your progress through each level
-          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
