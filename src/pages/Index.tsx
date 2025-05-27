@@ -4,6 +4,7 @@ import AssessmentFlow from '../components/AssessmentFlow';
 import ChatFlow from '../components/ChatFlow';
 import Level3Flow from '../components/Level3Flow';
 import Level4Flow from '../components/Level4Flow';
+import Level5Flow from '../components/Level5Flow';
 import InteractiveRoadmap from '../components/InteractiveRoadmap';
 
 const Index = () => {
@@ -13,6 +14,7 @@ const Index = () => {
   const [showChat, setShowChat] = useState(false);
   const [showLevel3, setShowLevel3] = useState(false);
   const [showLevel4, setShowLevel4] = useState(false);
+  const [showLevel5, setShowLevel5] = useState(false);
   const [assessmentScore] = useState(70);
 
   const learningSteps = [
@@ -71,6 +73,11 @@ const Index = () => {
       setShowLevel4(true);
       return;
     }
+
+    if (index === 4) {
+      setShowLevel5(true);
+      return;
+    }
     
     // Simulate completion after 2 seconds for other levels
     setTimeout(() => {
@@ -108,6 +115,13 @@ const Index = () => {
     if (!completedLevels.includes(3)) {
       setCompletedLevels(prev => [...prev, 3]);
       setCurrentLevel(4);
+    }
+  };
+
+  const handleLevel5Completed = () => {
+    if (!completedLevels.includes(4)) {
+      setCompletedLevels(prev => [...prev, 4]);
+      // All levels completed
     }
   };
 
@@ -151,6 +165,18 @@ const Index = () => {
         onBack={() => {
           setShowLevel4(false);
           handleLevel4Completed();
+        }}
+        userName="Revati"
+      />
+    );
+  }
+
+  if (showLevel5) {
+    return (
+      <Level5Flow 
+        onBack={() => {
+          setShowLevel5(false);
+          handleLevel5Completed();
         }}
         userName="Revati"
       />
