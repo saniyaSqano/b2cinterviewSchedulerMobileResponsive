@@ -47,7 +47,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
       title: "Pitch Yourself",
       subtitle: "Level 3", 
       description: "Learn to create compelling personal pitches and develop your professional presentation skills",
-      position: { x: 45, y: 45 },
+      position: { x: 50, y: 45 },
       icon: "star"
     },
     {
@@ -55,7 +55,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
       title: "Self Practice",
       subtitle: "Level 4",
       description: "Practice your skills with interactive exercises and real-world scenarios at your own pace",
-      position: { x: 60, y: 30 },
+      position: { x: 70, y: 30 },
       icon: "target"
     },
     {
@@ -63,16 +63,8 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
       title: "AI Proctored Interview",
       subtitle: "Level 5",
       description: "Demonstrate your newly acquired skills in an AI-proctored interview environment",
-      position: { x: 75, y: 50 },
+      position: { x: 85, y: 50 },
       icon: "zap"
-    },
-    {
-      id: 5,
-      title: "Game on",
-      subtitle: "Level 6",
-      description: "Compete and showcase your expertise",
-      position: { x: 85, y: 20 },
-      icon: "star"
     }
   ];
 
