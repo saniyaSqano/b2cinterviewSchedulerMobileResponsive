@@ -30,41 +30,41 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
       id: 0,
       title: "Assessment",
       subtitle: "Level 1",
-      description: "Start your journey with a comprehensive skill evaluation",
+      description: "Take our comprehensive assessment to evaluate your current skills and identify areas for improvement",
       position: { x: 15, y: 85 },
       icon: "target"
     },
     {
       id: 1,
       title: "Chat with AI",
-      subtitle: "Level 2",
-      description: "Get personalized feedback from our AI mentor",
+      subtitle: "Level 2", 
+      description: "Engage with our AI assistant to get personalized feedback and guidance on your performance",
       position: { x: 30, y: 65 },
       icon: "zap"
     },
     {
       id: 2,
       title: "Pitch Yourself",
-      subtitle: "Level 3",
-      description: "Master the art of professional presentation",
+      subtitle: "Level 3", 
+      description: "Learn to create compelling personal pitches and develop your professional presentation skills",
       position: { x: 45, y: 45 },
       icon: "star"
     },
     {
       id: 3,
-      title: "AI Proctored Interview",
+      title: "Self Practice",
       subtitle: "Level 4",
-      description: "Demonstrate mastery in realistic scenarios",
+      description: "Practice your skills with interactive exercises and real-world scenarios at your own pace",
       position: { x: 60, y: 30 },
-      icon: "zap"
+      icon: "target"
     },
     {
       id: 4,
-      title: "Self Practice",
+      title: "AI Proctored Interview",
       subtitle: "Level 5",
-      description: "Refine your skills through guided practice",
+      description: "Demonstrate your newly acquired skills in an AI-proctored interview environment",
       position: { x: 75, y: 50 },
-      icon: "target"
+      icon: "zap"
     },
     {
       id: 5,
