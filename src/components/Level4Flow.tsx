@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Video, VideoOff, Mic, MicOff, Shield, AlertTriangle, CheckCircle } from 'lucide-react';
 import Level4CongratulationsScreen from './Level4CongratulationsScreen';
@@ -234,9 +233,9 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
             </div>
           </div>
 
-          {/* Video Feed */}
+          {/* Video Feed - Made larger */}
           <div className="flex-1 p-4">
-            <div className="bg-white/90 rounded-2xl p-4 h-3/5 flex flex-col mb-4">
+            <div className="bg-white/90 rounded-2xl p-4 h-4/5 flex flex-col mb-4">
               <h3 className="text-lg font-semibold text-gray-700 mb-4">Your Video</h3>
               <div className="flex-1 bg-gray-900 rounded-xl overflow-hidden relative">
                 {isStartingCamera ? (
@@ -303,16 +302,16 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
               </div>
             </div>
 
-            {/* Violation Logs */}
-            <div className="bg-white/90 rounded-2xl p-4 h-2/5">
-              <div className="flex items-center space-x-2 mb-3">
-                <Shield className="w-5 h-5 text-indigo-600" />
-                <h3 className="text-lg font-semibold text-gray-700">Violation Logs</h3>
+            {/* Violation Logs - Made smaller */}
+            <div className="bg-white/90 rounded-2xl p-4 h-1/5">
+              <div className="flex items-center space-x-2 mb-2">
+                <Shield className="w-4 h-4 text-indigo-600" />
+                <h3 className="text-base font-semibold text-gray-700">Violation Logs</h3>
               </div>
-              <div className="h-32 overflow-y-auto space-y-2">
+              <div className="h-20 overflow-y-auto space-y-1">
                 {violationLogs.length === 0 ? (
                   <div className="flex items-center justify-center h-full text-green-600">
-                    <CheckCircle className="w-6 h-6 mr-2" />
+                    <CheckCircle className="w-5 h-5 mr-2" />
                     <span className="text-sm font-medium">No violations detected</span>
                   </div>
                 ) : (
@@ -323,7 +322,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
                         log.type === 'error' ? 'bg-red-50 border border-red-200' : 'bg-yellow-50 border border-yellow-200'
                       }`}
                     >
-                      <AlertTriangle className={`w-4 h-4 mt-0.5 ${
+                      <AlertTriangle className={`w-3 h-3 mt-0.5 ${
                         log.type === 'error' ? 'text-red-500' : 'text-yellow-500'
                       }`} />
                       <div className="flex-1">
