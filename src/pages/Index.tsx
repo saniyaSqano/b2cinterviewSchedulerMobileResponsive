@@ -17,26 +17,43 @@ const Index = () => {
       icon: 'graduation-cap' as const
     },
     {
-      title: "Pitch Yourself",
+      title: "Chat with AI",
       subtitle: "Level 2", 
+      description: "Engage with our AI assistant to get personalized feedback and guidance on your performance",
+      icon: 'user' as const
+    },
+    {
+      title: "Pitch Yourself",
+      subtitle: "Level 3", 
       description: "Learn to create compelling personal pitches and develop your professional presentation skills",
       icon: 'user' as const
     },
     {
       title: "Self Practice",
-      subtitle: "Level 3",
+      subtitle: "Level 4",
       description: "Practice your skills with interactive exercises and real-world scenarios at your own pace",
       icon: 'graduation-cap' as const
     },
     {
       title: "AI Proctored Interview",
-      subtitle: "Level 4",
+      subtitle: "Level 5",
       description: "Complete your journey with an AI-proctored interview to demonstrate your newly acquired skills",
       icon: 'user' as const
+    },
+    {
+      title: "Game on",
+      subtitle: "Level 6",
+      description: "Unlock exciting challenges and compete with others to showcase your mastered skills",
+      icon: 'graduation-cap' as const
     }
   ];
 
   const handleCardClick = (index: number) => {
+    // Disable the last card (Game on)
+    if (index === learningSteps.length - 1) {
+      return;
+    }
+
     if (index <= currentLevel) {
       console.log(`Starting ${learningSteps[index].title}`);
       
@@ -61,7 +78,7 @@ const Index = () => {
     // Mark assessment as completed and unlock next level
     if (!completedLevels.includes(0)) {
       setCompletedLevels(prev => [...prev, 0]);
-      setCurrentLevel(1); // Unlock Level 2
+      setCurrentLevel(1); // Unlock Level 2 (Chat with AI)
     }
   };
 
@@ -88,7 +105,7 @@ const Index = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
           {learningSteps.map((step, index) => (
             <div key={step.title} className="animate-fade-in" style={{ animationDelay: `${index * 200}ms` }}>
               <LearningCard
@@ -114,6 +131,8 @@ const Index = () => {
                     ? 'bg-green-500 shadow-lg'
                     : index === currentLevel
                     ? 'bg-blue-500 shadow-lg'
+                    : index === learningSteps.length - 1
+                    ? 'bg-gray-200'
                     : 'bg-gray-300'
                 }`}
               />
