@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import ParticleBackground from '../components/ParticleBackground';
 import AssessmentFlow from '../components/AssessmentFlow';
@@ -34,16 +33,16 @@ const Index = () => {
       icon: 'user' as const
     },
     {
-      title: "AI Proctored Interview",
-      subtitle: "Level 4",
-      description: "Demonstrate your newly acquired skills in an AI-proctored interview environment",
-      icon: 'user' as const
-    },
-    {
       title: "Self Practice",
-      subtitle: "Level 5",
+      subtitle: "Level 4",
       description: "Practice your skills with interactive exercises and real-world scenarios at your own pace",
       icon: 'graduation-cap' as const
+    },
+    {
+      title: "AI Proctored Interview",
+      subtitle: "Level 5",
+      description: "Demonstrate your newly acquired skills in an AI-proctored interview environment",
+      icon: 'user' as const
     },
     {
       title: "Game on",
