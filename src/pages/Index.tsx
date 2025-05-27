@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import ParticleBackground from '../components/ParticleBackground';
 import AssessmentFlow from '../components/AssessmentFlow';
@@ -29,16 +28,16 @@ const Index = () => {
       icon: 'user' as const
     },
     {
-      title: "Self Practice",
+      title: "AI Proctored Interview",
       subtitle: "Level 4",
-      description: "Practice your skills with interactive exercises and real-world scenarios at your own pace",
-      icon: 'graduation-cap' as const
+      description: "Demonstrate your newly acquired skills in an AI-proctored interview environment",
+      icon: 'user' as const
     },
     {
-      title: "AI Proctored Interview",
+      title: "Self Practice",
       subtitle: "Level 5",
-      description: "Complete your journey with an AI-proctored interview to demonstrate your newly acquired skills",
-      icon: 'user' as const
+      description: "Practice your skills with interactive exercises and real-world scenarios at your own pace",
+      icon: 'graduation-cap' as const
     },
     {
       title: "Game on",
@@ -95,8 +94,8 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 relative overflow-hidden">
       <ParticleBackground />
       
-      <div className="relative z-10">
-        <div className="text-center pt-8 pb-4">
+      <div className="relative z-10 h-screen flex flex-col">
+        <div className="bg-gradient-to-br from-indigo-50/80 via-purple-50/80 to-pink-50/80 backdrop-blur-md text-center pt-6 pb-4">
           <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-4">
             Start your Proctor Journey
           </h1>
@@ -105,11 +104,13 @@ const Index = () => {
           </p>
         </div>
 
-        <InteractiveRoadmap
-          currentLevel={currentLevel}
-          completedLevels={completedLevels}
-          onStepClick={handleCardClick}
-        />
+        <div className="flex-1">
+          <InteractiveRoadmap
+            currentLevel={currentLevel}
+            completedLevels={completedLevels}
+            onStepClick={handleCardClick}
+          />
+        </div>
       </div>
     </div>
   );

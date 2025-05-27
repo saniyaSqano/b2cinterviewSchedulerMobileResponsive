@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { CheckCircle, Circle, Lock, Target, Zap, Star, ArrowRight } from 'lucide-react';
 
@@ -53,19 +52,19 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
     },
     {
       id: 3,
-      title: "Self Practice",
+      title: "AI Proctored Interview",
       subtitle: "Level 4",
-      description: "Refine your skills through guided practice",
+      description: "Demonstrate mastery in realistic scenarios",
       position: { x: 60, y: 30 },
-      icon: "target"
+      icon: "zap"
     },
     {
       id: 4,
-      title: "AI Proctored Interview",
+      title: "Self Practice",
       subtitle: "Level 5",
-      description: "Demonstrate mastery in realistic scenarios",
+      description: "Refine your skills through guided practice",
       position: { x: 75, y: 50 },
-      icon: "zap"
+      icon: "target"
     },
     {
       id: 5,
