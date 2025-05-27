@@ -27,61 +27,61 @@ const LearningCard: React.FC<LearningCardProps> = ({
     <div
       onClick={onClick}
       className={`
-        relative p-8 rounded-2xl border transition-all duration-300 cursor-pointer group
+        relative p-6 rounded-lg border transition-all duration-300 cursor-pointer group bg-white
         ${isActive 
-          ? 'bg-blue-50 border-blue-200 shadow-lg ring-2 ring-blue-100' 
-          : 'bg-white border-gray-200 hover:border-gray-300'
+          ? 'border-slate-300 shadow-lg ring-1 ring-slate-200' 
+          : 'border-slate-200 hover:border-slate-300'
         }
-        ${isCompleted ? 'bg-green-50 border-green-200' : ''}
-        hover:shadow-xl hover:-translate-y-1
+        ${isCompleted ? 'border-slate-300 bg-slate-50' : ''}
+        hover:shadow-md
       `}
     >
       {/* Status Indicator */}
       {isCompleted && (
         <div className="absolute top-4 right-4">
-          <CheckCircle className="w-6 h-6 text-green-600" />
+          <CheckCircle className="w-5 h-5 text-slate-600" />
         </div>
       )}
       
       {/* Icon */}
       <div className={`
-        w-16 h-16 rounded-xl mb-6 flex items-center justify-center
+        w-12 h-12 rounded-lg mb-4 flex items-center justify-center
         ${isActive 
-          ? 'bg-blue-100 text-blue-600' 
+          ? 'bg-slate-100 text-slate-700' 
           : isCompleted 
-            ? 'bg-green-100 text-green-600'
-            : 'bg-gray-100 text-gray-600 group-hover:bg-gray-200'
+            ? 'bg-slate-100 text-slate-600'
+            : 'bg-slate-50 text-slate-500 group-hover:bg-slate-100 group-hover:text-slate-600'
         }
       `}>
-        <IconComponent className="w-8 h-8" />
+        <IconComponent className="w-6 h-6" />
       </div>
       
       {/* Content */}
       <div className="space-y-3">
         <div>
-          <h3 className="text-xl font-bold text-gray-900 mb-1">{title}</h3>
-          <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">{subtitle}</p>
+          <h3 className="text-lg font-semibold text-slate-900 mb-1">{title}</h3>
+          <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">{subtitle}</p>
         </div>
-        <p className="text-gray-600 leading-relaxed text-sm">{description}</p>
+        <p className="text-slate-600 leading-relaxed text-sm">{description}</p>
       </div>
       
       {/* Progress Indicator */}
       <div className={`
-        mt-6 h-1 w-full rounded-full
+        mt-4 h-1 w-full rounded-full
         ${isCompleted 
-          ? 'bg-green-200' 
+          ? 'bg-slate-200' 
           : isActive 
-            ? 'bg-blue-200'
-            : 'bg-gray-100'
+            ? 'bg-slate-200'
+            : 'bg-slate-100'
         }
       `}>
         <div className={`
           h-full rounded-full transition-all duration-500
           ${isCompleted 
-            ? 'w-full bg-green-500' 
+            ? 'w-full bg-slate-600' 
             : isActive 
-              ? 'w-1/3 bg-blue-500'
-              : 'w-0 bg-gray-300'
+              ? 'w-1/3 bg-slate-500'
+              : 'w-0 bg-slate-300'
           }
         `} />
       </div>
