@@ -1,6 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Send, Bot, User } from 'lucide-react';
+import CongratulationsScreen from './CongratulationsScreen';
 
 interface ChatFlowProps {
   onBack: () => void;
@@ -21,6 +22,7 @@ const ChatFlow: React.FC<ChatFlowProps> = ({ onBack, userName, assessmentScore }
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
   const [showCongratulations, setShowCongratulations] = useState(true);
+  const [showChat, setShowChat] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const questions = [
@@ -39,33 +41,22 @@ const ChatFlow: React.FC<ChatFlowProps> = ({ onBack, userName, assessmentScore }
     scrollToBottom();
   }, [messages]);
 
-  useEffect(() => {
-    if (showCongratulations) {
-      // Show congratulations message first
-      const congratsMessage: Message = {
-        id: Date.now(),
-        text: `Congratulations ${userName}! You have completed Level 1 successfully with ${assessmentScore}%. Now let's start with the second level of interview.`,
-        sender: 'ai',
-        timestamp: new Date()
-      };
-      setMessages([congratsMessage]);
-
-      // After 3 seconds, start with the first question
-      setTimeout(() => {
-        setShowCongratulations(false);
-        const firstQuestion: Message = {
-          id: Date.now() + 1,
-          text: questions[0],
-          sender: 'ai',
-          timestamp: new Date()
-        };
-        setMessages(prev => [...prev, firstQuestion]);
-      }, 3000);
-    }
-  }, [showCongratulations, userName, assessmentScore]);
+  const handleProceedToChat = () => {
+    setShowCongratulations(false);
+    setShowChat(true);
+    
+    // Start with the first question
+    const firstQuestion: Message = {
+      id: Date.now(),
+      text: questions[0],
+      sender: 'ai',
+      timestamp: new Date()
+    };
+    setMessages([firstQuestion]);
+  };
 
   const handleSendMessage = () => {
-    if (!currentInput.trim() || showCongratulations) return;
+    if (!currentInput.trim()) return;
 
     const userMessage: Message = {
       id: Date.now(),
@@ -112,6 +103,19 @@ const ChatFlow: React.FC<ChatFlowProps> = ({ onBack, userName, assessmentScore }
     }
   };
 
+  // Show congratulations screen first
+  if (showCongratulations) {
+    return (
+      <CongratulationsScreen
+        onBack={onBack}
+        onProceed={handleProceedToChat}
+        userName={userName}
+        assessmentScore={assessmentScore}
+      />
+    );
+  }
+
+  // Show chat interface
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 relative overflow-hidden">
       <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
@@ -177,7 +181,7 @@ const ChatFlow: React.FC<ChatFlowProps> = ({ onBack, userName, assessmentScore }
         </div>
 
         {/* Input Area */}
-        {!showCongratulations && !isComplete && (
+        {showChat && !isComplete && (
           <div className="bg-white/90 backdrop-blur-md border-t border-white/20 p-4">
             <div className="flex items-end space-x-3">
               <div className="flex-1">
@@ -217,11 +221,13 @@ const ChatFlow: React.FC<ChatFlowProps> = ({ onBack, userName, assessmentScore }
         )}
 
         {/* Progress Indicator */}
-        <div className="absolute top-20 right-4 bg-white/90 backdrop-blur-md rounded-full px-3 py-1 shadow-lg">
-          <p className="text-xs font-medium text-gray-700">
-            Question {Math.min(currentQuestionIndex + 1, questions.length)} of {questions.length}
-          </p>
-        </div>
+        {showChat && (
+          <div className="absolute top-20 right-4 bg-white/90 backdrop-blur-md rounded-full px-3 py-1 shadow-lg">
+            <p className="text-xs font-medium text-gray-700">
+              Question {Math.min(currentQuestionIndex + 1, questions.length)} of {questions.length}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
