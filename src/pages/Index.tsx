@@ -9,7 +9,7 @@ const Index = () => {
   const [completedLevels, setCompletedLevels] = useState<number[]>([]);
   const [showAssessment, setShowAssessment] = useState(false);
   const [showChat, setShowChat] = useState(false);
-  const [assessmentScore] = useState(70); // Store the assessment score
+  const [assessmentScore] = useState(70);
 
   const learningSteps = [
     {
@@ -51,50 +51,41 @@ const Index = () => {
   ];
 
   const handleCardClick = (index: number) => {
-    // Disable the last card (Game on)
-    if (index === learningSteps.length - 1) {
+    // For testing: allow access to all levels
+    console.log(`Starting ${learningSteps[index].title}`);
+    
+    if (index === 0) {
+      setShowAssessment(true);
       return;
     }
-
-    // Allow clicking on completed levels, current level, or if it's level 1 (Chat with AI) and assessment is completed
-    if (index <= currentLevel || (index === 1 && completedLevels.includes(0))) {
-      console.log(`Starting ${learningSteps[index].title}`);
-      
-      if (index === 0) {
-        setShowAssessment(true);
-        return;
-      }
-      
-      if (index === 1) {
-        setShowChat(true);
-        return;
-      }
-      
-      // Simulate completion after 2 seconds for other levels
-      setTimeout(() => {
-        if (!completedLevels.includes(index)) {
-          setCompletedLevels(prev => [...prev, index]);
-          if (index === currentLevel && currentLevel < learningSteps.length - 1) {
-            setCurrentLevel(prev => prev + 1);
-          }
-        }
-      }, 2000);
+    
+    if (index === 1) {
+      setShowChat(true);
+      return;
     }
+    
+    // Simulate completion after 2 seconds for other levels
+    setTimeout(() => {
+      if (!completedLevels.includes(index)) {
+        setCompletedLevels(prev => [...prev, index]);
+        if (index === currentLevel && currentLevel < learningSteps.length - 1) {
+          setCurrentLevel(prev => prev + 1);
+        }
+      }
+    }, 2000);
   };
 
   const handleTestPassed = () => {
-    // Mark assessment as completed and unlock next level
     if (!completedLevels.includes(0)) {
       setCompletedLevels(prev => [...prev, 0]);
-      setCurrentLevel(1); // Unlock Level 2 (Chat with AI)
+      setCurrentLevel(1);
     }
   };
 
   const handleChatCompleted = () => {
-    // Mark chat as completed and unlock next level
     if (!completedLevels.includes(1)) {
       setCompletedLevels(prev => [...prev, 1]);
-      setCurrentLevel(2); // Unlock Level 3 (Pitch Yourself)
+      setCurrentLevel(2);
     }
   };
 

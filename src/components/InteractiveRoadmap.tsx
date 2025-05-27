@@ -79,9 +79,8 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
   const getStepStatus = (index: number): StepStatus => {
     if (completedLevels.includes(index)) return 'completed';
     if (index === currentLevel) return 'current';
-    if (index <= currentLevel) return 'available';
-    if (index === 1 && completedLevels.includes(0)) return 'available';
-    return 'locked';
+    // For testing: allow access to all levels
+    return 'available';
   };
 
   const getStepIcon = (step: RoadmapStep, status: StepStatus) => {
