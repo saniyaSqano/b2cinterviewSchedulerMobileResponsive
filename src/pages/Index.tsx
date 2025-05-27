@@ -75,17 +75,20 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-slate-100 relative overflow-hidden">
       <ParticleBackground />
       
       <div className="relative z-10 container mx-auto px-4 py-16">
         <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 animate-fade-in">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 animate-fade-in">
             Start your Proctor Journey
           </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Master your skills through our comprehensive learning platform
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {learningSteps.map((step, index) => (
             <div key={step.title} className="animate-fade-in" style={{ animationDelay: `${index * 200}ms` }}>
               <LearningCard
@@ -101,22 +104,22 @@ const Index = () => {
           ))}
         </div>
 
-        <div className="mt-12 text-center">
+        <div className="mt-16 text-center">
           <div className="flex justify-center space-x-3 mb-6">
             {learningSteps.map((_, index) => (
               <div
                 key={index}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                className={`w-4 h-4 rounded-full transition-all duration-300 ${
                   completedLevels.includes(index)
-                    ? 'bg-green-500'
+                    ? 'bg-green-500 shadow-lg'
                     : index === currentLevel
-                    ? 'bg-blue-500'
-                    : 'bg-slate-600'
+                    ? 'bg-blue-500 shadow-lg'
+                    : 'bg-gray-300'
                 }`}
               />
             ))}
           </div>
-          <p className="text-slate-400 text-sm">
+          <p className="text-gray-600 text-sm">
             Progress: {completedLevels.length} of {learningSteps.length} levels completed
           </p>
         </div>

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { CheckCircle, XCircle, Lightbulb, Clock, TrendingUp, Award, RotateCcw } from 'lucide-react';
+import { CheckCircle, XCircle, Lightbulb, Clock, TrendingUp, Award, RotateCcw, User, Mail, Phone } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from './ui/chart';
@@ -18,11 +18,18 @@ interface TestReportProps {
     score: number;
     passed: boolean;
   };
+  candidateDetails?: {
+    fullName: string;
+    email: string;
+    phoneNumber: string;
+    skills: string;
+    experience: string;
+  };
   onBack: () => void;
   onRetakeTest: () => void;
 }
 
-const TestReport: React.FC<TestReportProps> = ({ results, onBack, onRetakeTest }) => {
+const TestReport: React.FC<TestReportProps> = ({ results, candidateDetails, onBack, onRetakeTest }) => {
   const accuracy = results.answeredQuestions > 0 ? (results.correctAnswers / results.answeredQuestions * 100) : 0;
   const timeEfficiency = (results.timeUsed / results.totalTime * 100);
   const hintUsageRate = results.totalQuestions > 0 ? (results.hintsUsed / results.totalQuestions * 100) : 0;
@@ -56,13 +63,11 @@ const TestReport: React.FC<TestReportProps> = ({ results, onBack, onRetakeTest }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 relative overflow-hidden">
-      <div className="absolute inset-0 bg-white/30 backdrop-blur-sm"></div>
-      
-      <div className="relative z-10 container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-slate-100">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto space-y-8">
           {/* Header */}
-          <div className="text-center mb-8 animate-fade-in">
+          <div className="text-center animate-fade-in">
             <div className={`w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center ${
               results.passed ? 'bg-green-100 border-2 border-green-500' : 'bg-red-100 border-2 border-red-500'
             }`}>
@@ -72,7 +77,7 @@ const TestReport: React.FC<TestReportProps> = ({ results, onBack, onRetakeTest }
                 <XCircle className="w-10 h-10 text-red-600" />
               )}
             </div>
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">
               {results.passed ? 'Congratulations!' : 'Test Completed'}
             </h1>
             <p className="text-gray-600 text-lg">
@@ -82,36 +87,82 @@ const TestReport: React.FC<TestReportProps> = ({ results, onBack, onRetakeTest }
             </p>
           </div>
 
-          {/* Score Card */}
-          <Card className="bg-white border-gray-200 shadow-lg mb-8 animate-fade-in" style={{ animationDelay: '200ms' }}>
-            <CardHeader className="text-center">
-              <CardTitle className="text-gray-800 text-3xl">
-                Your Score: <span className={results.passed ? 'text-green-600' : 'text-red-600'}>
-                  {results.score}%
-                </span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="w-full bg-gray-200 rounded-full h-4 mb-4">
-                <div 
-                  className={`h-4 rounded-full transition-all duration-1000 ${
-                    results.passed ? 'bg-green-500' : 'bg-red-500'
-                  }`}
-                  style={{ width: `${results.score}%` }}
-                />
-              </div>
-              <p className="text-center text-gray-600">
-                Passing score: 70% | Your score: {results.score}%
-              </p>
-            </CardContent>
-          </Card>
+          {/* Candidate Details and Score - Side by side */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Candidate Details */}
+            {candidateDetails && (
+              <Card className="bg-white border-gray-200 shadow-lg animate-fade-in" style={{ animationDelay: '200ms' }}>
+                <CardHeader>
+                  <CardTitle className="text-gray-900 flex items-center gap-2">
+                    <User className="w-5 h-5" />
+                    Candidate Details
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <User className="w-4 h-4 text-gray-500" />
+                    <div>
+                      <p className="text-sm text-gray-500">Full Name</p>
+                      <p className="text-gray-900 font-medium">{candidateDetails.fullName}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Mail className="w-4 h-4 text-gray-500" />
+                    <div>
+                      <p className="text-sm text-gray-500">Email</p>
+                      <p className="text-gray-900 font-medium">{candidateDetails.email}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Phone className="w-4 h-4 text-gray-500" />
+                    <div>
+                      <p className="text-sm text-gray-500">Phone</p>
+                      <p className="text-gray-900 font-medium">{candidateDetails.phoneNumber}</p>
+                    </div>
+                  </div>
+                  <div className="pt-2 border-t border-gray-200">
+                    <p className="text-sm text-gray-500 mb-1">Skills</p>
+                    <p className="text-gray-900">{candidateDetails.skills}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 mb-1">Experience</p>
+                    <p className="text-gray-900">{candidateDetails.experience}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Score Card */}
+            <Card className="bg-white border-gray-200 shadow-lg animate-fade-in" style={{ animationDelay: '400ms' }}>
+              <CardHeader className="text-center">
+                <CardTitle className="text-gray-900 text-3xl">
+                  Your Score: <span className={results.passed ? 'text-green-600' : 'text-red-600'}>
+                    {results.score}%
+                  </span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="w-full bg-gray-200 rounded-full h-4 mb-4">
+                  <div 
+                    className={`h-4 rounded-full transition-all duration-1000 ${
+                      results.passed ? 'bg-green-500' : 'bg-red-500'
+                    }`}
+                    style={{ width: `${results.score}%` }}
+                  />
+                </div>
+                <p className="text-center text-gray-600">
+                  Passing score: 70% | Your score: {results.score}%
+                </p>
+              </CardContent>
+            </Card>
+          </div>
 
           {/* Detailed Results */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Questions Breakdown */}
-            <Card className="bg-white border-gray-200 shadow-lg animate-fade-in" style={{ animationDelay: '400ms' }}>
+            <Card className="bg-white border-gray-200 shadow-lg animate-fade-in" style={{ animationDelay: '600ms' }}>
               <CardHeader>
-                <CardTitle className="text-gray-800 flex items-center gap-2">
+                <CardTitle className="text-gray-900 flex items-center gap-2">
                   <CheckCircle className="w-5 h-5" />
                   Questions Breakdown
                 </CardTitle>
@@ -141,9 +192,9 @@ const TestReport: React.FC<TestReportProps> = ({ results, onBack, onRetakeTest }
             </Card>
 
             {/* Time Analysis */}
-            <Card className="bg-white border-gray-200 shadow-lg animate-fade-in" style={{ animationDelay: '600ms' }}>
+            <Card className="bg-white border-gray-200 shadow-lg animate-fade-in" style={{ animationDelay: '800ms' }}>
               <CardHeader>
-                <CardTitle className="text-gray-800 flex items-center gap-2">
+                <CardTitle className="text-gray-900 flex items-center gap-2">
                   <Clock className="w-5 h-5" />
                   Time Analysis
                 </CardTitle>
@@ -175,9 +226,9 @@ const TestReport: React.FC<TestReportProps> = ({ results, onBack, onRetakeTest }
           </div>
 
           {/* Performance Analytics with Charts */}
-          <Card className="bg-white border-gray-200 shadow-lg mb-8 animate-fade-in" style={{ animationDelay: '800ms' }}>
+          <Card className="bg-white border-gray-200 shadow-lg animate-fade-in" style={{ animationDelay: '1000ms' }}>
             <CardHeader>
-              <CardTitle className="text-gray-800 flex items-center gap-2">
+              <CardTitle className="text-gray-900 flex items-center gap-2">
                 <TrendingUp className="w-5 h-5" />
                 Performance Analytics
               </CardTitle>
@@ -186,7 +237,7 @@ const TestReport: React.FC<TestReportProps> = ({ results, onBack, onRetakeTest }
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Questions Distribution Pie Chart */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-700 text-center">Questions Distribution</h3>
+                  <h3 className="text-lg font-semibold text-gray-800 text-center">Questions Distribution</h3>
                   <ChartContainer config={chartConfig} className="h-64">
                     <PieChart>
                       <Pie
@@ -208,42 +259,42 @@ const TestReport: React.FC<TestReportProps> = ({ results, onBack, onRetakeTest }
                   <div className="flex justify-center gap-4 text-sm">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                      <span>Correct</span>
+                      <span className="text-gray-700">Correct</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                      <span>Wrong</span>
+                      <span className="text-gray-700">Wrong</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 bg-slate-400 rounded-full"></div>
-                      <span>Unanswered</span>
+                      <span className="text-gray-700">Unanswered</span>
                     </div>
                   </div>
                 </div>
 
                 {/* Performance Metrics Bar Chart */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-700 text-center">Performance Metrics</h3>
+                  <h3 className="text-lg font-semibold text-gray-800 text-center">Performance Metrics</h3>
                   <ChartContainer config={chartConfig} className="h-64">
                     <BarChart data={barChartData}>
-                      <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                      <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
+                      <XAxis dataKey="name" tick={{ fontSize: 12, fill: '#374151' }} />
+                      <YAxis domain={[0, 100]} tick={{ fontSize: 12, fill: '#374151' }} />
                       <ChartTooltip content={<ChartTooltipContent />} />
                       <Bar dataKey="value" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ChartContainer>
                   <div className="grid grid-cols-3 gap-2 text-center text-sm">
                     <div>
-                      <div className="text-green-600 font-bold">{accuracy.toFixed(1)}%</div>
-                      <div className="text-gray-500">Accuracy</div>
+                      <div className="text-green-600 font-bold text-lg">{accuracy.toFixed(1)}%</div>
+                      <div className="text-gray-600">Accuracy</div>
                     </div>
                     <div>
-                      <div className="text-blue-600 font-bold">{timeEfficiency.toFixed(1)}%</div>
-                      <div className="text-gray-500">Time Usage</div>
+                      <div className="text-blue-600 font-bold text-lg">{timeEfficiency.toFixed(1)}%</div>
+                      <div className="text-gray-600">Time Usage</div>
                     </div>
                     <div>
-                      <div className="text-purple-600 font-bold">{hintUsageRate.toFixed(1)}%</div>
-                      <div className="text-gray-500">Hint Usage</div>
+                      <div className="text-purple-600 font-bold text-lg">{hintUsageRate.toFixed(1)}%</div>
+                      <div className="text-gray-600">Hint Usage</div>
                     </div>
                   </div>
                 </div>
@@ -252,9 +303,9 @@ const TestReport: React.FC<TestReportProps> = ({ results, onBack, onRetakeTest }
           </Card>
 
           {/* Performance Insights */}
-          <Card className="bg-white border-gray-200 shadow-lg mb-8 animate-fade-in" style={{ animationDelay: '1000ms' }}>
+          <Card className="bg-white border-gray-200 shadow-lg animate-fade-in" style={{ animationDelay: '1200ms' }}>
             <CardHeader>
-              <CardTitle className="text-gray-800 flex items-center gap-2">
+              <CardTitle className="text-gray-900 flex items-center gap-2">
                 <Lightbulb className="w-5 h-5" />
                 Performance Insights
               </CardTitle>
@@ -302,7 +353,7 @@ const TestReport: React.FC<TestReportProps> = ({ results, onBack, onRetakeTest }
           </Card>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in" style={{ animationDelay: '1200ms' }}>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-in" style={{ animationDelay: '1400ms' }}>
             <Button
               onClick={onBack}
               className={`px-8 py-3 text-lg rounded-full transition-all duration-300 transform hover:scale-105 ${
