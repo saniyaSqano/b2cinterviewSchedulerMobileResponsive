@@ -27,26 +27,26 @@ const LearningCard: React.FC<LearningCardProps> = ({
     <div
       onClick={onClick}
       className={`
-        relative p-6 rounded-xl border transition-all duration-300 cursor-pointer
+        relative p-6 rounded-xl border transition-all duration-300 cursor-pointer shadow-lg
         ${isActive 
-          ? 'bg-blue-900/40 border-blue-500/50 shadow-lg shadow-blue-500/20' 
-          : 'bg-slate-800/50 border-slate-700/50 hover:bg-slate-800/70 hover:border-slate-600/50'
+          ? 'bg-blue-50 border-blue-300 hover:bg-blue-100' 
+          : 'bg-white border-gray-200 hover:bg-gray-50'
         }
-        ${isCompleted ? 'border-green-500/50 bg-green-900/20' : ''}
-        backdrop-blur-sm hover:scale-105
+        ${isCompleted ? 'border-green-300 bg-green-50' : ''}
+        hover:scale-105 hover:shadow-xl
       `}
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
-          <h3 className="text-xl font-semibold text-white mb-1">{title}</h3>
-          <p className="text-sm text-slate-400 mb-3">{subtitle}</p>
-          <p className="text-sm text-slate-300">{description}</p>
+          <h3 className="text-xl font-semibold text-gray-900 mb-1">{title}</h3>
+          <p className="text-sm text-gray-600 mb-3">{subtitle}</p>
+          <p className="text-sm text-gray-700">{description}</p>
         </div>
         <div className={`
           p-3 rounded-lg ml-4
-          ${isActive ? 'bg-blue-500/20' : 'bg-purple-500/20'}
+          ${isActive ? 'bg-blue-100' : 'bg-purple-100'}
         `}>
-          <IconComponent className={`w-6 h-6 ${isActive ? 'text-blue-400' : 'text-purple-400'}`} />
+          <IconComponent className={`w-6 h-6 ${isActive ? 'text-blue-600' : 'text-purple-600'}`} />
         </div>
       </div>
       

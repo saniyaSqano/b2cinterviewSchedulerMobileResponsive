@@ -75,7 +75,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-slate-100 relative overflow-hidden">
+    <div className="min-h-screen bg-white relative overflow-hidden">
       <ParticleBackground />
       
       <div className="relative z-10 container mx-auto px-4 py-16">
@@ -83,7 +83,7 @@ const Index = () => {
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 animate-fade-in">
             Start your Proctor Journey
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-700 max-w-2xl mx-auto">
             Master your skills through our comprehensive learning platform
           </p>
         </div>
@@ -119,7 +119,7 @@ const Index = () => {
               />
             ))}
           </div>
-          <p className="text-gray-600 text-sm">
+          <p className="text-gray-700 text-sm">
             Progress: {completedLevels.length} of {learningSteps.length} levels completed
           </p>
         </div>
