@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Upload, Calendar, Clock, FileText } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -34,6 +34,7 @@ interface FormData {
 
 const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack }) => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
     email: '',
@@ -49,6 +50,19 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack }) => {
     scheduledDate: ''
   });
 
+  // Calculate time based on questions
+  const calculateTimeFrame = (totalQuestions: number, codingQuestions: number) => {
+    const mcqTime = (totalQuestions - codingQuestions) * 2; // 2 minutes per MCQ
+    const codingTime = codingQuestions * 15; // 15 minutes per coding question
+    const baseTime = 10; // 10 minutes buffer time
+    return mcqTime + codingTime + baseTime;
+  };
+
+  useEffect(() => {
+    const calculatedTime = calculateTimeFrame(formData.totalQuestions, formData.codingQuestions);
+    setFormData(prev => ({ ...prev, timeFrame: calculatedTime }));
+  }, [formData.totalQuestions, formData.codingQuestions]);
+
   const handleInputChange = (field: keyof FormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
@@ -60,13 +74,21 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack }) => {
 
   const handleNext = () => {
     if (currentStep < 4) {
-      setCurrentStep(prev => prev + 1);
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentStep(prev => prev + 1);
+        setIsTransitioning(false);
+      }, 300);
     }
   };
 
   const handlePrevious = () => {
     if (currentStep > 1) {
-      setCurrentStep(prev => prev - 1);
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentStep(prev => prev - 1);
+        setIsTransitioning(false);
+      }, 300);
     }
   };
 
@@ -76,42 +98,44 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack }) => {
   };
 
   const renderStep1 = () => (
-    <div className="max-w-2xl mx-auto text-center space-y-8">
-      <div className="mb-12">
+    <div className={`max-w-2xl mx-auto text-center space-y-8 transition-all duration-500 ease-in-out ${
+      isTransitioning ? 'opacity-0 transform translate-x-8' : 'opacity-100 transform translate-x-0'
+    }`}>
+      <div className="mb-12 animate-fade-in">
         <h1 className="text-4xl font-bold text-white mb-4">Help us personalize your experience</h1>
       </div>
       
       <div className="space-y-8">
-        <div className="text-left">
+        <div className="text-left transform transition-all duration-500 hover:scale-105">
           <Label htmlFor="fullName" className="text-white text-lg block mb-3">What's your name?</Label>
           <Input
             id="fullName"
             value={formData.fullName}
             onChange={(e) => handleInputChange('fullName', e.target.value)}
-            className="bg-transparent border-2 border-slate-600 text-white text-lg h-14 rounded-lg focus:border-purple-500"
+            className="bg-transparent border-2 border-slate-600 text-white text-lg h-14 rounded-lg focus:border-purple-500 transition-all duration-300 focus:scale-105"
             placeholder="Enter your name"
           />
         </div>
         
-        <div className="text-left">
+        <div className="text-left transform transition-all duration-500 hover:scale-105" style={{ animationDelay: '200ms' }}>
           <Label htmlFor="email" className="text-white text-lg block mb-3">What's your email?</Label>
           <Input
             id="email"
             type="email"
             value={formData.email}
             onChange={(e) => handleInputChange('email', e.target.value)}
-            className="bg-transparent border-2 border-slate-600 text-white text-lg h-14 rounded-lg focus:border-purple-500"
+            className="bg-transparent border-2 border-slate-600 text-white text-lg h-14 rounded-lg focus:border-purple-500 transition-all duration-300 focus:scale-105"
             placeholder="Enter your email address"
           />
         </div>
         
-        <div className="text-left">
+        <div className="text-left transform transition-all duration-500 hover:scale-105" style={{ animationDelay: '400ms' }}>
           <Label htmlFor="phoneNumber" className="text-white text-lg block mb-3">What's your phone number?</Label>
           <Input
             id="phoneNumber"
             value={formData.phoneNumber}
             onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
-            className="bg-transparent border-2 border-slate-600 text-white text-lg h-14 rounded-lg focus:border-purple-500"
+            className="bg-transparent border-2 border-slate-600 text-white text-lg h-14 rounded-lg focus:border-purple-500 transition-all duration-300 focus:scale-105"
             placeholder="Enter your phone number"
           />
         </div>
@@ -120,35 +144,37 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack }) => {
   );
 
   const renderStep2 = () => (
-    <div className="max-w-2xl mx-auto text-center space-y-8">
-      <div className="mb-12">
+    <div className={`max-w-2xl mx-auto text-center space-y-8 transition-all duration-500 ease-in-out ${
+      isTransitioning ? 'opacity-0 transform translate-x-8' : 'opacity-100 transform translate-x-0'
+    }`}>
+      <div className="mb-12 animate-fade-in">
         <h1 className="text-4xl font-bold text-white mb-4">Tell us about your professional background</h1>
       </div>
       
       <div className="space-y-8">
-        <div className="text-left">
+        <div className="text-left transform transition-all duration-500 hover:scale-105">
           <Label htmlFor="skills" className="text-white text-lg block mb-3">What are your key skills?</Label>
           <Textarea
             id="skills"
             value={formData.skills}
             onChange={(e) => handleInputChange('skills', e.target.value)}
-            className="bg-transparent border-2 border-slate-600 text-white text-lg min-h-[120px] rounded-lg focus:border-purple-500"
+            className="bg-transparent border-2 border-slate-600 text-white text-lg min-h-[120px] rounded-lg focus:border-purple-500 transition-all duration-300"
             placeholder="List your technical skills (e.g., JavaScript, React, Python, etc.)"
           />
         </div>
         
-        <div className="text-left">
+        <div className="text-left transform transition-all duration-500 hover:scale-105" style={{ animationDelay: '200ms' }}>
           <Label htmlFor="experience" className="text-white text-lg block mb-3">Tell us about your experience</Label>
           <Textarea
             id="experience"
             value={formData.experience}
             onChange={(e) => handleInputChange('experience', e.target.value)}
-            className="bg-transparent border-2 border-slate-600 text-white text-lg min-h-[120px] rounded-lg focus:border-purple-500"
+            className="bg-transparent border-2 border-slate-600 text-white text-lg min-h-[120px] rounded-lg focus:border-purple-500 transition-all duration-300"
             placeholder="Describe your work experience and projects"
           />
         </div>
         
-        <div className="text-left">
+        <div className="text-left transform transition-all duration-500 hover:scale-105" style={{ animationDelay: '400ms' }}>
           <Label htmlFor="cv" className="text-white text-lg block mb-3">Upload your CV</Label>
           <div className="relative">
             <Input
@@ -156,22 +182,22 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack }) => {
               type="file"
               accept=".pdf,.doc,.docx"
               onChange={handleFileUpload}
-              className="bg-transparent border-2 border-slate-600 text-white text-lg h-14 rounded-lg focus:border-purple-500 file:text-white file:bg-purple-600 file:border-0 file:rounded file:px-4 file:py-2 file:mr-4"
+              className="bg-transparent border-2 border-slate-600 text-white text-lg h-14 rounded-lg focus:border-purple-500 file:text-white file:bg-purple-600 file:border-0 file:rounded file:px-4 file:py-2 file:mr-4 transition-all duration-300"
             />
-            <Upload className="absolute right-4 top-4 w-6 h-6 text-slate-400" />
+            <Upload className="absolute right-4 top-4 w-6 h-6 text-slate-400 transition-colors duration-300 hover:text-purple-400" />
           </div>
           {formData.cv && (
-            <p className="text-green-400 mt-2 text-sm">File uploaded: {formData.cv.name}</p>
+            <p className="text-green-400 mt-2 text-sm animate-fade-in">File uploaded: {formData.cv.name}</p>
           )}
         </div>
         
-        <div className="text-left">
+        <div className="text-left transform transition-all duration-500 hover:scale-105" style={{ animationDelay: '600ms' }}>
           <Label htmlFor="jobDescription" className="text-white text-lg block mb-3">Job description (optional)</Label>
           <Textarea
             id="jobDescription"
             value={formData.jobDescription}
             onChange={(e) => handleInputChange('jobDescription', e.target.value)}
-            className="bg-transparent border-2 border-slate-600 text-white text-lg min-h-[120px] rounded-lg focus:border-purple-500"
+            className="bg-transparent border-2 border-slate-600 text-white text-lg min-h-[120px] rounded-lg focus:border-purple-500 transition-all duration-300"
             placeholder="Paste the job description you're applying for"
           />
         </div>
@@ -180,72 +206,78 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack }) => {
   );
 
   const renderStep3 = () => (
-    <div className="max-w-2xl mx-auto text-center space-y-8">
-      <div className="mb-12">
+    <div className={`max-w-2xl mx-auto text-center space-y-8 transition-all duration-500 ease-in-out ${
+      isTransitioning ? 'opacity-0 transform translate-x-8' : 'opacity-100 transform translate-x-0'
+    }`}>
+      <div className="mb-12 animate-fade-in">
         <h1 className="text-4xl font-bold text-white mb-4">Configure your test preferences</h1>
       </div>
       
       <div className="space-y-8">
-        <div className="text-left">
+        <div className="text-left transform transition-all duration-500 hover:scale-105">
           <Label htmlFor="totalQuestions" className="text-white text-lg block mb-3">How many questions would you like?</Label>
           <Select value={formData.totalQuestions.toString()} onValueChange={(value) => handleInputChange('totalQuestions', parseInt(value))}>
-            <SelectTrigger className="bg-transparent border-2 border-slate-600 text-white text-lg h-14 rounded-lg focus:border-purple-500">
+            <SelectTrigger className="bg-transparent border-2 border-slate-600 text-white text-lg h-14 rounded-lg focus:border-purple-500 transition-all duration-300 hover:scale-105">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-slate-800 border-slate-600">
-              <SelectItem value="10" className="text-white">10 questions</SelectItem>
-              <SelectItem value="15" className="text-white">15 questions</SelectItem>
-              <SelectItem value="20" className="text-white">20 questions</SelectItem>
-              <SelectItem value="25" className="text-white">25 questions</SelectItem>
-              <SelectItem value="30" className="text-white">30 questions</SelectItem>
+            <SelectContent className="bg-slate-800 border-slate-600 animate-scale-in">
+              <SelectItem value="10" className="text-white hover:bg-slate-700 transition-colors">10 questions</SelectItem>
+              <SelectItem value="15" className="text-white hover:bg-slate-700 transition-colors">15 questions</SelectItem>
+              <SelectItem value="20" className="text-white hover:bg-slate-700 transition-colors">20 questions</SelectItem>
+              <SelectItem value="25" className="text-white hover:bg-slate-700 transition-colors">25 questions</SelectItem>
+              <SelectItem value="30" className="text-white hover:bg-slate-700 transition-colors">30 questions</SelectItem>
             </SelectContent>
           </Select>
         </div>
         
-        <div className="text-left">
+        <div className="text-left transform transition-all duration-500 hover:scale-105" style={{ animationDelay: '200ms' }}>
           <Label htmlFor="codingQuestions" className="text-white text-lg block mb-3">How many coding questions?</Label>
           <Select value={formData.codingQuestions.toString()} onValueChange={(value) => handleInputChange('codingQuestions', parseInt(value))}>
-            <SelectTrigger className="bg-transparent border-2 border-slate-600 text-white text-lg h-14 rounded-lg focus:border-purple-500">
+            <SelectTrigger className="bg-transparent border-2 border-slate-600 text-white text-lg h-14 rounded-lg focus:border-purple-500 transition-all duration-300 hover:scale-105">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-slate-800 border-slate-600">
-              <SelectItem value="0" className="text-white">0 coding questions</SelectItem>
-              <SelectItem value="1" className="text-white">1 coding question</SelectItem>
-              <SelectItem value="2" className="text-white">2 coding questions</SelectItem>
-              <SelectItem value="3" className="text-white">3 coding questions</SelectItem>
-              <SelectItem value="5" className="text-white">5 coding questions</SelectItem>
+            <SelectContent className="bg-slate-800 border-slate-600 animate-scale-in">
+              <SelectItem value="0" className="text-white hover:bg-slate-700 transition-colors">0 coding questions</SelectItem>
+              <SelectItem value="1" className="text-white hover:bg-slate-700 transition-colors">1 coding question</SelectItem>
+              <SelectItem value="2" className="text-white hover:bg-slate-700 transition-colors">2 coding questions</SelectItem>
+              <SelectItem value="3" className="text-white hover:bg-slate-700 transition-colors">3 coding questions</SelectItem>
+              <SelectItem value="5" className="text-white hover:bg-slate-700 transition-colors">5 coding questions</SelectItem>
             </SelectContent>
           </Select>
         </div>
         
-        <div className="text-left">
-          <Label htmlFor="timeFrame" className="text-white text-lg block mb-3">How much time do you need?</Label>
-          <Select value={formData.timeFrame.toString()} onValueChange={(value) => handleInputChange('timeFrame', parseInt(value))}>
-            <SelectTrigger className="bg-transparent border-2 border-slate-600 text-white text-lg h-14 rounded-lg focus:border-purple-500">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="bg-slate-800 border-slate-600">
-              <SelectItem value="30" className="text-white">30 minutes</SelectItem>
-              <SelectItem value="45" className="text-white">45 minutes</SelectItem>
-              <SelectItem value="60" className="text-white">60 minutes</SelectItem>
-              <SelectItem value="90" className="text-white">90 minutes</SelectItem>
-              <SelectItem value="120" className="text-white">120 minutes</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="text-left transform transition-all duration-500 hover:scale-105" style={{ animationDelay: '400ms' }}>
+          <Label htmlFor="timeFrame" className="text-white text-lg block mb-3 flex items-center gap-2">
+            <Clock className="w-5 h-5" />
+            Calculated time required
+          </Label>
+          <div className="bg-slate-800/50 border-2 border-purple-500/50 rounded-lg p-4 text-white text-lg animate-pulse">
+            <div className="flex items-center justify-between">
+              <span>Total Duration:</span>
+              <span className="text-purple-400 font-bold text-xl">{formData.timeFrame} minutes</span>
+            </div>
+            <div className="text-sm text-slate-400 mt-2">
+              Based on {formData.totalQuestions - formData.codingQuestions} MCQs and {formData.codingQuestions} coding questions
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 
   const renderStep4 = () => (
-    <div className="max-w-2xl mx-auto text-center space-y-8">
-      <div className="mb-12">
+    <div className={`max-w-2xl mx-auto text-center space-y-8 transition-all duration-500 ease-in-out ${
+      isTransitioning ? 'opacity-0 transform translate-x-8' : 'opacity-100 transform translate-x-0'
+    }`}>
+      <div className="mb-12 animate-fade-in">
         <h1 className="text-4xl font-bold text-white mb-4">When would you like to take the test?</h1>
       </div>
       
       <div className="space-y-8">
         <div className="space-y-6">
-          <div className="flex items-center space-x-4 p-4 border-2 border-slate-600 rounded-lg cursor-pointer hover:border-purple-500 transition-colors"
+          <div className={`flex items-center space-x-4 p-4 border-2 rounded-lg cursor-pointer transition-all duration-300 transform hover:scale-105 ${
+            !formData.scheduleForLater ? 'border-purple-500 bg-purple-500/10' : 'border-slate-600 hover:border-purple-500'
+          }`}
                onClick={() => handleInputChange('scheduleForLater', false)}>
             <input
               type="radio"
@@ -253,12 +285,14 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack }) => {
               name="schedule"
               checked={!formData.scheduleForLater}
               onChange={() => handleInputChange('scheduleForLater', false)}
-              className="text-purple-500 w-5 h-5"
+              className="text-purple-500 w-5 h-5 transition-all duration-300"
             />
             <Label htmlFor="startNow" className="text-white text-lg cursor-pointer">Start the test now</Label>
           </div>
           
-          <div className="flex items-center space-x-4 p-4 border-2 border-slate-600 rounded-lg cursor-pointer hover:border-purple-500 transition-colors"
+          <div className={`flex items-center space-x-4 p-4 border-2 rounded-lg cursor-pointer transition-all duration-300 transform hover:scale-105 ${
+            formData.scheduleForLater ? 'border-purple-500 bg-purple-500/10' : 'border-slate-600 hover:border-purple-500'
+          }`}
                onClick={() => handleInputChange('scheduleForLater', true)}>
             <input
               type="radio"
@@ -266,32 +300,35 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack }) => {
               name="schedule"
               checked={formData.scheduleForLater}
               onChange={() => handleInputChange('scheduleForLater', true)}
-              className="text-purple-500 w-5 h-5"
+              className="text-purple-500 w-5 h-5 transition-all duration-300"
             />
             <Label htmlFor="scheduleLater" className="text-white text-lg cursor-pointer">Schedule for later</Label>
           </div>
         </div>
         
         {formData.scheduleForLater && (
-          <div className="text-left">
+          <div className="text-left animate-fade-in">
             <Label htmlFor="scheduledDate" className="text-white text-lg block mb-3">Select date & time</Label>
             <Input
               id="scheduledDate"
               type="datetime-local"
               value={formData.scheduledDate}
               onChange={(e) => handleInputChange('scheduledDate', e.target.value)}
-              className="bg-transparent border-2 border-slate-600 text-white text-lg h-14 rounded-lg focus:border-purple-500"
+              className="bg-transparent border-2 border-slate-600 text-white text-lg h-14 rounded-lg focus:border-purple-500 transition-all duration-300 focus:scale-105"
             />
           </div>
         )}
 
-        <div className="bg-slate-800/50 p-6 rounded-lg border border-slate-600">
-          <h4 className="text-white font-semibold mb-4 text-xl">Test Summary</h4>
+        <div className="bg-slate-800/50 p-6 rounded-lg border border-slate-600 animate-fade-in transform transition-all duration-500 hover:scale-105">
+          <h4 className="text-white font-semibold mb-4 text-xl flex items-center gap-2">
+            <FileText className="w-5 h-5" />
+            Test Summary
+          </h4>
           <div className="text-slate-300 space-y-2">
-            <p className="flex justify-between"><span>Total questions:</span> <span>{formData.totalQuestions}</span></p>
-            <p className="flex justify-between"><span>Coding questions:</span> <span>{formData.codingQuestions}</span></p>
-            <p className="flex justify-between"><span>Duration:</span> <span>{formData.timeFrame} minutes</span></p>
-            <p className="flex justify-between"><span>Schedule:</span> <span>{formData.scheduleForLater ? 'Later' : 'Now'}</span></p>
+            <p className="flex justify-between"><span>Total questions:</span> <span className="text-purple-400">{formData.totalQuestions}</span></p>
+            <p className="flex justify-between"><span>Coding questions:</span> <span className="text-purple-400">{formData.codingQuestions}</span></p>
+            <p className="flex justify-between"><span>Duration:</span> <span className="text-purple-400 font-bold">{formData.timeFrame} minutes</span></p>
+            <p className="flex justify-between"><span>Schedule:</span> <span className="text-purple-400">{formData.scheduleForLater ? 'Later' : 'Now'}</span></p>
           </div>
         </div>
       </div>
@@ -307,7 +344,7 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack }) => {
           <Button
             onClick={onBack}
             variant="ghost"
-            className="text-slate-300 hover:text-white hover:bg-slate-800"
+            className="text-slate-300 hover:text-white hover:bg-slate-800 transition-all duration-300 hover:scale-105"
           >
             <ChevronLeft className="w-4 h-4 mr-2" />
             Back to Journey
@@ -320,12 +357,12 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack }) => {
               {[1, 2, 3, 4].map((step) => (
                 <div
                   key={step}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                  className={`h-3 rounded-full transition-all duration-500 transform ${
                     step === currentStep
-                      ? 'bg-purple-500 w-8'
+                      ? 'bg-purple-500 w-8 scale-110'
                       : step < currentStep
-                      ? 'bg-purple-400'
-                      : 'bg-slate-600'
+                      ? 'bg-purple-400 w-3 scale-100'
+                      : 'bg-slate-600 w-3 scale-90'
                   }`}
                 />
               ))}
@@ -343,18 +380,19 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack }) => {
             {currentStep < 4 ? (
               <Button
                 onClick={handleNext}
-                className="bg-purple-600 hover:bg-purple-700 text-white px-12 py-3 text-lg rounded-full"
+                className="bg-purple-600 hover:bg-purple-700 text-white px-12 py-3 text-lg rounded-full transition-all duration-300 transform hover:scale-110 hover:shadow-lg hover:shadow-purple-500/25"
                 disabled={
                   (currentStep === 1 && (!formData.fullName || !formData.email || !formData.phoneNumber)) ||
                   (currentStep === 2 && (!formData.skills || !formData.experience))
                 }
               >
                 Continue
+                <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             ) : (
               <Button
                 onClick={handleStartTest}
-                className="bg-purple-600 hover:bg-purple-700 text-white px-12 py-3 text-lg rounded-full"
+                className="bg-purple-600 hover:bg-purple-700 text-white px-12 py-3 text-lg rounded-full transition-all duration-300 transform hover:scale-110 hover:shadow-lg hover:shadow-purple-500/25"
               >
                 {formData.scheduleForLater ? 'Schedule Test' : 'Start Test'}
               </Button>
@@ -366,7 +404,7 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack }) => {
               <Button
                 onClick={handlePrevious}
                 variant="ghost"
-                className="text-slate-400 hover:text-white"
+                className="text-slate-400 hover:text-white transition-all duration-300 hover:scale-105"
               >
                 <ChevronLeft className="w-4 h-4 mr-2" />
                 Previous
