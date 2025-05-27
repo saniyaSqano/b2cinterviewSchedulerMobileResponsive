@@ -16,6 +16,8 @@ interface InteractiveRoadmapProps {
   onStepClick: (index: number) => void;
 }
 
+type StepStatus = 'completed' | 'current' | 'available' | 'locked';
+
 const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
   currentLevel,
   completedLevels,
@@ -66,7 +68,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
     }
   ];
 
-  const getStepStatus = (index: number) => {
+  const getStepStatus = (index: number): StepStatus => {
     if (completedLevels.includes(index)) return 'completed';
     if (index === currentLevel) return 'current';
     if (index < currentLevel) return 'available';
@@ -74,7 +76,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
     return 'locked';
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status: StepStatus) => {
     switch (status) {
       case 'completed':
         return <CheckCircle className="w-6 h-6 text-green-600" />;
@@ -87,7 +89,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
     }
   };
 
-  const getStatusColors = (status: string) => {
+  const getStatusColors = (status: StepStatus) => {
     switch (status) {
       case 'completed':
         return 'bg-green-100 border-green-300 text-green-800';
@@ -153,7 +155,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                 }}
               >
                 <div
-                  onClick={() => isClickable && status !== 'locked' && onStepClick(index)}
+                  onClick={() => isClickable && onStepClick(index)}
                   className={`
                     relative cursor-pointer transition-all duration-300 hover:scale-105
                     ${isClickable ? 'cursor-pointer' : 'cursor-not-allowed'}
