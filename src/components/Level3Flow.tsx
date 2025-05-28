@@ -291,7 +291,10 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
     };
     
     let yPosition = 130;
-    Object.entries(reportData.scores).forEach(([skill, score]) => {
+    Object.entries(reportData.scores).forEach(([skill, scoreValue]) => {
+      // Type assertion to ensure score is treated as number
+      const score = scoreValue as number;
+      
       pdf.setFontSize(12);
       pdf.setFont('helvetica', 'normal');
       pdf.text(`${skillCategories[skill as keyof Scores]}: ${score}/5`, 25, yPosition);
