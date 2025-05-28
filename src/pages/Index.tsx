@@ -234,7 +234,7 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Cards Grid with Custom Arrow Pattern */}
+        {/* Cards Grid with Correct Arrow Pattern */}
         <div className="max-w-6xl mx-auto px-6 py-12">
           <div className="relative">
             {/* Grid Container - First row: cards 1,2 - Second row: cards 3,4 - Third row: cards 5,6 */}
@@ -396,7 +396,7 @@ const Index = () => {
             {/* Corrected Arrow Pattern: 1→2, 2↓3, 4←3, 4↓5, 5→6 */}
             
             {/* Arrow 1→2 (Right arrow between cards 1 and 2) */}
-            <div className="hidden md:block absolute top-[12%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+            <div className="hidden md:block absolute top-[20%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
               <div className={`
                 flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 shadow-lg
                 ${completedLevels.includes(0)
@@ -409,7 +409,7 @@ const Index = () => {
             </div>
 
             {/* Down arrow from AI Chat (2) to Pitch Yourself (3) */}
-            <div className="hidden md:block absolute top-[29%] right-[25%] transform translate-x-1/2 z-10">
+            <div className="hidden md:block absolute top-[37%] right-[25%] transform translate-x-1/2 z-10">
               <div className={`
                 flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 shadow-lg
                 ${completedLevels.includes(1)
@@ -422,7 +422,7 @@ const Index = () => {
             </div>
 
             {/* Arrow Self Practice (4) ← Pitch Yourself (3) - Left arrow from card 3 to card 4 */}
-            <div className="hidden md:block absolute top-[46%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+            <div className="hidden md:block absolute top-[54%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
               <div className={`
                 flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 shadow-lg
                 ${completedLevels.includes(2)
@@ -435,7 +435,7 @@ const Index = () => {
             </div>
 
             {/* Down arrow from Self Practice (4) to AI Proctored Interview (5) */}
-            <div className="hidden md:block absolute top-[63%] left-[25%] transform -translate-x-1/2 z-10">
+            <div className="hidden md:block absolute top-[71%] left-[25%] transform -translate-x-1/2 z-10">
               <div className={`
                 flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 shadow-lg
                 ${completedLevels.includes(3)
@@ -448,7 +448,7 @@ const Index = () => {
             </div>
 
             {/* Arrow AI Proctored Interview (5) → GameOn Competition (6) */}
-            <div className="hidden md:block absolute top-[80%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+            <div className="hidden md:block absolute top-[88%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
               <div className={`
                 flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 shadow-lg
                 ${completedLevels.includes(4)
