@@ -43,7 +43,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
 
   useEffect(() => {
     return () => {
-      console.log('Cleaning up camera stream...');
+      console.log('Component unmounting, cleaning up camera...');
       stopCamera();
     };
   }, []);
@@ -52,38 +52,82 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
     try {
       setIsStartingCamera(true);
       setCameraError(null);
-      console.log('Attempting to start camera...');
+      console.log('Starting camera...');
       
       // Stop any existing stream first
       stopCamera();
       
+      // Check if getUserMedia is supported
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Camera access is not supported in this browser');
+      }
+      
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: {
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
+          width: { ideal: 1280, min: 640 },
+          height: { ideal: 720, min: 480 },
           facingMode: 'user'
         }, 
         audio: false 
       });
       
-      console.log('Got camera stream:', stream);
+      console.log('Camera stream obtained successfully');
       streamRef.current = stream;
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        console.log('Camera stream assigned to video element');
         
-        // Ensure video plays and update state immediately
-        await videoRef.current.play();
-        setIsVideoOn(true);
-        setIsStartingCamera(false);
-        console.log('Camera started successfully');
+        // Wait for the video to be ready before updating state
+        const handleLoadedMetadata = () => {
+          console.log('Video metadata loaded, camera ready');
+          setIsVideoOn(true);
+          setIsStartingCamera(false);
+          videoRef.current?.removeEventListener('loadedmetadata', handleLoadedMetadata);
+        };
+        
+        videoRef.current.addEventListener('loadedmetadata', handleLoadedMetadata);
+        
+        // Fallback timeout in case loadedmetadata doesn't fire
+        setTimeout(() => {
+          if (isStartingCamera) {
+            console.log('Fallback: Setting camera as ready');
+            setIsVideoOn(true);
+            setIsStartingCamera(false);
+          }
+        }, 3000);
+        
+        try {
+          await videoRef.current.play();
+          console.log('Video playback started');
+        } catch (playError) {
+          console.warn('Video play failed, but stream is active:', playError);
+          // Sometimes autoplay fails but the stream is still active
+          setIsVideoOn(true);
+          setIsStartingCamera(false);
+        }
       }
     } catch (error) {
-      console.error('Error accessing camera:', error);
-      setCameraError('Unable to access camera. Please check your permissions and try again.');
-      setIsVideoOn(false);
+      console.error('Camera access error:', error);
       setIsStartingCamera(false);
+      
+      let errorMessage = 'Unable to access camera. ';
+      
+      if (error instanceof Error) {
+        if (error.name === 'NotAllowedError') {
+          errorMessage += 'Please allow camera access and refresh the page.';
+        } else if (error.name === 'NotFoundError') {
+          errorMessage += 'No camera found on this device.';
+        } else if (error.name === 'NotReadableError') {
+          errorMessage += 'Camera is being used by another application.';
+        } else {
+          errorMessage += error.message;
+        }
+      } else {
+        errorMessage += 'Please check your camera permissions and try again.';
+      }
+      
+      setCameraError(errorMessage);
+      setIsVideoOn(false);
     }
   };
 
@@ -91,7 +135,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
     console.log('Stopping camera...');
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => {
-        console.log('Stopping track:', track.kind);
+        console.log('Stopping track:', track.kind, track.label);
         track.stop();
       });
       streamRef.current = null;
@@ -117,12 +161,12 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
     console.log('Proceeding to interview...');
     setShowCongratulations(false);
     
-    // Start camera immediately with a slight delay to ensure UI is ready
+    // Start camera immediately when entering interview
     setTimeout(async () => {
-      console.log('Starting camera for interview...');
+      console.log('Auto-starting camera for interview...');
       await startCamera();
       
-      // Start with the first question after camera starts
+      // Start with the first question after a short delay
       setTimeout(() => {
         const firstQuestion: Message = {
           id: Date.now(),
@@ -222,6 +266,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
                   <div className="w-full h-full flex flex-col items-center justify-center text-center p-4">
                     <div className="animate-spin w-12 h-12 border-4 border-pink-500 border-t-transparent rounded-full mb-4"></div>
                     <p className="text-white text-lg">Starting camera...</p>
+                    <p className="text-gray-300 text-sm mt-2">Please allow camera access if prompted</p>
                   </div>
                 ) : cameraError ? (
                   <div className="w-full h-full flex flex-col items-center justify-center text-center p-6">
