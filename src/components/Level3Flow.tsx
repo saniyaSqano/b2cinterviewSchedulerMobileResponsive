@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Mic, MicOff, X } from 'lucide-react';
 import Level3CongratulationsScreen from './Level3CongratulationsScreen';
@@ -41,145 +40,28 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
 
   // Log when the component mounts to track initialization
   useEffect(() => {
-    return () => {
-      console.log('Component unmounting, cleaning up camera...');
-      stopCamera();
-    };
+    console.log('Video interview component mounted');
   }, []);
 
-  const startCamera = async () => {
-    try {
-      setIsStartingCamera(true);
-      setCameraError(null);
-      console.log('Starting camera...');
-      
-      // Stop any existing stream first
-      stopCamera();
-      
-      // Check if getUserMedia is supported
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error('Camera access is not supported in this browser');
-      }
-      
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: {
-          width: { ideal: 1280, min: 640 },
-          height: { ideal: 720, min: 480 },
-          facingMode: 'user'
-        }, 
-        audio: false 
-      });
-      
-      console.log('Camera stream obtained successfully');
-      streamRef.current = stream;
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        
-        // Use a promise-based approach for better reliability
-        await new Promise((resolve, reject) => {
-          const video = videoRef.current!;
-          
-          const handleCanPlay = () => {
-            console.log('Video can play, setting camera as ready');
-            video.removeEventListener('canplay', handleCanPlay);
-            video.removeEventListener('error', handleError);
-            setIsVideoOn(true);
-            setIsStartingCamera(false);
-            resolve(true);
-          };
-          
-          const handleError = (error: Event) => {
-            console.error('Video error:', error);
-            video.removeEventListener('canplay', handleCanPlay);
-            video.removeEventListener('error', handleError);
-            reject(new Error('Video playback failed'));
-          };
-          
-          video.addEventListener('canplay', handleCanPlay);
-          video.addEventListener('error', handleError);
-          
-          // Shorter timeout for faster response
-          setTimeout(() => {
-            video.removeEventListener('canplay', handleCanPlay);
-            video.removeEventListener('error', handleError);
-            console.log('Timeout reached, forcing camera ready state');
-            setIsVideoOn(true);
-            setIsStartingCamera(false);
-            resolve(true);
-          }, 2000);
-        });
-        
-        // Attempt to play the video
-        try {
-          await videoRef.current.play();
-          console.log('Video playback started successfully');
-        } catch (playError) {
-          console.warn('Video autoplay failed, but stream is active:', playError);
-          // This is often due to browser autoplay policies, but the stream is still working
-        }
-      }
-    } catch (error) {
-      console.error('Camera access error:', error);
-      setIsStartingCamera(false);
-      
-      let errorMessage = 'Unable to access camera. ';
-      
-      if (error instanceof Error) {
-        if (error.name === 'NotAllowedError') {
-          errorMessage += 'Please allow camera access and refresh the page.';
-        } else if (error.name === 'NotFoundError') {
-          errorMessage += 'No camera found on this device.';
-        } else if (error.name === 'NotReadableError') {
-          errorMessage += 'Camera is being used by another application.';
-        } else {
-          errorMessage += error.message;
-        }
-      } else {
-        errorMessage += 'Please check your camera permissions and try again.';
-      }
-      
-      setCameraError(errorMessage);
-      setIsVideoOn(false);
-    }
-  };
-
-  const stopCamera = () => {
-    console.log('Stopping camera...');
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => {
-        console.log('Stopping track:', track.kind, track.label);
-        track.stop();
-      });
-      streamRef.current = null;
-    }
-    
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
-    
-    setIsVideoOn(false);
+  // Handle video status changes from the VideoFeed component
+  const handleVideoStatusChange = (status: boolean) => {
+    console.log('Video status changed:', status);
+    setIsVideoOn(status);
   };
 
   const handleProceedToInterview = () => {
     console.log('Proceeding to interview...');
     setShowCongratulations(false);
     
-    // Start camera immediately when entering interview
-    setTimeout(async () => {
-      console.log('Auto-starting camera for interview...');
-      await startCamera();
-      
-      // Start with the first question after a short delay
-      setTimeout(() => {
-        const firstQuestion: Message = {
-          id: Date.now(),
-          text: questions[0],
-          sender: 'ai',
-          timestamp: new Date()
-        };
-        setMessages([firstQuestion]);
-      }, 1000);
+    // Start with the first question immediately
+    setTimeout(() => {
+      const firstQuestion: Message = {
+        id: Date.now(),
+        text: questions[0],
+        sender: 'ai',
+        timestamp: new Date()
+      };
+      setMessages([firstQuestion]);
     }, 500);
   };
 
@@ -263,77 +145,26 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
 
           {/* Your Video Feed */}
           <div className="flex-1 p-6">
-            <div className="bg-white/90 rounded-2xl p-6 h-full flex flex-col">
-              <h3 className="text-lg font-semibold text-gray-700 mb-4">Your Video</h3>
-              <div className="flex-1 bg-gray-900 rounded-xl overflow-hidden relative">
-                {isStartingCamera ? (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-center p-4">
-                    <div className="animate-spin w-12 h-12 border-4 border-pink-500 border-t-transparent rounded-full mb-4"></div>
-                    <p className="text-white text-lg">Starting camera...</p>
-                    <p className="text-gray-300 text-sm mt-2">Please allow camera access if prompted</p>
-                  </div>
-                ) : cameraError ? (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-center p-6">
-                    <VideoOff className="w-16 h-16 text-red-400 mb-4" />
-                    <p className="text-red-400 text-lg mb-4">{cameraError}</p>
-                    <button
-                      onClick={startCamera}
-                      className="mt-4 px-6 py-3 bg-pink-500 text-white text-lg rounded-full hover:bg-pink-600 transition-colors"
-                    >
-                      Try Again
-                    </button>
-                  </div>
-                ) : isVideoOn ? (
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    muted
-                    playsInline
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-center p-6">
-                    <VideoOff className="w-16 h-16 text-gray-400 mb-4" />
-                    <p className="text-gray-400 text-lg mb-4">Camera is off</p>
-                    <button
-                      onClick={startCamera}
-                      className="px-6 py-3 bg-pink-500 text-white text-lg rounded-full hover:bg-pink-600 transition-colors"
-                    >
-                      Start Camera
-                    </button>
-                  </div>
-                )}
-              </div>
-              
-              {/* Video Controls */}
-              <div className="flex justify-center space-x-4 mt-6">
-                <button
-                  onClick={toggleVideo}
-                  disabled={isStartingCamera}
-                  className={`p-4 rounded-full transition-colors ${
-                    isVideoOn 
-                      ? 'bg-gray-200 hover:bg-gray-300' 
-                      : 'bg-red-500 hover:bg-red-600 text-white'
-                  } ${isStartingCamera ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  {isVideoOn ? <Video className="w-6 h-6" /> : <VideoOff className="w-6 h-6" />}
-                </button>
-                <button
-                  onClick={() => setIsMicOn(!isMicOn)}
-                  className={`p-4 rounded-full transition-colors ${
-                    isMicOn 
-                      ? 'bg-gray-200 hover:bg-gray-300' 
-                      : 'bg-red-500 hover:bg-red-600 text-white'
-                  }`}
-                >
-                  {isMicOn ? <Mic className="w-6 h-6" /> : <MicOff className="w-6 h-6" />}
-                </button>
-              </div>
-            </div>
+            <VideoFeed onStatusChange={handleVideoStatusChange} />
+          </div>
+          
+          {/* Audio Controls */}
+          <div className="p-4 flex justify-center">
+            <button
+              onClick={() => setIsMicOn(!isMicOn)}
+              className={`p-4 rounded-full transition-colors ${
+                isMicOn 
+                  ? 'bg-gray-200 hover:bg-gray-300' 
+                  : 'bg-red-500 hover:bg-red-600 text-white'
+              }`}
+              title={isMicOn ? "Turn Microphone Off" : "Turn Microphone On"}
+            >
+              {isMicOn ? <Mic className="w-6 h-6" /> : <MicOff className="w-6 h-6" />}
+            </button>
           </div>
         </div>
 
-        {/* Right Side - AI Coach and Chat (30%) */}
+        {/* Right Side - AI Coach and Chat (40%) */}
         <div className="w-2/5 flex flex-col">
           {/* AI Coach Area */}
           <div className="bg-gradient-to-r from-pink-100/80 to-purple-100/80 backdrop-blur-md p-4 border-b border-white/20">
@@ -369,82 +200,58 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
                 className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-xs px-3 py-2 rounded-2xl text-sm ${
-                    message.sender === 'user'
-                      ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white'
-                      : 'bg-white/90 backdrop-blur-md text-gray-800 shadow-lg'
-                  }`}
+                  className={`max-w-[80%] rounded-2xl p-3 ${
+                    message.sender === 'user' 
+                      ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white' 
+                      : 'bg-white/90 text-gray-800'
+                  } shadow-md`}
                 >
-                  <div className="flex items-start space-x-2">
-                    {message.sender === 'ai' && (
-                      <div className="text-base">👩‍💼</div>
-                    )}
-                    <div>
-                      <p className="leading-relaxed">{message.text}</p>
-                      <p className={`text-xs mt-1 ${
-                        message.sender === 'user' ? 'text-purple-100' : 'text-gray-500'
-                      }`}>
-                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                    </div>
-                  </div>
+                  <p className="text-sm">{message.text}</p>
+                  <p className="text-xs opacity-70 text-right mt-1">
+                    {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </p>
                 </div>
               </div>
             ))}
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input Area */}
-          {!isComplete && (
-            <div className="bg-white/90 backdrop-blur-md border-t border-white/20 p-3">
-              <div className="flex items-end space-x-2">
-                <div className="flex-1">
-                  <textarea
-                    value={currentInput}
-                    onChange={(e) => setCurrentInput(e.target.value)}
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        handleSendMessage();
-                      }
-                    }}
-                    placeholder="Share your thoughts here..."
-                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent text-sm"
-                    rows={2}
-                  />
-                </div>
+          {/* Chat Input */}
+          {!isComplete ? (
+            <div className="p-3 bg-white/80 backdrop-blur-md border-t border-white/20">
+              <div className="flex items-center space-x-2">
+                <input
+                  type="text"
+                  value={currentInput}
+                  onChange={(e) => setCurrentInput(e.target.value)}
+                  placeholder="Type your response..."
+                  className="flex-1 bg-white/80 border border-gray-200 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                />
                 <button
                   onClick={handleSendMessage}
                   disabled={!currentInput.trim()}
-                  className="p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full hover:from-pink-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
+                  className="p-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <ArrowLeft className="w-4 h-4 rotate-180" />
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
                 </button>
               </div>
             </div>
-          )}
-
-          {/* Completion Area */}
-          {isComplete && (
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-t border-green-200 p-3">
-              <div className="text-center">
-                <p className="text-green-800 font-semibold mb-2 text-sm">Level 3 Complete! 🎉</p>
-                <button
-                  onClick={onBack}
-                  className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-full hover:from-green-600 hover:to-emerald-600 transition-all shadow-lg text-sm"
-                >
-                  Continue to Next Level
-                </button>
-              </div>
+          ) : (
+            <div className="p-4 bg-white/80 backdrop-blur-md border-t border-white/20 text-center">
+              <button
+                onClick={onBack}
+                className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full shadow-md hover:from-pink-600 hover:to-purple-600 transition-colors"
+              >
+                Complete Interview
+              </button>
+              <p className="text-xs text-gray-500 mt-2">
+                {currentQuestionIndex + 1} of {questions.length} questions completed
+              </p>
             </div>
           )}
-
-          {/* Progress Indicator */}
-          <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md rounded-full px-2 py-1 shadow-lg">
-            <p className="text-xs font-medium text-gray-700">
-              Question {Math.min(currentQuestionIndex + 1, questions.length)} of {questions.length}
-            </p>
-          </div>
         </div>
       </div>
     </div>

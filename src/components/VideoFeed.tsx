@@ -12,6 +12,7 @@ const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange }) => {
   const [error, setError] = useState<string | null>(null);
   const webcamRef = useRef<Webcam>(null);
   const [key, setKey] = useState(0); // Used to force remount of webcam component
+  const [rearCameraId, setRearCameraId] = useState<string | null>(null);
 
   // Notify parent component when video status changes
   useEffect(() => {
@@ -23,26 +24,98 @@ const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange }) => {
   // Handle webcam errors
   const handleWebcamError = useCallback((err: string | DOMException) => {
     console.error('Webcam error:', err);
-    setError(`Unable to access camera: ${err instanceof DOMException ? err.message : err}`);
+    const errorMessage = err instanceof DOMException ? err.message : String(err);
+    setError(`Unable to access camera: ${errorMessage}`);
     setIsVideoOn(false);
     setIsStarting(false);
   }, []);
 
   // Handle successful webcam start
   const handleWebcamStart = useCallback(() => {
-    console.log('Webcam started successfully');
+    console.log('Camera started successfully');
+    
+    // Get information about the camera being used
+    if (webcamRef.current && webcamRef.current.stream) {
+      const videoTracks = webcamRef.current.stream.getVideoTracks();
+      if (videoTracks.length > 0) {
+        console.log('Camera info:', videoTracks[0].label);
+        console.log('Camera settings:', videoTracks[0].getSettings());
+      }
+    }
+    
     setIsVideoOn(true);
     setIsStarting(false);
     setError(null);
   }, []);
 
-  const startCamera = useCallback(() => {
+  // Find rear camera by enumerating devices
+  const findRearCamera = useCallback(async () => {
+    try {
+      // Request permission first
+      const initialStream = await navigator.mediaDevices.getUserMedia({ video: true });
+      // Stop the stream immediately after getting permission
+      initialStream.getTracks().forEach(track => track.stop());
+      
+      // Now enumerate devices
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices.filter(device => device.kind === 'videoinput');
+      
+      console.log('Available video devices:', videoDevices);
+      
+      if (videoDevices.length === 0) {
+        throw new Error('No video devices found');
+      }
+      
+      // Try to find rear camera by label
+      let rearCamera = videoDevices.find(device => {
+        const label = device.label.toLowerCase();
+        return label.includes('back') || label.includes('rear') || label.includes('environment');
+      });
+      
+      // If no camera with rear/back in the name, and we have multiple cameras,
+      // use the last one (often the rear camera)
+      if (!rearCamera && videoDevices.length > 1) {
+        rearCamera = videoDevices[videoDevices.length - 1];
+      }
+      
+      // If we still don't have a camera, use the first one
+      if (!rearCamera && videoDevices.length > 0) {
+        rearCamera = videoDevices[0];
+      }
+      
+      if (rearCamera) {
+        console.log('Selected camera:', rearCamera.label);
+        return rearCamera.deviceId;
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error finding rear camera:', error);
+      return null;
+    }
+  }, []);
+
+  const startCamera = useCallback(async () => {
     setIsStarting(true);
     setError(null);
-    console.log('Starting camera...');
-    // The webcam will start automatically when mounted
-    setKey(prevKey => prevKey + 1); // Force remount of webcam component
-  }, []);
+    
+    try {
+      // If we don't have a rear camera ID yet, try to find one
+      if (!rearCameraId) {
+        const deviceId = await findRearCamera();
+        if (deviceId) {
+          setRearCameraId(deviceId);
+        }
+      }
+      
+      // Force remount of webcam component
+      setKey(prevKey => prevKey + 1);
+    } catch (error) {
+      console.error('Error starting camera:', error);
+      setError('Failed to start camera');
+      setIsStarting(false);
+    }
+  }, [rearCameraId, findRearCamera]);
 
   const stopCamera = useCallback(() => {
     console.log('Stopping camera');
@@ -59,15 +132,28 @@ const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange }) => {
   }, [isVideoOn, startCamera, stopCamera]);
 
   const retryCamera = useCallback(() => {
+    // Reset rear camera ID to force a new search
+    setRearCameraId(null);
     startCamera();
   }, [startCamera]);
 
-  // Video constraints
-  const videoConstraints = {
-    width: 1280,
-    height: 720,
-    facingMode: "user"
-  };
+  // Auto-start camera on component mount
+  useEffect(() => {
+    startCamera();
+  }, [startCamera]);
+
+  // Determine video constraints based on whether we have a rear camera ID
+  const videoConstraints = rearCameraId
+    ? {
+        width: 1280,
+        height: 720,
+        deviceId: { exact: rearCameraId }
+      }
+    : {
+        width: 1280,
+        height: 720,
+        facingMode: { exact: "environment" }
+      };
 
   return (
     <div className="bg-white/90 rounded-2xl p-6 h-full flex flex-col">
@@ -83,9 +169,9 @@ const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange }) => {
             onUserMedia={handleWebcamStart}
             onUserMediaError={handleWebcamError}
             className="w-full h-full object-cover"
-            mirrored={true}
+            mirrored={false} // Never mirror to ensure rear camera displays correctly
             screenshotFormat="image/jpeg"
-            style={{ display: isVideoOn ? 'block' : 'none' }}
+            style={{ display: isVideoOn ? 'block' : 'none', transform: 'scaleX(-1)' }} // Flip horizontally to correct orientation
           />
         )}
         
