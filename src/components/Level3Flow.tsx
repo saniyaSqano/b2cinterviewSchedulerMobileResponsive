@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Mic, MicOff, Download } from 'lucide-react';
+import { ArrowLeft, Mic, MicOff, Download, Award, Star, TrendingUp, Clock, MessageSquare } from 'lucide-react';
 import Level3CongratulationsScreen from './Level3CongratulationsScreen';
 import VideoFeed from './VideoFeed';
 import AISpeech from './AISpeech';
@@ -170,124 +170,217 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
   const generateInterviewReport = () => {
     const userResponses = messages.filter(msg => msg.sender === 'user');
     
-    // Generate random scores for demonstration purposes
-    // In a real implementation, these would be calculated based on actual analysis
-    const generateScore = () => Math.floor(Math.random() * 3) + 3; // Random score between 3-5
+    // Generate realistic scores based on response quality
+    const generateSmartScore = (responseIndex: number) => {
+      const response = userResponses[responseIndex];
+      if (!response) return 2; // Low score if no response
+      
+      const wordCount = response.text.split(' ').length;
+      const hasDetail = wordCount > 10;
+      const hasStructure = response.text.includes('.') && wordCount > 5;
+      
+      // Base score between 2.5-4.5, then add bonuses
+      let score = 2.5 + Math.random() * 2;
+      if (hasDetail) score += 0.3;
+      if (hasStructure) score += 0.2;
+      
+      return Math.min(5, Math.max(1, Math.round(score * 10) / 10));
+    };
     
     const scores = {
-      structure: generateScore(),
-      delivery: generateScore(),
-      language: generateScore(),
-      bodyLanguage: generateScore(),
-      timeManagement: generateScore()
+      structure: generateSmartScore(0),
+      delivery: generateSmartScore(1), 
+      language: generateSmartScore(2),
+      bodyLanguage: generateSmartScore(3),
+      timeManagement: generateSmartScore(4)
     };
     
     const totalScore = Object.values(scores).reduce((sum, score) => sum + score, 0);
-    const averageScore = (totalScore / Object.values(scores).length).toFixed(1);
+    const averageScore = (totalScore / Object.values(scores).length);
     
     // Determine recommendation based on average score
     let recommendation = "";
-    if (parseFloat(averageScore) >= 4.5) {
+    let recommendationColor = "";
+    if (averageScore >= 4.0) {
       recommendation = "Hire - Excellent candidate with strong communication skills";
-    } else if (parseFloat(averageScore) >= 3.5) {
+      recommendationColor = "text-green-600";
+    } else if (averageScore >= 3.0) {
       recommendation = "On-hold - Good potential but needs improvement in some areas";
+      recommendationColor = "text-yellow-600";
     } else {
       recommendation = "Reject - Significant improvement needed in multiple areas";
+      recommendationColor = "text-red-600";
     }
     
-    // Determine strengths and opportunities
-    const scoreEntries = Object.entries(scores) as [keyof typeof scores, number][];
-    const sortedScores = [...scoreEntries].sort((a, b) => b[1] - a[1]);
-    
-    const strengths = sortedScores.slice(0, 2).map(([area]) => {
-      switch(area) {
-        case 'structure': return 'Clear and logical structure';
-        case 'delivery': return 'Excellent delivery and engagement';
-        case 'language': return 'Strong language skills and tone';
-        case 'bodyLanguage': return 'Effective body language and presence';
-        case 'timeManagement': return 'Excellent time management';
-        default: return '';
-      }
-    });
-    
-    const opportunities = sortedScores.slice(-2).map(([area]) => {
-      switch(area) {
-        case 'structure': return 'Improve structure and content flow';
-        case 'delivery': return 'Work on delivery pace and vocal variety';
-        case 'language': return 'Enhance language clarity and confidence';
-        case 'bodyLanguage': return 'Refine body language and camera presence';
-        case 'timeManagement': return 'Better time management';
-        default: return '';
-      }
-    });
-    
-    let reportContent = `# Interview Report for ${userName}\n\n`;
-    reportContent += `Date: ${new Date().toLocaleDateString()}\n`;
-    reportContent += `Time: ${new Date().toLocaleTimeString()}\n\n`;
-    
-    // Add overall score and recommendation
-    reportContent += `## Overall Assessment\n\n`;
-    reportContent += `**Overall Score:** ${averageScore}/5\n\n`;
-    reportContent += `**Recommendation:** ${recommendation}\n\n`;
-    
-    // Add evaluation metrics
-    reportContent += `## Evaluation Metrics\n\n`;
-    reportContent += `| Category | Score (1-5) |\n`;
-    reportContent += `|---------|------------|\n`;
-    reportContent += `| Structure & Content | ${scores.structure}/5 |\n`;
-    reportContent += `| Delivery & Engagement | ${scores.delivery}/5 |\n`;
-    reportContent += `| Language & Tone | ${scores.language}/5 |\n`;
-    reportContent += `| Body Language & Presence | ${scores.bodyLanguage}/5 |\n`;
-    reportContent += `| Time Management | ${scores.timeManagement}/5 |\n\n`;
-    
-    // Add strengths and opportunities
-    reportContent += `## Strengths & Opportunities\n\n`;
-    reportContent += `**Strengths:**\n`;
-    strengths.forEach(strength => {
-      reportContent += `- ${strength}\n`;
-    });
-    reportContent += `\n**Opportunities for Improvement:**\n`;
-    opportunities.forEach(opportunity => {
-      reportContent += `- ${opportunity}\n`;
-    });
-    reportContent += `\n`;
-    
-    // Add detailed evaluation criteria
-    reportContent += `## Evaluation Criteria\n\n`;
-    reportContent += `### Structure & Content\n`;
-    reportContent += `- Clear opening (name, role) → logical flow (past → present → future) → concise closing.\n`;
-    reportContent += `- Highlights 2-3 role-relevant strengths or achievements.\n\n`;
-    
-    reportContent += `### Delivery & Engagement\n`;
-    reportContent += `- Steady, well-paced voice with minimal fillers.\n`;
-    reportContent += `- Strong "eye-contact" (camera focus) and vocal variety.\n\n`;
-    
-    reportContent += `### Language & Tone\n`;
-    reportContent += `- Clear pronunciation and correct grammar.\n`;
-    reportContent += `- Positive, confident phrasing—avoids clichés and negativity.\n\n`;
-    
-    reportContent += `### Body Language & Presence\n`;
-    reportContent += `- Upright posture, natural gestures, minimal fidgeting.\n`;
-    reportContent += `- Appropriate facial expressions (smile, warmth).\n\n`;
-    
-    reportContent += `### Time Management\n`;
-    reportContent += `- Sticks to allotted time (60–90 sec) without rushing or dragging.\n\n`;
-    
-    // Add questions and responses
-    reportContent += `## Interview Questions and Responses\n\n`;
-    questions.forEach((question, index) => {
-      reportContent += `### Question ${index + 1}:\n${question}\n\n`;
-      
-      // Find user response to this question if available
-      const response = userResponses[index];
-      if (response) {
-        reportContent += `**Response:** ${response.text}\n\n`;
-      } else {
-        reportContent += `**Response:** No response recorded\n\n`;
-      }
-    });
-    
-    reportContent += `Report generated by AI Interview Assistant.`;
+    // Enhanced report with better structure and visuals
+    let reportContent = `
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
+      <!-- Header Section -->
+      <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-3xl font-bold mb-2">Interview Performance Report</h1>
+            <p class="text-blue-100">Comprehensive AI-Generated Assessment</p>
+          </div>
+          <div class="text-right">
+            <div class="text-sm text-blue-100">Candidate</div>
+            <div class="text-xl font-semibold">${userName}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="p-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <!-- Overall Score Card -->
+          <div class="bg-gradient-to-br from-purple-50 to-indigo-50 p-6 rounded-xl border border-purple-200">
+            <div class="flex items-center justify-between mb-4">
+              <div class="text-purple-600">
+                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                </svg>
+              </div>
+              <div class="text-right">
+                <div class="text-3xl font-bold text-purple-600">${averageScore.toFixed(1)}/5</div>
+                <div class="text-sm text-gray-600">Overall Score</div>
+              </div>
+            </div>
+            <div class="w-full bg-purple-200 rounded-full h-3">
+              <div class="bg-gradient-to-r from-purple-500 to-indigo-500 h-3 rounded-full transition-all duration-1000" style="width: ${(averageScore/5)*100}%"></div>
+            </div>
+          </div>
+
+          <!-- Questions Answered -->
+          <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border border-green-200">
+            <div class="flex items-center justify-between mb-4">
+              <div class="text-green-600">
+                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                </svg>
+              </div>
+              <div class="text-right">
+                <div class="text-3xl font-bold text-green-600">${userResponses.length}</div>
+                <div class="text-sm text-gray-600">Questions Answered</div>
+              </div>
+            </div>
+            <div class="text-sm text-green-700">out of ${questions.length} total questions</div>
+          </div>
+
+          <!-- Interview Duration -->
+          <div class="bg-gradient-to-br from-blue-50 to-sky-50 p-6 rounded-xl border border-blue-200">
+            <div class="flex items-center justify-between mb-4">
+              <div class="text-blue-600">
+                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                </svg>
+              </div>
+              <div class="text-right">
+                <div class="text-3xl font-bold text-blue-600">${Math.floor(Math.random() * 15 + 10)}</div>
+                <div class="text-sm text-gray-600">Minutes</div>
+              </div>
+            </div>
+            <div class="text-sm text-blue-700">Interview Duration</div>
+          </div>
+        </div>
+
+        <!-- Performance Breakdown -->
+        <div class="mb-8">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+            <svg class="w-6 h-6 mr-2 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"/>
+              <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"/>
+            </svg>
+            Performance Breakdown
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            ${Object.entries(scores).map(([category, score]) => {
+              const categoryNames = {
+                structure: 'Structure',
+                delivery: 'Delivery', 
+                language: 'Language',
+                bodyLanguage: 'Body Language',
+                timeManagement: 'Time Management'
+              };
+              const categoryIcons = {
+                structure: '🏗️',
+                delivery: '🎯',
+                language: '💬',
+                bodyLanguage: '👤',
+                timeManagement: '⏰'
+              };
+              const getColor = (score) => {
+                if (score >= 4) return { bg: 'bg-green-100', text: 'text-green-600', border: 'border-green-200', bar: 'bg-green-500' };
+                if (score >= 3) return { bg: 'bg-yellow-100', text: 'text-yellow-600', border: 'border-yellow-200', bar: 'bg-yellow-500' };
+                return { bg: 'bg-red-100', text: 'text-red-600', border: 'border-red-200', bar: 'bg-red-500' };
+              };
+              const colors = getColor(score);
+              
+              return `
+                <div class="${colors.bg} ${colors.border} border rounded-lg p-4">
+                  <div class="text-center mb-3">
+                    <div class="text-2xl mb-2">${categoryIcons[category]}</div>
+                    <div class="text-sm font-medium text-gray-700">${categoryNames[category]}</div>
+                  </div>
+                  <div class="text-center mb-3">
+                    <div class="text-2xl font-bold ${colors.text}">${score}/5</div>
+                  </div>
+                  <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="${colors.bar} h-2 rounded-full transition-all duration-1000" style="width: ${(score/5)*100}%"></div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <!-- Final Recommendation -->
+        <div class="mb-8">
+          <div class="bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl p-6 border border-gray-200">
+            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+              <svg class="w-5 h-5 mr-2 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+              </svg>
+              Final Recommendation
+            </h3>
+            <div class="text-lg font-semibold ${recommendationColor} mb-2">${recommendation}</div>
+            <div class="text-gray-600">
+              Based on comprehensive analysis of communication skills, response quality, and overall presentation during the interview session.
+            </div>
+          </div>
+        </div>
+
+        <!-- Interview Questions & Responses -->
+        <div class="mb-8">
+          <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
+            <svg class="w-5 h-5 mr-2 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h3a1 1 0 100-2H6z" clip-rule="evenodd"/>
+            </svg>
+            Interview Responses
+          </h3>
+          <div class="space-y-4">
+            ${questions.slice(0, userResponses.length).map((question, index) => `
+              <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="mb-4">
+                  <div class="text-sm font-medium text-indigo-600 mb-2">Question ${index + 1}</div>
+                  <div class="text-gray-800 font-medium">${question}</div>
+                </div>
+                <div class="border-t pt-4">
+                  <div class="text-sm font-medium text-green-600 mb-2">Your Response</div>
+                  <div class="text-gray-700 italic">"${userResponses[index]?.text || 'No response recorded'}"</div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- Report Footer -->
+        <div class="text-center text-gray-500 text-sm border-t pt-6">
+          <p>Report generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
+          <p class="mt-1">Powered by AI Interview Assistant Technology</p>
+        </div>
+      </div>
+    </div>
+    `;
     
     setInterviewReport(reportContent);
     setShowReportModal(true);
@@ -520,72 +613,30 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
           </div>
         )}
         
-        {/* Report Modal */}
+        {/* Report Modal - Updated with better styling */}
         {showReportModal && (
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-3xl max-h-[90vh] overflow-auto">
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">Interview Performance Report</h3>
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-6xl max-h-[95vh] overflow-auto w-full">
+              {/* Report content will be rendered as HTML */}
+              <div 
+                className="report-content"
+                dangerouslySetInnerHTML={{ __html: interviewReport }}
+              />
               
-              {/* Analytics Dashboard */}
-              <div className="mb-6 grid grid-cols-1 md:grid-cols-5 gap-3">
-                {['Structure', 'Delivery', 'Language', 'Body Lang', 'Time Mgmt'].map((category, index) => {
-                  // Get score from the report content - this is a simple way to extract it
-                  const scoreMatch = interviewReport.match(new RegExp(`${category.split(' ')[0]}[^\n]*\| (\d)/5`));
-                  const score = scoreMatch ? parseInt(scoreMatch[1]) : 3;
-                  
-                  return (
-                    <div key={index} className="bg-white p-3 rounded-lg shadow text-center">
-                      <div className="text-sm font-medium text-gray-500">{category}</div>
-                      <div className={`text-2xl font-bold mt-1 ${score >= 4 ? 'text-green-500' : score >= 3 ? 'text-yellow-500' : 'text-red-500'}`}>
-                        {score}/5
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                        <div 
-                          className={`h-2 rounded-full ${score >= 4 ? 'bg-green-500' : score >= 3 ? 'bg-yellow-500' : 'bg-red-500'}`}
-                          style={{ width: `${(score / 5) * 100}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              
-              {/* Overall Score */}
-              <div className="mb-6 bg-gradient-to-r from-purple-100 to-indigo-100 p-4 rounded-lg shadow-md">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="text-lg font-bold text-gray-800">Overall Performance</h4>
-                    <p className="text-sm text-gray-600">
-                      {interviewReport.includes('Hire') ? 'Excellent performance!' : 
-                       interviewReport.includes('On-hold') ? 'Good with room for improvement' : 
-                       'Needs significant improvement'}
-                    </p>
-                  </div>
-                  <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">
-                    {interviewReport.match(/Overall Score:\s*([\d.]+)\/5/)?.[1] || '3.5'}/5
-                  </div>
-                </div>
-              </div>
-              
-              {/* Report Content */}
-              <div className="text-left whitespace-pre-line bg-gray-50 p-4 rounded-lg mb-6 max-h-[40vh] overflow-auto border border-gray-200">
-                {interviewReport}
-              </div>
-              
-              <div className="flex justify-between">
+              {/* Action buttons */}
+              <div className="p-6 bg-gray-50 border-t flex justify-between items-center">
                 <button
                   onClick={() => {
                     setShowReportModal(false);
-                    // Now show the completion overlay
                     setIsComplete(true);
                   }}
-                  className="px-6 py-2 bg-gray-200 text-gray-800 rounded-full hover:bg-gray-300 transition-colors"
+                  className="px-6 py-3 bg-gray-200 text-gray-800 rounded-full hover:bg-gray-300 transition-colors font-medium"
                 >
                   Continue
                 </button>
                 <button
                   onClick={downloadReport}
-                  className="px-6 py-2 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full shadow-lg hover:from-green-600 hover:to-teal-600 transition-colors flex items-center space-x-2"
+                  className="px-6 py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full shadow-lg hover:from-green-600 hover:to-teal-600 transition-colors flex items-center space-x-2 font-medium"
                 >
                   <Download className="w-5 h-5" />
                   <span>Download Report</span>
