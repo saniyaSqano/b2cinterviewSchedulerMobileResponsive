@@ -393,7 +393,7 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Custom Arrow Pattern: 1→2, ↓2→3, 4←3, ↓4→5, 5→6 */}
+            {/* Corrected Arrow Pattern: 1→2, 2↓3, 4←3, 4↓5, 5→6 */}
             
             {/* Arrow 1→2 (Right arrow between cards 1 and 2) */}
             <div className="hidden md:block absolute top-[12%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
@@ -408,7 +408,7 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Down arrow from 2→3 */}
+            {/* Down arrow from AI Chat (2) to Pitch Yourself (3) */}
             <div className="hidden md:block absolute top-[29%] right-[25%] transform translate-x-1/2 z-10">
               <div className={`
                 flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 shadow-lg
@@ -421,7 +421,7 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Arrow 4←3 (Left arrow from card 3 to card 4) */}
+            {/* Arrow Self Practice (4) ← Pitch Yourself (3) - Left arrow from card 3 to card 4 */}
             <div className="hidden md:block absolute top-[46%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
               <div className={`
                 flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 shadow-lg
@@ -434,8 +434,8 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Down arrow from 4→5 */}
-            <div className="hidden md:block absolute top-[63%] right-[25%] transform translate-x-1/2 z-10">
+            {/* Down arrow from Self Practice (4) to AI Proctored Interview (5) */}
+            <div className="hidden md:block absolute top-[63%] left-[25%] transform -translate-x-1/2 z-10">
               <div className={`
                 flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 shadow-lg
                 ${completedLevels.includes(3)
@@ -447,7 +447,7 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Arrow 5→6 (Right arrow between cards 5 and 6) */}
+            {/* Arrow AI Proctored Interview (5) → GameOn Competition (6) */}
             <div className="hidden md:block absolute top-[80%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
               <div className={`
                 flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 shadow-lg
