@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import ParticleBackground from '../components/ParticleBackground';
 import AssessmentFlow from '../components/AssessmentFlow';
@@ -5,7 +6,7 @@ import ChatFlow from '../components/ChatFlow';
 import Level3Flow from '../components/Level3Flow';
 import Level4Flow from '../components/Level4Flow';
 import Level5Flow from '../components/Level5Flow';
-import LearningCard from '../components/LearningCard';
+import InteractiveRoadmap from '../components/InteractiveRoadmap';
 
 const Index = () => {
   const [currentLevel, setCurrentLevel] = useState(0);
@@ -17,48 +18,9 @@ const Index = () => {
   const [showLevel5, setShowLevel5] = useState(false);
   const [assessmentScore] = useState(70);
 
-  const learningSteps = [
-    {
-      title: "Assessment",
-      subtitle: "Level 1",
-      description: "Take our comprehensive assessment to evaluate your current skills and identify areas for improvement",
-      icon: 'graduation-cap' as const
-    },
-    {
-      title: "Chat with AI",
-      subtitle: "Level 2", 
-      description: "Engage with our AI assistant to get personalized feedback and guidance on your performance",
-      icon: 'user' as const
-    },
-    {
-      title: "Pitch Yourself",
-      subtitle: "Level 3", 
-      description: "Learn to create compelling personal pitches and develop your professional presentation skills",
-      icon: 'user' as const
-    },
-    {
-      title: "Self Practice",
-      subtitle: "Level 4",
-      description: "Practice your skills with interactive exercises and real-world scenarios at your own pace",
-      icon: 'graduation-cap' as const
-    },
-    {
-      title: "AI Proctored Interview",
-      subtitle: "Level 5",
-      description: "Demonstrate your newly acquired skills in an AI-proctored interview environment",
-      icon: 'user' as const
-    },
-    {
-      title: "GameOn",
-      subtitle: "Level 6",
-      description: "Compete with others and showcase your skills in gamified challenges and competitions",
-      icon: 'graduation-cap' as const
-    }
-  ];
-
   const handleCardClick = (index: number) => {
     // For testing: allow access to all levels
-    console.log(`Starting ${learningSteps[index].title}`);
+    console.log(`Starting level ${index}`);
     
     if (index === 0) {
       setShowAssessment(true);
@@ -95,7 +57,7 @@ const Index = () => {
     setTimeout(() => {
       if (!completedLevels.includes(index)) {
         setCompletedLevels(prev => [...prev, index]);
-        if (index === currentLevel && currentLevel < learningSteps.length - 1) {
+        if (index === currentLevel && currentLevel < 5) {
           setCurrentLevel(prev => prev + 1);
         }
       }
@@ -133,7 +95,7 @@ const Index = () => {
   const handleLevel5Completed = () => {
     if (!completedLevels.includes(4)) {
       setCompletedLevels(prev => [...prev, 4]);
-      // All levels completed
+      setCurrentLevel(5);
     }
   };
 
@@ -200,43 +162,23 @@ const Index = () => {
       <ParticleBackground />
       
       <div className="relative z-10 min-h-screen flex flex-col">
-        <div className="bg-white/95 backdrop-blur-sm border-b border-gray-200 text-center py-12">
+        <div className="bg-white/95 backdrop-blur-sm border-b border-gray-200 text-center py-8">
           <div className="max-w-4xl mx-auto px-6">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">
               Professional Development Platform
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Advance your career through our comprehensive skill assessment and development program
+              Follow your personalized roadmap to advance your career through comprehensive skill assessment and development
             </p>
           </div>
         </div>
 
-        <div className="flex-1 py-16 px-6">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-                Your Learning Journey
-              </h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Progress through each level to build and demonstrate your professional capabilities
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {learningSteps.map((step, index) => (
-                <LearningCard
-                  key={index}
-                  title={step.title}
-                  subtitle={step.subtitle}
-                  description={step.description}
-                  icon={step.icon}
-                  isCompleted={completedLevels.includes(index)}
-                  isActive={index === currentLevel}
-                  onClick={() => handleCardClick(index)}
-                />
-              ))}
-            </div>
-          </div>
+        <div className="flex-1">
+          <InteractiveRoadmap
+            currentLevel={currentLevel}
+            completedLevels={completedLevels}
+            onStepClick={handleCardClick}
+          />
         </div>
       </div>
     </div>
