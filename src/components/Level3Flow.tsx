@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Video, VideoOff, Mic, MicOff, X } from 'lucide-react';
 import Level3CongratulationsScreen from './Level3CongratulationsScreen';
@@ -77,33 +78,47 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         
-        // Wait for the video to be ready before updating state
-        const handleLoadedMetadata = () => {
-          console.log('Video metadata loaded, camera ready');
-          setIsVideoOn(true);
-          setIsStartingCamera(false);
-          videoRef.current?.removeEventListener('loadedmetadata', handleLoadedMetadata);
-        };
-        
-        videoRef.current.addEventListener('loadedmetadata', handleLoadedMetadata);
-        
-        // Fallback timeout in case loadedmetadata doesn't fire
-        setTimeout(() => {
-          if (isStartingCamera) {
-            console.log('Fallback: Setting camera as ready');
+        // Use a promise-based approach for better reliability
+        await new Promise((resolve, reject) => {
+          const video = videoRef.current!;
+          
+          const handleCanPlay = () => {
+            console.log('Video can play, setting camera as ready');
+            video.removeEventListener('canplay', handleCanPlay);
+            video.removeEventListener('error', handleError);
             setIsVideoOn(true);
             setIsStartingCamera(false);
-          }
-        }, 3000);
+            resolve(true);
+          };
+          
+          const handleError = (error: Event) => {
+            console.error('Video error:', error);
+            video.removeEventListener('canplay', handleCanPlay);
+            video.removeEventListener('error', handleError);
+            reject(new Error('Video playback failed'));
+          };
+          
+          video.addEventListener('canplay', handleCanPlay);
+          video.addEventListener('error', handleError);
+          
+          // Shorter timeout for faster response
+          setTimeout(() => {
+            video.removeEventListener('canplay', handleCanPlay);
+            video.removeEventListener('error', handleError);
+            console.log('Timeout reached, forcing camera ready state');
+            setIsVideoOn(true);
+            setIsStartingCamera(false);
+            resolve(true);
+          }, 2000);
+        });
         
+        // Attempt to play the video
         try {
           await videoRef.current.play();
-          console.log('Video playback started');
+          console.log('Video playback started successfully');
         } catch (playError) {
-          console.warn('Video play failed, but stream is active:', playError);
-          // Sometimes autoplay fails but the stream is still active
-          setIsVideoOn(true);
-          setIsStartingCamera(false);
+          console.warn('Video autoplay failed, but stream is active:', playError);
+          // This is often due to browser autoplay policies, but the stream is still working
         }
       }
     } catch (error) {
