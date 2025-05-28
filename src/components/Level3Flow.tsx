@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Mic, MicOff, X } from 'lucide-react';
+import { ArrowLeft, Mic, MicOff, Download } from 'lucide-react';
 import Level3CongratulationsScreen from './Level3CongratulationsScreen';
 import VideoFeed from './VideoFeed';
 import AISpeech from './AISpeech';
@@ -33,6 +33,8 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
   const [responseTimer, setResponseTimer] = useState<NodeJS.Timeout | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentInput, setCurrentInput] = useState('');
+  const [interviewReport, setInterviewReport] = useState<string>('');
+  const [showReportModal, setShowReportModal] = useState(false);
 
   const questions = [
     "Hi there! I'm excited to meet you. Could you please introduce yourself and tell me a bit about your background?",
@@ -141,6 +143,9 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
         // Set the current speech text and start speaking
         setCurrentSpeechText(completionMessage.text);
         setIsAISpeaking(true);
+        
+        // Generate interview report
+        generateInterviewReport();
       }, 1500);
     }
   };
@@ -159,6 +164,152 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
     if (transcript.trim()) {
       setCurrentInput(transcript);
     }
+  };
+  
+  // Generate interview report based on questions and messages with analytics
+  const generateInterviewReport = () => {
+    const userResponses = messages.filter(msg => msg.sender === 'user');
+    
+    // Generate random scores for demonstration purposes
+    // In a real implementation, these would be calculated based on actual analysis
+    const generateScore = () => Math.floor(Math.random() * 3) + 3; // Random score between 3-5
+    
+    const scores = {
+      structure: generateScore(),
+      delivery: generateScore(),
+      language: generateScore(),
+      bodyLanguage: generateScore(),
+      timeManagement: generateScore()
+    };
+    
+    const totalScore = Object.values(scores).reduce((sum, score) => sum + score, 0);
+    const averageScore = (totalScore / Object.values(scores).length).toFixed(1);
+    
+    // Determine recommendation based on average score
+    let recommendation = "";
+    if (parseFloat(averageScore) >= 4.5) {
+      recommendation = "Hire - Excellent candidate with strong communication skills";
+    } else if (parseFloat(averageScore) >= 3.5) {
+      recommendation = "On-hold - Good potential but needs improvement in some areas";
+    } else {
+      recommendation = "Reject - Significant improvement needed in multiple areas";
+    }
+    
+    // Determine strengths and opportunities
+    const scoreEntries = Object.entries(scores) as [keyof typeof scores, number][];
+    const sortedScores = [...scoreEntries].sort((a, b) => b[1] - a[1]);
+    
+    const strengths = sortedScores.slice(0, 2).map(([area]) => {
+      switch(area) {
+        case 'structure': return 'Clear and logical structure';
+        case 'delivery': return 'Excellent delivery and engagement';
+        case 'language': return 'Strong language skills and tone';
+        case 'bodyLanguage': return 'Effective body language and presence';
+        case 'timeManagement': return 'Excellent time management';
+        default: return '';
+      }
+    });
+    
+    const opportunities = sortedScores.slice(-2).map(([area]) => {
+      switch(area) {
+        case 'structure': return 'Improve structure and content flow';
+        case 'delivery': return 'Work on delivery pace and vocal variety';
+        case 'language': return 'Enhance language clarity and confidence';
+        case 'bodyLanguage': return 'Refine body language and camera presence';
+        case 'timeManagement': return 'Better time management';
+        default: return '';
+      }
+    });
+    
+    let reportContent = `# Interview Report for ${userName}\n\n`;
+    reportContent += `Date: ${new Date().toLocaleDateString()}\n`;
+    reportContent += `Time: ${new Date().toLocaleTimeString()}\n\n`;
+    
+    // Add overall score and recommendation
+    reportContent += `## Overall Assessment\n\n`;
+    reportContent += `**Overall Score:** ${averageScore}/5\n\n`;
+    reportContent += `**Recommendation:** ${recommendation}\n\n`;
+    
+    // Add evaluation metrics
+    reportContent += `## Evaluation Metrics\n\n`;
+    reportContent += `| Category | Score (1-5) |\n`;
+    reportContent += `|---------|------------|\n`;
+    reportContent += `| Structure & Content | ${scores.structure}/5 |\n`;
+    reportContent += `| Delivery & Engagement | ${scores.delivery}/5 |\n`;
+    reportContent += `| Language & Tone | ${scores.language}/5 |\n`;
+    reportContent += `| Body Language & Presence | ${scores.bodyLanguage}/5 |\n`;
+    reportContent += `| Time Management | ${scores.timeManagement}/5 |\n\n`;
+    
+    // Add strengths and opportunities
+    reportContent += `## Strengths & Opportunities\n\n`;
+    reportContent += `**Strengths:**\n`;
+    strengths.forEach(strength => {
+      reportContent += `- ${strength}\n`;
+    });
+    reportContent += `\n**Opportunities for Improvement:**\n`;
+    opportunities.forEach(opportunity => {
+      reportContent += `- ${opportunity}\n`;
+    });
+    reportContent += `\n`;
+    
+    // Add detailed evaluation criteria
+    reportContent += `## Evaluation Criteria\n\n`;
+    reportContent += `### Structure & Content\n`;
+    reportContent += `- Clear opening (name, role) → logical flow (past → present → future) → concise closing.\n`;
+    reportContent += `- Highlights 2-3 role-relevant strengths or achievements.\n\n`;
+    
+    reportContent += `### Delivery & Engagement\n`;
+    reportContent += `- Steady, well-paced voice with minimal fillers.\n`;
+    reportContent += `- Strong "eye-contact" (camera focus) and vocal variety.\n\n`;
+    
+    reportContent += `### Language & Tone\n`;
+    reportContent += `- Clear pronunciation and correct grammar.\n`;
+    reportContent += `- Positive, confident phrasing—avoids clichés and negativity.\n\n`;
+    
+    reportContent += `### Body Language & Presence\n`;
+    reportContent += `- Upright posture, natural gestures, minimal fidgeting.\n`;
+    reportContent += `- Appropriate facial expressions (smile, warmth).\n\n`;
+    
+    reportContent += `### Time Management\n`;
+    reportContent += `- Sticks to allotted time (60–90 sec) without rushing or dragging.\n\n`;
+    
+    // Add questions and responses
+    reportContent += `## Interview Questions and Responses\n\n`;
+    questions.forEach((question, index) => {
+      reportContent += `### Question ${index + 1}:\n${question}\n\n`;
+      
+      // Find user response to this question if available
+      const response = userResponses[index];
+      if (response) {
+        reportContent += `**Response:** ${response.text}\n\n`;
+      } else {
+        reportContent += `**Response:** No response recorded\n\n`;
+      }
+    });
+    
+    reportContent += `Report generated by AI Interview Assistant.`;
+    
+    setInterviewReport(reportContent);
+    setShowReportModal(true);
+  };
+  
+  // Handle end recording and generate report
+  const handleEndRecording = () => {
+    // Generate report first, don't set complete yet
+    generateInterviewReport();
+    
+    // We'll set isComplete when user closes the report modal
+  };
+  
+  // Download report as text file
+  const downloadReport = () => {
+    const element = document.createElement('a');
+    const file = new Blob([interviewReport], {type: 'text/plain'});
+    element.href = URL.createObjectURL(file);
+    element.download = `interview_report_${userName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
   };
 
   if (showCongratulations) {
@@ -189,11 +340,11 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
                 Level 3 - Video Interview
               </h2>
               <button
-                onClick={onBack}
-                className="p-2 rounded-full bg-red-500 hover:bg-red-600 text-white transition-colors shadow-lg"
-                title="End Interview"
+                onClick={handleEndRecording}
+                className="px-4 py-2 rounded-full bg-red-500 hover:bg-red-600 text-white transition-colors shadow-lg flex items-center space-x-1"
+                title="End Recording"
               >
-                <X className="w-5 h-5" />
+                <span>End Recording</span>
               </button>
             </div>
           </div>
@@ -350,12 +501,96 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
               <p className="text-gray-600 mb-6">
                 Fantastic! You've completed the Pitch Yourself challenge beautifully. Your responses show great self-awareness and motivation.
               </p>
-              <button
-                onClick={onBack}
-                className="px-8 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-full shadow-lg hover:from-purple-600 hover:to-indigo-600 transition-colors"
-              >
-                Continue to Next Level
-              </button>
+              <div className="flex flex-col space-y-3">
+                <button
+                  onClick={downloadReport}
+                  className="px-8 py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full shadow-lg hover:from-green-600 hover:to-teal-600 transition-colors flex items-center justify-center space-x-2"
+                >
+                  <Download className="w-5 h-5" />
+                  <span>Download Report</span>
+                </button>
+                <button
+                  onClick={onBack}
+                  className="px-8 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-full shadow-lg hover:from-purple-600 hover:to-indigo-600 transition-colors"
+                >
+                  Continue to Next Level
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Report Modal */}
+        {showReportModal && (
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-3xl max-h-[90vh] overflow-auto">
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">Interview Performance Report</h3>
+              
+              {/* Analytics Dashboard */}
+              <div className="mb-6 grid grid-cols-1 md:grid-cols-5 gap-3">
+                {['Structure', 'Delivery', 'Language', 'Body Lang', 'Time Mgmt'].map((category, index) => {
+                  // Get score from the report content - this is a simple way to extract it
+                  const scoreMatch = interviewReport.match(new RegExp(`${category.split(' ')[0]}[^\n]*\| (\d)/5`));
+                  const score = scoreMatch ? parseInt(scoreMatch[1]) : 3;
+                  
+                  return (
+                    <div key={index} className="bg-white p-3 rounded-lg shadow text-center">
+                      <div className="text-sm font-medium text-gray-500">{category}</div>
+                      <div className={`text-2xl font-bold mt-1 ${score >= 4 ? 'text-green-500' : score >= 3 ? 'text-yellow-500' : 'text-red-500'}`}>
+                        {score}/5
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                        <div 
+                          className={`h-2 rounded-full ${score >= 4 ? 'bg-green-500' : score >= 3 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                          style={{ width: `${(score / 5) * 100}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              {/* Overall Score */}
+              <div className="mb-6 bg-gradient-to-r from-purple-100 to-indigo-100 p-4 rounded-lg shadow-md">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-lg font-bold text-gray-800">Overall Performance</h4>
+                    <p className="text-sm text-gray-600">
+                      {interviewReport.includes('Hire') ? 'Excellent performance!' : 
+                       interviewReport.includes('On-hold') ? 'Good with room for improvement' : 
+                       'Needs significant improvement'}
+                    </p>
+                  </div>
+                  <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">
+                    {interviewReport.match(/Overall Score:\s*([\d.]+)\/5/)?.[1] || '3.5'}/5
+                  </div>
+                </div>
+              </div>
+              
+              {/* Report Content */}
+              <div className="text-left whitespace-pre-line bg-gray-50 p-4 rounded-lg mb-6 max-h-[40vh] overflow-auto border border-gray-200">
+                {interviewReport}
+              </div>
+              
+              <div className="flex justify-between">
+                <button
+                  onClick={() => {
+                    setShowReportModal(false);
+                    // Now show the completion overlay
+                    setIsComplete(true);
+                  }}
+                  className="px-6 py-2 bg-gray-200 text-gray-800 rounded-full hover:bg-gray-300 transition-colors"
+                >
+                  Continue
+                </button>
+                <button
+                  onClick={downloadReport}
+                  className="px-6 py-2 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full shadow-lg hover:from-green-600 hover:to-teal-600 transition-colors flex items-center space-x-2"
+                >
+                  <Download className="w-5 h-5" />
+                  <span>Download Report</span>
+                </button>
+              </div>
             </div>
           </div>
         )}
