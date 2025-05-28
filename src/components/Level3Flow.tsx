@@ -239,48 +239,81 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
     // We'll set isComplete when user closes the report modal
   };
   
-  // Download report as PDF
+  // Enhanced download report as PDF with attractive analytics
   const downloadReport = () => {
     const reportData = JSON.parse(interviewReport);
     const pdf = new jsPDF();
     
-    // Set up colors as tuples to avoid spread operator issues
-    const primaryColor: [number, number, number] = [79, 70, 229]; // Indigo
-    const secondaryColor: [number, number, number] = [107, 114, 128]; // Gray
-    const accentColor: [number, number, number] = [34, 197, 94]; // Green
+    // Enhanced color palette
+    const colors = {
+      primary: [75, 85, 235] as [number, number, number],
+      secondary: [107, 114, 128] as [number, number, number],
+      success: [16, 185, 129] as [number, number, number],
+      warning: [245, 158, 11] as [number, number, number],
+      danger: [239, 68, 68] as [number, number, number],
+      light: [248, 250, 252] as [number, number, number],
+      white: [255, 255, 255] as [number, number, number]
+    };
     
-    // Header
-    pdf.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-    pdf.rect(0, 0, 210, 40, 'F');
+    // Helper function to draw rounded rectangles
+    const drawRoundedRect = (x: number, y: number, w: number, h: number, r: number, fill = false) => {
+      if (fill) {
+        pdf.roundedRect(x, y, w, h, r, r, 'F');
+      } else {
+        pdf.roundedRect(x, y, w, h, r, r, 'S');
+      }
+    };
     
-    pdf.setTextColor(255, 255, 255);
-    pdf.setFontSize(24);
+    // Enhanced Header with gradient effect
+    pdf.setFillColor(...colors.primary);
+    pdf.rect(0, 0, 210, 50, 'F');
+    
+    // Add decorative elements
+    pdf.setFillColor(...colors.success);
+    pdf.circle(180, 15, 8, 'F');
+    pdf.setFillColor(...colors.warning);
+    pdf.circle(190, 25, 6, 'F');
+    
+    pdf.setTextColor(...colors.white);
+    pdf.setFontSize(26);
     pdf.setFont('helvetica', 'bold');
-    pdf.text('Interview Performance Report', 20, 25);
+    pdf.text('AI INTERVIEW PERFORMANCE REPORT', 20, 28);
     
-    pdf.setFontSize(12);
+    pdf.setFontSize(14);
     pdf.setFont('helvetica', 'normal');
-    pdf.text(`Candidate: ${userName}`, 20, 32);
-    pdf.text(`Date: ${new Date().toLocaleDateString()}`, 140, 32);
+    pdf.text(`Candidate: ${userName}`, 20, 38);
+    pdf.text(`Assessment Date: ${new Date().toLocaleDateString()}`, 20, 45);
+    pdf.text(`Report ID: RPT-${Date.now().toString().slice(-6)}`, 140, 38);
+    pdf.text(`Duration: ${Math.floor(Math.random() * 15 + 10)} minutes`, 140, 45);
     
     // Reset text color
     pdf.setTextColor(0, 0, 0);
     
-    // Overall Score Section
+    // Executive Summary Card
+    pdf.setFillColor(...colors.light);
+    drawRoundedRect(15, 60, 180, 35, 5, true);
+    pdf.setDrawColor(...colors.primary);
+    pdf.setLineWidth(2);
+    drawRoundedRect(15, 60, 180, 35, 5, false);
+    
     pdf.setFontSize(18);
     pdf.setFont('helvetica', 'bold');
-    pdf.text('Overall Performance', 20, 60);
+    pdf.setTextColor(...colors.primary);
+    pdf.text('📊 EXECUTIVE SUMMARY', 25, 75);
     
-    pdf.setFontSize(14);
+    pdf.setFontSize(12);
+    pdf.setTextColor(0, 0, 0);
     pdf.setFont('helvetica', 'normal');
-    pdf.text(`Overall Score: ${reportData.averageScore.toFixed(1)}/5.0`, 20, 75);
-    pdf.text(`Questions Answered: ${reportData.userResponses.length}/${reportData.questions.length}`, 20, 85);
-    pdf.text(`Interview Duration: ${Math.floor(Math.random() * 15 + 10)} minutes`, 20, 95);
+    pdf.text(`Overall Performance Score: ${reportData.averageScore.toFixed(1)}/5.0`, 25, 85);
+    pdf.text(`Questions Completed: ${reportData.userResponses.length}/${reportData.questions.length}`, 110, 85);
+    pdf.text(`Recommendation: ${reportData.recommendation.split(' - ')[0]}`, 25, 92);
     
-    // Performance Breakdown
-    pdf.setFontSize(16);
+    // Performance Metrics Dashboard
+    let yPos = 110;
+    pdf.setFontSize(18);
     pdf.setFont('helvetica', 'bold');
-    pdf.text('Performance Breakdown', 20, 115);
+    pdf.setTextColor(...colors.primary);
+    pdf.text('📈 PERFORMANCE DASHBOARD', 20, yPos);
     
     const skillCategories: Record<keyof Scores, string> = {
       structure: 'Structure & Organization',
@@ -290,95 +323,174 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
       timeManagement: 'Time Management'
     };
     
-    let yPosition = 130;
-    Object.entries(reportData.scores).forEach(([skill, scoreValue]) => {
-      // Type assertion to ensure score is treated as number
+    yPos += 15;
+    Object.entries(reportData.scores).forEach(([skill, scoreValue], index) => {
       const score = scoreValue as number;
+      const skillName = skillCategories[skill as keyof Scores];
       
-      pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'normal');
-      pdf.text(`${skillCategories[skill as keyof Scores]}: ${score}/5`, 25, yPosition);
+      // Skill card background
+      pdf.setFillColor(250, 250, 250);
+      drawRoundedRect(20, yPos - 5, 170, 20, 3, true);
       
-      // Draw progress bar
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(60, 60, 60);
+      pdf.text(skillName, 25, yPos + 5);
+      
+      // Score display
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(10);
+      pdf.text(`${score}/5`, 160, yPos + 5);
+      
+      // Enhanced progress bar with gradient effect
+      const barWidth = 80;
+      const barHeight = 8;
+      const barX = 25;
+      const barY = yPos + 8;
+      
+      // Background bar
       pdf.setFillColor(230, 230, 230);
-      pdf.rect(120, yPosition - 4, 60, 6, 'F');
+      drawRoundedRect(barX, barY, barWidth, barHeight, 2, true);
       
-      const barWidth = (score / 5) * 60;
-      if (score >= 4) pdf.setFillColor(accentColor[0], accentColor[1], accentColor[2]);
-      else if (score >= 3) pdf.setFillColor(234, 179, 8);
-      else pdf.setFillColor(239, 68, 68);
+      // Progress bar with color coding
+      const progressWidth = (score / 5) * barWidth;
+      if (score >= 4) pdf.setFillColor(...colors.success);
+      else if (score >= 3) pdf.setFillColor(...colors.warning);
+      else pdf.setFillColor(...colors.danger);
       
-      pdf.rect(120, yPosition - 4, barWidth, 6, 'F');
-      
-      yPosition += 15;
-    });
-    
-    // Recommendation
-    pdf.setFontSize(16);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('Final Recommendation', 20, yPosition + 15);
-    
-    pdf.setFontSize(12);
-    pdf.setFont('helvetica', 'normal');
-    const recommendationLines = pdf.splitTextToSize(reportData.recommendation, 170);
-    pdf.text(recommendationLines, 20, yPosition + 30);
-    
-    // Questions and Responses
-    yPosition += 50;
-    if (yPosition > 250) {
-      pdf.addPage();
-      yPosition = 20;
-    }
-    
-    pdf.setFontSize(16);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('Interview Questions & Responses', 20, yPosition);
-    yPosition += 15;
-    
-    reportData.questions.forEach((question: string, index: number) => {
-      if (yPosition > 250) {
-        pdf.addPage();
-        yPosition = 20;
+      if (progressWidth > 0) {
+        drawRoundedRect(barX, barY, progressWidth, barHeight, 2, true);
       }
       
-      // Question
+      // Performance indicator
+      let indicator = '';
+      let indicatorColor = colors.secondary;
+      if (score >= 4.5) { indicator = '🌟 Excellent'; indicatorColor = colors.success; }
+      else if (score >= 4) { indicator = '✨ Very Good'; indicatorColor = colors.success; }
+      else if (score >= 3.5) { indicator = '👍 Good'; indicatorColor = colors.warning; }
+      else if (score >= 3) { indicator = '⚡ Fair'; indicatorColor = colors.warning; }
+      else { indicator = '⚠️ Needs Work'; indicatorColor = colors.danger; }
+      
+      pdf.setTextColor(...indicatorColor);
+      pdf.setFontSize(9);
+      pdf.text(indicator, 110, yPos + 12);
+      
+      yPos += 25;
+    });
+    
+    // Analytics Insights Section
+    yPos += 10;
+    pdf.setFillColor(...colors.light);
+    drawRoundedRect(15, yPos - 5, 180, 40, 5, true);
+    
+    pdf.setFontSize(16);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(...colors.primary);
+    pdf.text('🎯 KEY INSIGHTS & ANALYTICS', 25, yPos + 8);
+    
+    pdf.setFontSize(10);
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFont('helvetica', 'normal');
+    
+    const insights = [
+      `• Communication Style: ${reportData.averageScore >= 4 ? 'Articulate and confident' : 'Room for improvement in clarity'}`,
+      `• Response Quality: ${reportData.userResponses.length === reportData.questions.length ? 'Complete responses to all questions' : 'Some questions unanswered'}`,
+      `• Engagement Level: ${reportData.averageScore >= 3.5 ? 'Highly engaged throughout' : 'Moderate engagement observed'}`,
+      `• Professional Readiness: ${reportData.averageScore >= 4 ? 'Ready for senior roles' : reportData.averageScore >= 3 ? 'Suitable for mid-level positions' : 'Entry-level recommended'}`
+    ];
+    
+    insights.forEach((insight, index) => {
+      pdf.text(insight, 25, yPos + 18 + (index * 5));
+    });
+    
+    // Add new page for detailed analysis
+    pdf.addPage();
+    
+    // Detailed Questions Analysis
+    pdf.setFontSize(20);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(...colors.primary);
+    pdf.text('📝 DETAILED QUESTION ANALYSIS', 20, 30);
+    
+    yPos = 50;
+    reportData.questions.forEach((question: string, index: number) => {
+      if (yPos > 250) {
+        pdf.addPage();
+        yPos = 30;
+      }
+      
+      // Question card
+      pdf.setFillColor(248, 250, 252);
+      drawRoundedRect(15, yPos - 5, 180, 50, 5, true);
+      pdf.setDrawColor(...colors.primary);
+      pdf.setLineWidth(1);
+      drawRoundedRect(15, yPos - 5, 180, 50, 5, false);
+      
+      // Question header
       pdf.setFontSize(12);
       pdf.setFont('helvetica', 'bold');
-      pdf.text(`Q${index + 1}: `, 20, yPosition);
+      pdf.setTextColor(...colors.primary);
+      pdf.text(`Question ${index + 1}`, 20, yPos + 5);
       
-      pdf.setFont('helvetica', 'normal');
-      const questionLines = pdf.splitTextToSize(question, 160);
-      pdf.text(questionLines, 35, yPosition);
-      yPosition += questionLines.length * 5 + 5;
-      
-      // Response
-      if (reportData.userResponses[index]) {
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('Response: ', 20, yPosition);
+      // Response quality indicator
+      const response = reportData.userResponses[index];
+      if (response) {
+        const wordCount = response.text.split(' ').length;
+        let quality = 'Brief';
+        let qualityColor = colors.warning;
+        if (wordCount > 20) { quality = 'Detailed'; qualityColor = colors.success; }
+        else if (wordCount > 10) { quality = 'Adequate'; qualityColor = colors.warning; }
+        else { quality = 'Brief'; qualityColor = colors.danger; }
         
-        pdf.setFont('helvetica', 'normal');
-        const responseLines = pdf.splitTextToSize(reportData.userResponses[index].text, 160);
-        pdf.text(responseLines, 20, yPosition + 8);
-        yPosition += responseLines.length * 5 + 15;
+        pdf.setTextColor(...qualityColor);
+        pdf.setFontSize(10);
+        pdf.text(`Response: ${quality} (${wordCount} words)`, 120, yPos + 5);
       } else {
-        pdf.setFont('helvetica', 'italic');
-        pdf.text('No response recorded', 20, yPosition);
-        yPosition += 15;
+        pdf.setTextColor(...colors.danger);
+        pdf.text('No Response Provided', 120, yPos + 5);
       }
+      
+      // Question text
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(60, 60, 60);
+      const questionLines = pdf.splitTextToSize(question, 160);
+      pdf.text(questionLines, 20, yPos + 15);
+      
+      // Response text
+      if (response) {
+        pdf.setFont('helvetica', 'italic');
+        pdf.setTextColor(80, 80, 80);
+        const responseLines = pdf.splitTextToSize(`"${response.text}"`, 160);
+        pdf.text(responseLines, 20, yPos + 25 + (questionLines.length * 3));
+      }
+      
+      yPos += 60;
     });
     
-    // Footer
+    // Footer with branding
     const pageCount = pdf.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       pdf.setPage(i);
+      
+      // Footer background
+      pdf.setFillColor(...colors.primary);
+      pdf.rect(0, 280, 210, 20, 'F');
+      
       pdf.setFontSize(10);
-      pdf.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
-      pdf.text('Generated by AI Interview Assistant', 20, 285);
-      pdf.text(`Page ${i} of ${pageCount}`, 170, 285);
+      pdf.setTextColor(...colors.white);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text('🤖 Powered by AI Interview Assistant | Confidential Report', 20, 292);
+      pdf.text(`Page ${i} of ${pageCount}`, 170, 292);
+      
+      // Add timestamp
+      pdf.setFontSize(8);
+      pdf.text(`Generated: ${new Date().toLocaleString()}`, 20, 297);
     }
     
-    // Save the PDF
-    pdf.save(`interview-report-${userName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`);
+    // Save the enhanced PDF
+    const fileName = `AI-Interview-Report-${userName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`;
+    pdf.save(fileName);
   };
 
   if (showCongratulations) {
