@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Mic, MicOff, X } from 'lucide-react';
 import Level3CongratulationsScreen from './Level3CongratulationsScreen';
 import VideoFeed from './VideoFeed';
+import AISpeech from './AISpeech';
+import SpeechRecognition from './SpeechRecognition';
 
 interface Level3FlowProps {
   onBack: () => void;
@@ -23,6 +25,9 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
   const [isComplete, setIsComplete] = useState(false);
   const [isVideoOn, setIsVideoOn] = useState(false);
   const [isMicOn, setIsMicOn] = useState(true);
+  const [isAISpeaking, setIsAISpeaking] = useState(false);
+  const [currentSpeechText, setCurrentSpeechText] = useState('');
+  const [useSpeechRecognition, setUseSpeechRecognition] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const questions = [
@@ -62,21 +67,24 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
         timestamp: new Date()
       };
       setMessages([firstQuestion]);
+      setCurrentSpeechText(questions[0]);
+      setIsAISpeaking(true);
     }, 500);
   };
 
-  const handleSendMessage = () => {
-    if (!currentInput.trim()) return;
+  const handleSendMessage = (inputText = currentInput) => {
+    if (!inputText.trim()) return;
 
     const userMessage: Message = {
       id: Date.now(),
-      text: currentInput,
+      text: inputText,
       sender: 'user',
       timestamp: new Date()
     };
 
     setMessages(prev => [...prev, userMessage]);
     setCurrentInput('');
+    setIsAISpeaking(false); // Stop AI speaking when user responds
 
     // Check if we need to ask the next question
     if (currentQuestionIndex < questions.length - 1) {
@@ -90,6 +98,10 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
         };
         setMessages(prev => [...prev, nextQuestion]);
         setCurrentQuestionIndex(nextQuestionIndex);
+        
+        // Set the current speech text and start speaking
+        setCurrentSpeechText(questions[nextQuestionIndex]);
+        setIsAISpeaking(true);
       }, 1500);
     } else {
       // All questions completed
@@ -102,7 +114,18 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
         };
         setMessages(prev => [...prev, completionMessage]);
         setIsComplete(true);
+        
+        // Set the current speech text and start speaking
+        setCurrentSpeechText(completionMessage.text);
+        setIsAISpeaking(true);
       }, 1500);
+    }
+  };
+  
+  // Handle speech recognition result
+  const handleSpeechResult = (transcript: string) => {
+    if (transcript.trim()) {
+      setCurrentInput(transcript);
     }
   };
 
@@ -207,9 +230,18 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
                   } shadow-md`}
                 >
                   <p className="text-sm">{message.text}</p>
-                  <p className="text-xs opacity-70 text-right mt-1">
-                    {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </p>
+                  <div className="flex justify-between items-center mt-2">
+                    {message.sender === 'ai' && currentSpeechText === message.text && (
+                      <AISpeech 
+                        text={message.text} 
+                        onSpeechEnd={() => setIsAISpeaking(false)}
+                        autoPlay={isAISpeaking}
+                      />
+                    )}
+                    <p className="text-xs opacity-70 text-right ml-auto">
+                      {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
                 </div>
               </div>
             ))}
@@ -228,14 +260,34 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
                   className="flex-1 bg-white/80 border border-gray-200 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                 />
+                
+                {/* Speech Recognition Button */}
+                <div className="relative">
+                  <SpeechRecognition
+                    onResult={handleSpeechResult}
+                    autoStart={false}
+                  />
+                </div>
+                
                 <button
-                  onClick={handleSendMessage}
+                  onClick={() => handleSendMessage()}
                   disabled={!currentInput.trim()}
                   className="p-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                   </svg>
+                </button>
+              </div>
+              
+              {/* Toggle Speech Recognition */}
+              <div className="mt-2 flex justify-end">
+                <button
+                  onClick={() => setUseSpeechRecognition(!useSpeechRecognition)}
+                  className="text-xs text-gray-500 hover:text-pink-500 transition-colors flex items-center space-x-1"
+                >
+                  <span>{useSpeechRecognition ? 'Disable' : 'Enable'} voice input</span>
+                  {useSpeechRecognition ? <MicOff className="w-3 h-3" /> : <Mic className="w-3 h-3" />}
                 </button>
               </div>
             </div>

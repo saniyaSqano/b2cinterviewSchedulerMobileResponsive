@@ -49,14 +49,9 @@ const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange }) => {
   }, []);
 
   // Find rear camera by enumerating devices
-  const findRearCamera = useCallback(async () => {
+  const findRearCamera = async () => {
     try {
-      // Request permission first
-      const initialStream = await navigator.mediaDevices.getUserMedia({ video: true });
-      // Stop the stream immediately after getting permission
-      initialStream.getTracks().forEach(track => track.stop());
-      
-      // Now enumerate devices
+      setError(null);
       const devices = await navigator.mediaDevices.enumerateDevices();
       const videoDevices = devices.filter(device => device.kind === 'videoinput');
       
@@ -66,56 +61,56 @@ const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange }) => {
         throw new Error('No video devices found');
       }
       
-      // Try to find rear camera by label
+      // Try to find a rear camera by looking at the label
       let rearCamera = videoDevices.find(device => {
         const label = device.label.toLowerCase();
         return label.includes('back') || label.includes('rear') || label.includes('environment');
       });
       
-      // If no camera with rear/back in the name, and we have multiple cameras,
-      // use the last one (often the rear camera)
+      // If no rear camera is explicitly labeled, use the last camera in the list
+      // (often the rear camera on mobile devices)
       if (!rearCamera && videoDevices.length > 1) {
         rearCamera = videoDevices[videoDevices.length - 1];
-      }
-      
-      // If we still don't have a camera, use the first one
-      if (!rearCamera && videoDevices.length > 0) {
+      } else if (!rearCamera) {
+        // If only one camera is available, use that one
         rearCamera = videoDevices[0];
       }
       
-      if (rearCamera) {
-        console.log('Selected camera:', rearCamera.label);
-        return rearCamera.deviceId;
-      }
-      
-      return null;
-    } catch (error) {
-      console.error('Error finding rear camera:', error);
+      console.log('Selected camera:', rearCamera);
+      setRearCameraId(rearCamera.deviceId);
+      return rearCamera.deviceId;
+    } catch (err) {
+      console.error('Error finding rear camera:', err);
+      setError('Failed to find camera devices. Please check permissions.');
       return null;
     }
-  }, []);
+  };
 
   const startCamera = useCallback(async () => {
     setIsStarting(true);
     setError(null);
-    
+
     try {
-      // If we don't have a rear camera ID yet, try to find one
-      if (!rearCameraId) {
-        const deviceId = await findRearCamera();
-        if (deviceId) {
-          setRearCameraId(deviceId);
-        }
+      // Try multiple approaches to get the camera working
+      // First try to enumerate devices and get specific camera
+      try {
+        await findRearCamera();
+      } catch (err) {
+        console.warn('Could not enumerate devices:', err);
+        // Continue anyway, we'll try with default constraints
       }
       
-      // Force remount of webcam component
-      setKey(prevKey => prevKey + 1);
-    } catch (error) {
-      console.error('Error starting camera:', error);
-      setError('Failed to start camera');
+      // Set video on - the Webcam component will handle the actual camera initialization
+      setIsVideoOn(true);
+      
+    } catch (err) {
+      console.error('Error starting camera:', err);
+      setError('Failed to start camera. Please check permissions and try again.');
+      setIsVideoOn(false);
+    } finally {
       setIsStarting(false);
     }
-  }, [rearCameraId, findRearCamera]);
+  }, []);
 
   const stopCamera = useCallback(() => {
     console.log('Stopping camera');
@@ -154,20 +149,36 @@ const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange }) => {
         height: 720,
         facingMode: { exact: "environment" }
       };
-
   return (
     <div className="bg-white/90 rounded-2xl p-6 h-full flex flex-col">
       <h3 className="text-lg font-semibold text-gray-700 mb-4">Your Video</h3>
       <div className="flex-1 bg-gray-900 rounded-xl overflow-hidden relative">
         {/* Webcam component */}
-        {!error && (
+        {isVideoOn && (
           <Webcam
-            key={key}
             ref={webcamRef}
+            key={key}
+            videoConstraints={
+              rearCameraId
+                ? { deviceId: rearCameraId } // Use deviceId without 'exact' to be more flexible
+                : { facingMode: { ideal: 'environment' } } // Use 'ideal' instead of requiring it
+            }
             audio={false}
-            videoConstraints={videoConstraints}
-            onUserMedia={handleWebcamStart}
-            onUserMediaError={handleWebcamError}
+            onUserMediaError={(err) => {
+              console.error('Webcam error:', err);
+              // Handle both string and DOMException error types
+              const errorName = typeof err === 'string' ? err : err.name;
+              setError(`Webcam error: ${errorName}`);
+              
+              // If we get an error with the current constraints, try with minimal constraints
+              if (typeof err !== 'string' && err.name === 'OverconstrainedError') {
+                console.log('Trying with minimal constraints');
+                setRearCameraId(null);
+                setKey(prevKey => prevKey + 1);
+              } else {
+                setIsVideoOn(false);
+              }
+            }}
             className="w-full h-full object-cover"
             mirrored={false} // Never mirror to ensure rear camera displays correctly
             screenshotFormat="image/jpeg"
