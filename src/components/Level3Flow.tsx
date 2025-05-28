@@ -1,7 +1,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Video, VideoOff, Mic, MicOff, X } from 'lucide-react';
+import { ArrowLeft, Mic, MicOff, X } from 'lucide-react';
 import Level3CongratulationsScreen from './Level3CongratulationsScreen';
+import VideoFeed from './VideoFeed';
 
 interface Level3FlowProps {
   onBack: () => void;
@@ -23,11 +24,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
   const [isComplete, setIsComplete] = useState(false);
   const [isVideoOn, setIsVideoOn] = useState(false);
   const [isMicOn, setIsMicOn] = useState(true);
-  const [cameraError, setCameraError] = useState<string | null>(null);
-  const [isStartingCamera, setIsStartingCamera] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
 
   const questions = [
     "Hi there! I'm excited to meet you. Could you please introduce yourself and tell me a bit about your background?",
@@ -42,6 +39,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Log when the component mounts to track initialization
   useEffect(() => {
     return () => {
       console.log('Component unmounting, cleaning up camera...');
@@ -163,16 +161,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
     setIsVideoOn(false);
   };
 
-  const toggleVideo = () => {
-    console.log('Toggle video clicked, current state:', isVideoOn);
-    if (isVideoOn) {
-      stopCamera();
-    } else {
-      startCamera();
-    }
-  };
-
-  const handleProceedToInterview = async () => {
+  const handleProceedToInterview = () => {
     console.log('Proceeding to interview...');
     setShowCongratulations(false);
     
