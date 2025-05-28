@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ArrowDown } from 'lucide-react';
 import ParticleBackground from '../components/ParticleBackground';
 import AssessmentFlow from '../components/AssessmentFlow';
 import ChatFlow from '../components/ChatFlow';
@@ -237,85 +236,106 @@ const Index = () => {
 
         {/* Cards Grid with Flow Arrows */}
         <div className="max-w-6xl mx-auto px-6 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative">
-            {learningSteps.map((step, index) => {
+          <div className="relative">
+            {/* Grid Container */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16">
+              {learningSteps.map((step, index) => {
+                const isCompleted = completedLevels.includes(index);
+                const isActive = index === currentLevel;
+                
+                return (
+                  <div key={step.id} className="relative">
+                    {/* Step Number */}
+                    <div className="absolute -top-3 -left-3 z-20">
+                      <div className={`
+                        w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shadow-lg
+                        ${isCompleted 
+                          ? 'bg-slate-600 text-white' 
+                          : isActive 
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-slate-300 text-slate-600'
+                        }
+                      `}>
+                        {index + 1}
+                      </div>
+                    </div>
+                    
+                    <LearningCard
+                      title={step.title}
+                      subtitle={step.subtitle}
+                      description={step.description}
+                      icon={step.icon}
+                      isCompleted={isCompleted}
+                      isActive={isActive}
+                      onClick={() => handleCardClick(index)}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Arrows positioned between cards */}
+            {learningSteps.map((_, index) => {
+              if (index >= learningSteps.length - 1) return null;
+              
               const isCompleted = completedLevels.includes(index);
-              const isActive = index === currentLevel;
               
               return (
-                <div key={step.id} className="relative">
-                  {/* Step Number */}
-                  <div className="absolute -top-3 -left-3 z-10">
-                    <div className={`
-                      w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shadow-lg
-                      ${isCompleted 
-                        ? 'bg-slate-600 text-white' 
-                        : isActive 
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-slate-300 text-slate-600'
-                      }
-                    `}>
-                      {index + 1}
-                    </div>
-                  </div>
-                  
-                  {/* Flow Arrow to Next Step */}
-                  {index < learningSteps.length - 1 && (
-                    <div className="absolute top-1/2 -translate-y-1/2 z-10">
-                      {/* Horizontal Arrow for same row */}
-                      {((index % 3) < 2) && (
-                        <div className="hidden lg:block absolute left-full ml-4 w-8">
-                          <div className={`
-                            flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300
-                            ${completedLevels.includes(index) 
-                              ? 'bg-slate-600 text-white shadow-lg' 
-                              : 'bg-slate-200 text-slate-400'
-                            }
-                          `}>
-                            <ArrowRight className="w-4 h-4" />
-                          </div>
-                        </div>
-                      )}
-                      
-                      {/* Diagonal Arrow for row transitions */}
-                      {((index % 3) === 2) && (index < learningSteps.length - 1) && (
-                        <div className="hidden lg:block absolute left-1/2 top-full mt-4">
-                          <div className={`
-                            flex items-center justify-center w-8 h-8 rounded-full rotate-90 transition-all duration-300
-                            ${completedLevels.includes(index) 
-                              ? 'bg-slate-600 text-white shadow-lg' 
-                              : 'bg-slate-200 text-slate-400'
-                            }
-                          `}>
-                            <ArrowRight className="w-4 h-4" />
-                          </div>
-                        </div>
-                      )}
-                      
-                      {/* Mobile Arrow (always downward) */}
-                      <div className="lg:hidden absolute left-1/2 top-full mt-4 -translate-x-1/2">
-                        <div className={`
-                          flex items-center justify-center w-8 h-8 rounded-full rotate-90 transition-all duration-300
-                          ${completedLevels.includes(index) 
-                            ? 'bg-slate-600 text-white shadow-lg' 
-                            : 'bg-slate-200 text-slate-400'
-                          }
-                        `}>
-                          <ArrowRight className="w-4 h-4" />
-                        </div>
+                <div key={`arrow-${index}`}>
+                  {/* Horizontal arrows (1→2, 4→5) */}
+                  {(index === 0 || index === 3) && (
+                    <div className="hidden md:block absolute top-1/2 z-10" style={{
+                      left: index === 0 ? '33.33%' : '66.66%',
+                      transform: 'translateY(-50%)',
+                      marginLeft: index === 0 ? '2rem' : '2rem'
+                    }}>
+                      <div className={`
+                        flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 shadow-md
+                        ${isCompleted 
+                          ? 'bg-slate-600 text-white' 
+                          : 'bg-slate-300 text-slate-500'
+                        }
+                      `}>
+                        <ArrowRight className="w-5 h-5" />
                       </div>
                     </div>
                   )}
-                  
-                  <LearningCard
-                    title={step.title}
-                    subtitle={step.subtitle}
-                    description={step.description}
-                    icon={step.icon}
-                    isCompleted={isCompleted}
-                    isActive={isActive}
-                    onClick={() => handleCardClick(index)}
-                  />
+
+                  {/* Vertical arrows (2→4, 3→5, 5→6) */}
+                  {(index === 1 || index === 2 || index === 4) && (
+                    <div className="hidden lg:block absolute left-1/2 z-10" style={{
+                      top: index === 1 ? '50%' : index === 2 ? '50%' : '150%',
+                      transform: 'translateX(-50%)',
+                      marginTop: '3rem',
+                      marginLeft: index === 1 ? '-16.66%' : index === 2 ? '16.66%' : '0%'
+                    }}>
+                      <div className={`
+                        flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 shadow-md
+                        ${isCompleted 
+                          ? 'bg-slate-600 text-white' 
+                          : 'bg-slate-300 text-slate-500'
+                        }
+                      `}>
+                        <ArrowDown className="w-5 h-5" />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Mobile arrows (always vertical) */}
+                  <div className="md:hidden absolute left-1/2 transform -translate-x-1/2 z-10" style={{
+                    top: '100%',
+                    marginTop: '1.5rem'
+                  }}>
+                    <div className={`
+                      flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 shadow-md
+                      ${isCompleted 
+                        ? 'bg-slate-600 text-white' 
+                        : 'bg-slate-300 text-slate-500'
+                      }
+                    `}>
+                      <ArrowDown className="w-5 h-5" />
+                    </div>
+                  </div>
                 </div>
               );
             })}
