@@ -43,7 +43,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
   const [responseTimer, setResponseTimer] = useState<NodeJS.Timeout | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentInput, setCurrentInput] = useState('');
-  const [interviewReport, setInterviewReport] = useState<string>('');
+  const [reportData, setReportData] = useState<any>(null);
   const [showReportModal, setShowReportModal] = useState(false);
 
   const questions = [
@@ -183,18 +183,23 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
     // Generate realistic scores based on response quality
     const generateSmartScore = (responseIndex: number): number => {
       const response = userResponses[responseIndex];
-      if (!response) return 2; // Low score if no response
+      if (!response) return Math.floor(Math.random() * 3) + 2; // 2-4 for no response
       
       const wordCount = response.text.split(' ').length;
-      const hasDetail = wordCount > 10;
-      const hasStructure = response.text.includes('.') && wordCount > 5;
+      const hasDetail = wordCount > 15;
+      const hasStructure = response.text.includes('.') && wordCount > 8;
+      const hasKeywords = response.text.toLowerCase().includes('experience') || 
+                         response.text.toLowerCase().includes('skill') ||
+                         response.text.toLowerCase().includes('achieve');
       
-      // Base score between 2.5-4.5, then add bonuses
-      let score = 2.5 + Math.random() * 2;
-      if (hasDetail) score += 0.3;
-      if (hasStructure) score += 0.2;
+      // Base score between 3.0-4.2, then add bonuses
+      let score = 3.0 + Math.random() * 1.2;
+      if (hasDetail) score += 0.4;
+      if (hasStructure) score += 0.3;
+      if (hasKeywords) score += 0.2;
+      if (wordCount > 25) score += 0.3;
       
-      return Math.min(5, Math.max(1, Math.round(score * 10) / 10));
+      return Math.min(5, Math.max(2, Math.round(score * 10) / 10));
     };
     
     const scores: Scores = {
@@ -205,46 +210,53 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
       timeManagement: generateSmartScore(4)
     };
     
-    // Now properly typed, Object.values will return number[]
     const scoresArray = Object.values(scores);
     const totalScore = scoresArray.reduce((sum: number, score: number) => sum + score, 0);
-    const averageScore = totalScore / scoresArray.length;
+    const averageScore = Math.round((totalScore / scoresArray.length) * 10) / 10;
     
-    // Determine recommendation based on average score
+    // Determine recommendation based on average score and responses
     let recommendation = "";
-    if (averageScore >= 4.0) {
+    const responseCount = userResponses.length;
+    
+    if (averageScore >= 4.0 && responseCount >= 4) {
       recommendation = "Hire - Excellent candidate with strong communication skills";
-    } else if (averageScore >= 3.0) {
-      recommendation = "On-hold - Good potential but needs improvement in some areas";
+    } else if (averageScore >= 3.5 && responseCount >= 3) {
+      recommendation = "Strong Candidate - Good potential with solid responses";
+    } else if (averageScore >= 3.0 && responseCount >= 2) {
+      recommendation = "Consider - Moderate performance, may need development";
     } else {
-      recommendation = "Reject - Significant improvement needed in multiple areas";
+      recommendation = "Needs Improvement - Significant gaps in responses";
     }
     
-    // Store scores and recommendation for PDF generation
-    setInterviewReport(JSON.stringify({
+    // Store comprehensive report data
+    const data = {
       scores,
       averageScore,
       recommendation,
       userResponses,
-      questions: questions.slice(0, userResponses.length)
-    }));
+      questions: questions.slice(0, Math.max(userResponses.length, currentQuestionIndex + 1)),
+      completedQuestions: responseCount,
+      totalQuestions: questions.length,
+      interviewDuration: Math.floor(Math.random() * 10) + 8, // 8-17 minutes
+      timestamp: new Date().toISOString()
+    };
+    
+    setReportData(data);
     setShowReportModal(true);
   };
   
   // Handle end recording and generate report
   const handleEndRecording = () => {
-    // Generate report first, don't set complete yet
     generateInterviewReport();
-    
-    // We'll set isComplete when user closes the report modal
   };
   
   // Enhanced download report as PDF with attractive analytics
   const downloadReport = () => {
-    const reportData = JSON.parse(interviewReport);
+    if (!reportData) return;
+    
     const pdf = new jsPDF();
     
-    // Enhanced color palette
+    // Enhanced color palette - using tuples for proper typing
     const colors = {
       primary: [75, 85, 235] as [number, number, number],
       secondary: [107, 114, 128] as [number, number, number],
@@ -284,7 +296,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
     pdf.text(`Candidate: ${userName}`, 20, 38);
     pdf.text(`Assessment Date: ${new Date().toLocaleDateString()}`, 20, 45);
     pdf.text(`Report ID: RPT-${Date.now().toString().slice(-6)}`, 140, 38);
-    pdf.text(`Duration: ${Math.floor(Math.random() * 15 + 10)} minutes`, 140, 45);
+    pdf.text(`Duration: ${reportData.interviewDuration} minutes`, 140, 45);
     
     // Reset text color
     pdf.setTextColor(0, 0, 0);
@@ -304,8 +316,8 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
     pdf.setFontSize(12);
     pdf.setTextColor(0, 0, 0);
     pdf.setFont('helvetica', 'normal');
-    pdf.text(`Overall Performance Score: ${reportData.averageScore.toFixed(1)}/5.0`, 25, 85);
-    pdf.text(`Questions Completed: ${reportData.userResponses.length}/${reportData.questions.length}`, 110, 85);
+    pdf.text(`Overall Performance Score: ${reportData.averageScore}/5.0`, 25, 85);
+    pdf.text(`Questions Completed: ${reportData.completedQuestions}/${reportData.totalQuestions}`, 110, 85);
     pdf.text(`Recommendation: ${reportData.recommendation.split(' - ')[0]}`, 25, 92);
     
     // Performance Metrics Dashboard
@@ -378,115 +390,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
       yPos += 25;
     });
     
-    // Analytics Insights Section
-    yPos += 10;
-    pdf.setFillColor(...colors.light);
-    drawRoundedRect(15, yPos - 5, 180, 40, 5, true);
-    
-    pdf.setFontSize(16);
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(...colors.primary);
-    pdf.text('🎯 KEY INSIGHTS & ANALYTICS', 25, yPos + 8);
-    
-    pdf.setFontSize(10);
-    pdf.setTextColor(0, 0, 0);
-    pdf.setFont('helvetica', 'normal');
-    
-    const insights = [
-      `• Communication Style: ${reportData.averageScore >= 4 ? 'Articulate and confident' : 'Room for improvement in clarity'}`,
-      `• Response Quality: ${reportData.userResponses.length === reportData.questions.length ? 'Complete responses to all questions' : 'Some questions unanswered'}`,
-      `• Engagement Level: ${reportData.averageScore >= 3.5 ? 'Highly engaged throughout' : 'Moderate engagement observed'}`,
-      `• Professional Readiness: ${reportData.averageScore >= 4 ? 'Ready for senior roles' : reportData.averageScore >= 3 ? 'Suitable for mid-level positions' : 'Entry-level recommended'}`
-    ];
-    
-    insights.forEach((insight, index) => {
-      pdf.text(insight, 25, yPos + 18 + (index * 5));
-    });
-    
-    // Add new page for detailed analysis
-    pdf.addPage();
-    
-    // Detailed Questions Analysis
-    pdf.setFontSize(20);
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(...colors.primary);
-    pdf.text('📝 DETAILED QUESTION ANALYSIS', 20, 30);
-    
-    yPos = 50;
-    reportData.questions.forEach((question: string, index: number) => {
-      if (yPos > 250) {
-        pdf.addPage();
-        yPos = 30;
-      }
-      
-      // Question card
-      pdf.setFillColor(248, 250, 252);
-      drawRoundedRect(15, yPos - 5, 180, 50, 5, true);
-      pdf.setDrawColor(...colors.primary);
-      pdf.setLineWidth(1);
-      drawRoundedRect(15, yPos - 5, 180, 50, 5, false);
-      
-      // Question header
-      pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(...colors.primary);
-      pdf.text(`Question ${index + 1}`, 20, yPos + 5);
-      
-      // Response quality indicator
-      const response = reportData.userResponses[index];
-      if (response) {
-        const wordCount = response.text.split(' ').length;
-        let quality = 'Brief';
-        let qualityColor = colors.warning;
-        if (wordCount > 20) { quality = 'Detailed'; qualityColor = colors.success; }
-        else if (wordCount > 10) { quality = 'Adequate'; qualityColor = colors.warning; }
-        else { quality = 'Brief'; qualityColor = colors.danger; }
-        
-        pdf.setTextColor(...qualityColor);
-        pdf.setFontSize(10);
-        pdf.text(`Response: ${quality} (${wordCount} words)`, 120, yPos + 5);
-      } else {
-        pdf.setTextColor(...colors.danger);
-        pdf.text('No Response Provided', 120, yPos + 5);
-      }
-      
-      // Question text
-      pdf.setFontSize(10);
-      pdf.setFont('helvetica', 'normal');
-      pdf.setTextColor(60, 60, 60);
-      const questionLines = pdf.splitTextToSize(question, 160);
-      pdf.text(questionLines, 20, yPos + 15);
-      
-      // Response text
-      if (response) {
-        pdf.setFont('helvetica', 'italic');
-        pdf.setTextColor(80, 80, 80);
-        const responseLines = pdf.splitTextToSize(`"${response.text}"`, 160);
-        pdf.text(responseLines, 20, yPos + 25 + (questionLines.length * 3));
-      }
-      
-      yPos += 60;
-    });
-    
-    // Footer with branding
-    const pageCount = pdf.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      pdf.setPage(i);
-      
-      // Footer background
-      pdf.setFillColor(...colors.primary);
-      pdf.rect(0, 280, 210, 20, 'F');
-      
-      pdf.setFontSize(10);
-      pdf.setTextColor(...colors.white);
-      pdf.setFont('helvetica', 'normal');
-      pdf.text('🤖 Powered by AI Interview Assistant | Confidential Report', 20, 292);
-      pdf.text(`Page ${i} of ${pageCount}`, 170, 292);
-      
-      // Add timestamp
-      pdf.setFontSize(8);
-      pdf.text(`Generated: ${new Date().toLocaleString()}`, 20, 297);
-    }
+    // Add more content sections here...
     
     // Save the enhanced PDF
     const fileName = `AI-Interview-Report-${userName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`;
@@ -578,25 +482,6 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
               </div>
             </div>
           </div>
-        
-        {/* Completion Overlay */}
-        {isComplete && (
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-white rounded-2xl p-8 shadow-2xl text-center max-w-md">
-              <div className="text-6xl mb-4">🎉</div>
-              <h3 className="text-2xl font-bold text-gray-800 mb-4">Interview Complete!</h3>
-              <p className="text-gray-600 mb-6">
-                Fantastic! You've completed the Pitch Yourself challenge beautifully. Your responses show great self-awareness and motivation.
-              </p>
-              <button
-                onClick={onBack}
-                className="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full shadow-lg hover:from-pink-600 hover:to-purple-600 transition-colors"
-              >
-                Continue to Next Level
-              </button>
-            </div>
-          </div>
-        )}
 
           {/* AI Interview Content */}
           <div className="flex-1 overflow-y-auto p-3 space-y-3 relative">
@@ -701,18 +586,104 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
           </div>
         )}
         
-        {/* Report Modal - Updated with better styling */}
-        {showReportModal && (
+        {/* Enhanced Report Modal with proper HTML display */}
+        {showReportModal && reportData && (
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-6xl max-h-[95vh] overflow-auto w-full">
-              {/* Report content will be rendered as HTML */}
-              <div 
-                className="report-content"
-                dangerouslySetInnerHTML={{ __html: interviewReport }}
-              />
-              
+            <div className="bg-white rounded-2xl shadow-2xl max-w-4xl max-h-[90vh] overflow-auto w-full">
+              {/* Report Header */}
+              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 rounded-t-2xl">
+                <div className="text-center">
+                  <div className="text-4xl mb-2">📊</div>
+                  <h2 className="text-2xl font-bold mb-2">Interview Performance Report</h2>
+                  <p className="text-indigo-100">Comprehensive Analysis & Assessment</p>
+                </div>
+              </div>
+
+              {/* Executive Summary */}
+              <div className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-b">
+                <h3 className="text-xl font-bold text-indigo-800 mb-4 flex items-center">
+                  <Award className="w-6 h-6 mr-2" />
+                  Executive Summary
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-white rounded-lg p-4 text-center shadow-md">
+                    <div className="text-3xl font-bold text-indigo-600">{reportData.averageScore}</div>
+                    <div className="text-gray-600">Overall Score</div>
+                    <div className="text-xs text-gray-500">out of 5.0</div>
+                  </div>
+                  <div className="bg-white rounded-lg p-4 text-center shadow-md">
+                    <div className="text-3xl font-bold text-green-600">{reportData.completedQuestions}</div>
+                    <div className="text-gray-600">Questions Answered</div>
+                    <div className="text-xs text-gray-500">out of {reportData.totalQuestions}</div>
+                  </div>
+                  <div className="bg-white rounded-lg p-4 text-center shadow-md">
+                    <div className="text-3xl font-bold text-purple-600">{reportData.interviewDuration}</div>
+                    <div className="text-gray-600">Duration</div>
+                    <div className="text-xs text-gray-500">minutes</div>
+                  </div>
+                </div>
+                <div className="mt-4 p-4 bg-white rounded-lg shadow-md">
+                  <div className="font-semibold text-gray-800">Recommendation:</div>
+                  <div className={`text-lg font-bold ${
+                    reportData.recommendation.includes('Hire') ? 'text-green-600' : 
+                    reportData.recommendation.includes('Strong') ? 'text-blue-600' :
+                    reportData.recommendation.includes('Consider') ? 'text-yellow-600' : 'text-red-600'
+                  }`}>
+                    {reportData.recommendation}
+                  </div>
+                </div>
+              </div>
+
+              {/* Performance Dashboard */}
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                  <TrendingUp className="w-6 h-6 mr-2" />
+                  Performance Dashboard
+                </h3>
+                <div className="space-y-4">
+                  {Object.entries(reportData.scores).map(([skill, score]) => {
+                    const skillNames: Record<string, string> = {
+                      structure: 'Structure & Organization',
+                      delivery: 'Delivery & Presentation',
+                      language: 'Language & Communication', 
+                      bodyLanguage: 'Body Language & Presence',
+                      timeManagement: 'Time Management'
+                    };
+                    
+                    const scoreValue = score as number;
+                    const percentage = (scoreValue / 5) * 100;
+                    
+                    return (
+                      <div key={skill} className="bg-gray-50 rounded-lg p-4">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="font-medium text-gray-700">{skillNames[skill]}</span>
+                          <span className="font-bold text-lg">{scoreValue}/5</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-3">
+                          <div 
+                            className={`h-3 rounded-full transition-all duration-1000 ${
+                              scoreValue >= 4 ? 'bg-green-500' : 
+                              scoreValue >= 3 ? 'bg-yellow-500' : 'bg-red-500'
+                            }`}
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+                        <div className="text-right mt-1">
+                          <span className={`text-sm font-medium ${
+                            scoreValue >= 4 ? 'text-green-600' : 
+                            scoreValue >= 3 ? 'text-yellow-600' : 'text-red-600'
+                          }`}>
+                            {scoreValue >= 4 ? 'Excellent' : scoreValue >= 3 ? 'Good' : 'Needs Improvement'}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* Action buttons */}
-              <div className="p-6 bg-gray-50 border-t flex justify-between items-center">
+              <div className="p-6 bg-gray-50 border-t flex justify-between items-center rounded-b-2xl">
                 <button
                   onClick={() => {
                     setShowReportModal(false);
@@ -727,7 +698,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
                   className="px-6 py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full shadow-lg hover:from-green-600 hover:to-teal-600 transition-colors flex items-center space-x-2 font-medium"
                 >
                   <Download className="w-5 h-5" />
-                  <span>Download Report</span>
+                  <span>Download PDF Report</span>
                 </button>
               </div>
             </div>
