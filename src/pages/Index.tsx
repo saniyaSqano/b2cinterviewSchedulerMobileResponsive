@@ -235,18 +235,18 @@ const Index = () => {
         </div>
 
         {/* Horizontal Timeline */}
-        <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="relative">
-            {/* Desktop: Horizontal Layout */}
+            {/* Desktop: Horizontal Layout with smaller cards */}
             <div className="hidden lg:block">
-              <div className="flex items-center justify-between space-x-4">
+              <div className="flex items-center justify-between space-x-2">
                 {learningSteps.map((step, index) => (
                   <div key={step.id} className="flex items-center">
-                    {/* Card with Step Number */}
+                    {/* Card with Step Number - made smaller */}
                     <div className="relative">
-                      <div className="absolute -top-3 -left-3 z-20">
+                      <div className="absolute -top-2 -left-2 z-20">
                         <div className={`
-                          w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shadow-lg
+                          w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shadow-lg
                           ${completedLevels.includes(index)
                             ? 'bg-slate-600 text-white' 
                             : index === currentLevel 
@@ -257,7 +257,7 @@ const Index = () => {
                           {index + 1}
                         </div>
                       </div>
-                      <div className="w-80">
+                      <div className="w-52"> {/* Reduced from w-80 to w-52 */}
                         <LearningCard
                           title={step.title}
                           subtitle={step.subtitle}
@@ -272,15 +272,15 @@ const Index = () => {
                     
                     {/* Arrow between cards (except after last card) */}
                     {index < learningSteps.length - 1 && (
-                      <div className="flex items-center justify-center mx-4">
+                      <div className="flex items-center justify-center mx-2"> {/* Reduced margin */}
                         <div className={`
-                          flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 shadow-lg
+                          flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300 shadow-lg
                           ${completedLevels.includes(index)
                             ? 'bg-slate-600 text-white' 
                             : 'bg-slate-300 text-slate-500'
                           }
                         `}>
-                          <ArrowRight className="w-6 h-6" />
+                          <ArrowRight className="w-4 h-4" />
                         </div>
                       </div>
                     )}
@@ -291,12 +291,12 @@ const Index = () => {
 
             {/* Tablet: 2 rows of 3 cards */}
             <div className="hidden md:block lg:hidden">
-              <div className="grid grid-cols-3 gap-8">
+              <div className="grid grid-cols-3 gap-6"> {/* Reduced gap */}
                 {learningSteps.map((step, index) => (
                   <div key={step.id} className="relative">
-                    <div className="absolute -top-3 -left-3 z-20">
+                    <div className="absolute -top-2 -left-2 z-20">
                       <div className={`
-                        w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shadow-lg
+                        w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shadow-lg
                         ${completedLevels.includes(index)
                           ? 'bg-slate-600 text-white' 
                           : index === currentLevel 
@@ -322,12 +322,12 @@ const Index = () => {
             </div>
 
             {/* Mobile: Single column */}
-            <div className="md:hidden space-y-8">
+            <div className="md:hidden space-y-6"> {/* Reduced spacing */}
               {learningSteps.map((step, index) => (
                 <div key={step.id} className="relative">
-                  <div className="absolute -top-3 -left-3 z-20">
+                  <div className="absolute -top-2 -left-2 z-20">
                     <div className={`
-                      w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shadow-lg
+                      w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shadow-lg
                       ${completedLevels.includes(index)
                         ? 'bg-slate-600 text-white' 
                         : index === currentLevel 
@@ -350,15 +350,15 @@ const Index = () => {
                   
                   {/* Vertical arrow for mobile */}
                   {index < learningSteps.length - 1 && (
-                    <div className="flex justify-center my-4">
+                    <div className="flex justify-center my-3">
                       <div className={`
-                        flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300 shadow-md
+                        flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300 shadow-md
                         ${completedLevels.includes(index)
                           ? 'bg-slate-600 text-white' 
                           : 'bg-slate-300 text-slate-500'
                         }
                       `}>
-                        <ArrowDown className="w-5 h-5" />
+                        <ArrowDown className="w-4 h-4" />
                       </div>
                     </div>
                   )}
