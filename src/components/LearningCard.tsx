@@ -27,19 +27,20 @@ const LearningCard: React.FC<LearningCardProps> = ({
     <div
       onClick={onClick}
       className={`
-        relative p-3 rounded-lg border transition-all duration-300 cursor-pointer group bg-white
+        relative p-3 rounded-xl border transition-all duration-300 cursor-pointer group
         ${isActive 
-          ? 'border-blue-200 shadow-lg ring-1 ring-blue-100' 
-          : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+          ? 'bg-gradient-to-br from-purple-500 to-blue-600 border-purple-200 shadow-xl ring-1 ring-purple-100 text-white' 
+          : isCompleted 
+            ? 'bg-gradient-to-br from-purple-100 to-blue-100 border-purple-300 text-purple-800'
+            : 'bg-white border-gray-200 hover:border-purple-300 hover:shadow-lg text-gray-700'
         }
-        ${isCompleted ? 'bg-gray-50 border-gray-300' : ''}
         w-[160px] h-[200px] flex flex-col justify-between
       `}
     >
       {/* Status Indicator */}
       {isCompleted && (
         <div className="absolute top-2 right-2">
-          <CheckCircle className="w-4 h-4 text-green-600" />
+          <CheckCircle className="w-4 h-4 text-purple-600" />
         </div>
       )}
       
@@ -47,10 +48,10 @@ const LearningCard: React.FC<LearningCardProps> = ({
       <div className={`
         w-8 h-8 rounded-lg mb-2 flex items-center justify-center
         ${isActive 
-          ? 'bg-blue-100 text-blue-600' 
+          ? 'bg-white/20 text-white' 
           : isCompleted 
-            ? 'bg-gray-100 text-gray-600'
-            : 'bg-gray-50 text-gray-500 group-hover:bg-gray-100 group-hover:text-gray-600'
+            ? 'bg-purple-200 text-purple-700'
+            : 'bg-purple-50 text-purple-500 group-hover:bg-purple-100 group-hover:text-purple-600'
         }
       `}>
         <IconComponent className="w-4 h-4" />
@@ -58,28 +59,40 @@ const LearningCard: React.FC<LearningCardProps> = ({
       
       {/* Content */}
       <div className="flex-1">
-        <h3 className="text-sm font-semibold text-gray-900 mb-1 leading-tight">{title}</h3>
-        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">{subtitle}</p>
-        <p className="text-xs text-gray-600 leading-relaxed line-clamp-3">{description}</p>
+        <h3 className={`text-sm font-semibold mb-1 leading-tight ${
+          isActive ? 'text-white' : isCompleted ? 'text-purple-800' : 'text-gray-900'
+        }`}>
+          {title}
+        </h3>
+        <p className={`text-xs font-medium uppercase tracking-wide mb-2 ${
+          isActive ? 'text-purple-100' : isCompleted ? 'text-purple-600' : 'text-purple-500'
+        }`}>
+          {subtitle}
+        </p>
+        <p className={`text-xs leading-relaxed line-clamp-3 ${
+          isActive ? 'text-purple-50' : isCompleted ? 'text-purple-700' : 'text-gray-600'
+        }`}>
+          {description}
+        </p>
       </div>
       
       {/* Progress Indicator */}
       <div className={`
         mt-2 h-1 w-full rounded-full
         ${isCompleted 
-          ? 'bg-gray-200' 
+          ? 'bg-purple-200' 
           : isActive 
-            ? 'bg-blue-100'
-            : 'bg-gray-100'
+            ? 'bg-white/20'
+            : 'bg-purple-100'
         }
       `}>
         <div className={`
           h-full rounded-full transition-all duration-500
           ${isCompleted 
-            ? 'w-full bg-green-500' 
+            ? 'w-full bg-purple-600' 
             : isActive 
-              ? 'w-1/3 bg-blue-500'
-              : 'w-0 bg-gray-300'
+              ? 'w-1/3 bg-white'
+              : 'w-0 bg-purple-300'
           }
         `} />
       </div>

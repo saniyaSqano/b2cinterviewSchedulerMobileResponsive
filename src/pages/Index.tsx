@@ -200,14 +200,14 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 relative overflow-hidden">
       <ParticleBackground />
       
       <div className="relative z-10 min-h-screen">
         {/* Header */}
-        <div className="bg-white/95 backdrop-blur-sm border-b border-gray-100 text-center py-8">
+        <div className="bg-white/95 backdrop-blur-sm border-b border-purple-100 text-center py-8">
           <div className="max-w-4xl mx-auto px-6">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4 leading-tight">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4 leading-tight">
               Professional Development Platform
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
@@ -217,17 +217,17 @@ const Index = () => {
         </div>
 
         {/* Progress Bar */}
-        <div className="bg-white/90 backdrop-blur-sm border-b border-gray-100 py-4">
+        <div className="bg-white/90 backdrop-blur-sm border-b border-purple-100 py-4">
           <div className="max-w-6xl mx-auto px-6">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-semibold text-gray-700">Learning Progress</span>
-              <span className="text-sm font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+              <span className="text-sm font-semibold text-purple-700">Learning Progress</span>
+              <span className="text-sm font-medium text-purple-600 bg-purple-100 px-3 py-1 rounded-full">
                 {completedLevels.length} of {learningSteps.length} completed
               </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-purple-200 rounded-full h-2">
               <div
-                className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-700"
+                className="bg-gradient-to-r from-purple-500 to-blue-600 h-2 rounded-full transition-all duration-700"
                 style={{ width: `${(completedLevels.length / learningSteps.length) * 100}%` }}
               />
             </div>
@@ -245,9 +245,9 @@ const Index = () => {
                     <div className={`
                       w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shadow-lg border-2 border-white
                       ${completedLevels.includes(index)
-                        ? 'bg-green-500 text-white' 
+                        ? 'bg-gradient-to-r from-purple-500 to-blue-600 text-white' 
                         : index === currentLevel 
-                          ? 'bg-blue-500 text-white'
+                          ? 'bg-gradient-to-r from-purple-500 to-blue-600 text-white'
                           : 'bg-gray-300 text-gray-600'
                       }
                     `}>
@@ -271,8 +271,8 @@ const Index = () => {
                     <div className={`
                       flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300
                       ${completedLevels.includes(index)
-                        ? 'bg-green-500 text-white shadow-md' 
-                        : 'bg-gray-200 text-gray-400'
+                        ? 'bg-gradient-to-r from-purple-500 to-blue-600 text-white shadow-md' 
+                        : 'bg-purple-200 text-purple-400'
                       }
                     `}>
                       <ArrowRight className="w-4 h-4" />
@@ -285,9 +285,11 @@ const Index = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="bg-white/95 backdrop-blur-sm border-t border-gray-100 py-8">
+        <div className="bg-white/95 backdrop-blur-sm border-t border-purple-100 py-8">
           <div className="max-w-4xl mx-auto px-6 text-center">
-            <h3 className="text-xl font-semibold text-gray-800 mb-3">Ready to advance your career?</h3>
+            <h3 className="text-xl font-semibold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-3">
+              Ready to advance your career?
+            </h3>
             <p className="text-base text-gray-600">
               Complete each level to unlock the next stage of your professional development journey.
             </p>
