@@ -5,6 +5,7 @@ import VideoFeed from './VideoFeed';
 import AISpeech from './AISpeech';
 import SpeechRecognition from './SpeechRecognition';
 import AnimatedAIInterviewer from './AnimatedAIInterviewer';
+import jsPDF from 'jspdf';
 
 // Define Message interface
 interface Message {
@@ -200,189 +201,22 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
     
     // Determine recommendation based on average score
     let recommendation = "";
-    let recommendationColor = "";
     if (averageScore >= 4.0) {
       recommendation = "Hire - Excellent candidate with strong communication skills";
-      recommendationColor = "text-green-600";
     } else if (averageScore >= 3.0) {
       recommendation = "On-hold - Good potential but needs improvement in some areas";
-      recommendationColor = "text-yellow-600";
     } else {
       recommendation = "Reject - Significant improvement needed in multiple areas";
-      recommendationColor = "text-red-600";
     }
     
-    // Enhanced report with better structure and visuals
-    let reportContent = `
-    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
-      <!-- Header Section -->
-      <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8">
-        <div class="flex items-center justify-between">
-          <div>
-            <h1 class="text-3xl font-bold mb-2">Interview Performance Report</h1>
-            <p class="text-blue-100">Comprehensive AI-Generated Assessment</p>
-          </div>
-          <div class="text-right">
-            <div class="text-sm text-blue-100">Candidate</div>
-            <div class="text-xl font-semibold">${userName}</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Summary Cards -->
-      <div class="p-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <!-- Overall Score Card -->
-          <div class="bg-gradient-to-br from-purple-50 to-indigo-50 p-6 rounded-xl border border-purple-200">
-            <div class="flex items-center justify-between mb-4">
-              <div class="text-purple-600">
-                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                </svg>
-              </div>
-              <div class="text-right">
-                <div class="text-3xl font-bold text-purple-600">${averageScore.toFixed(1)}/5</div>
-                <div class="text-sm text-gray-600">Overall Score</div>
-              </div>
-            </div>
-            <div class="w-full bg-purple-200 rounded-full h-3">
-              <div class="bg-gradient-to-r from-purple-500 to-indigo-500 h-3 rounded-full transition-all duration-1000" style="width: ${(averageScore/5)*100}%"></div>
-            </div>
-          </div>
-
-          <!-- Questions Answered -->
-          <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border border-green-200">
-            <div class="flex items-center justify-between mb-4">
-              <div class="text-green-600">
-                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                </svg>
-              </div>
-              <div class="text-right">
-                <div class="text-3xl font-bold text-green-600">${userResponses.length}</div>
-                <div class="text-sm text-gray-600">Questions Answered</div>
-              </div>
-            </div>
-            <div class="text-sm text-green-700">out of ${questions.length} total questions</div>
-          </div>
-
-          <!-- Interview Duration -->
-          <div class="bg-gradient-to-br from-blue-50 to-sky-50 p-6 rounded-xl border border-blue-200">
-            <div class="flex items-center justify-between mb-4">
-              <div class="text-blue-600">
-                <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
-                </svg>
-              </div>
-              <div class="text-right">
-                <div class="text-3xl font-bold text-blue-600">${Math.floor(Math.random() * 15 + 10)}</div>
-                <div class="text-sm text-gray-600">Minutes</div>
-              </div>
-            </div>
-            <div class="text-sm text-blue-700">Interview Duration</div>
-          </div>
-        </div>
-
-        <!-- Performance Breakdown -->
-        <div class="mb-8">
-          <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
-            <svg class="w-6 h-6 mr-2 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"/>
-              <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"/>
-            </svg>
-            Performance Breakdown
-          </h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            ${Object.entries(scores).map(([category, score]) => {
-              const categoryNames = {
-                structure: 'Structure',
-                delivery: 'Delivery', 
-                language: 'Language',
-                bodyLanguage: 'Body Language',
-                timeManagement: 'Time Management'
-              };
-              const categoryIcons = {
-                structure: '🏗️',
-                delivery: '🎯',
-                language: '💬',
-                bodyLanguage: '👤',
-                timeManagement: '⏰'
-              };
-              const getColor = (score) => {
-                if (score >= 4) return { bg: 'bg-green-100', text: 'text-green-600', border: 'border-green-200', bar: 'bg-green-500' };
-                if (score >= 3) return { bg: 'bg-yellow-100', text: 'text-yellow-600', border: 'border-yellow-200', bar: 'bg-yellow-500' };
-                return { bg: 'bg-red-100', text: 'text-red-600', border: 'border-red-200', bar: 'bg-red-500' };
-              };
-              const colors = getColor(score);
-              
-              return `
-                <div class="${colors.bg} ${colors.border} border rounded-lg p-4">
-                  <div class="text-center mb-3">
-                    <div class="text-2xl mb-2">${categoryIcons[category]}</div>
-                    <div class="text-sm font-medium text-gray-700">${categoryNames[category]}</div>
-                  </div>
-                  <div class="text-center mb-3">
-                    <div class="text-2xl font-bold ${colors.text}">${score}/5</div>
-                  </div>
-                  <div class="w-full bg-gray-200 rounded-full h-2">
-                    <div class="${colors.bar} h-2 rounded-full transition-all duration-1000" style="width: ${(score/5)*100}%"></div>
-                  </div>
-                </div>
-              `;
-            }).join('')}
-          </div>
-        </div>
-
-        <!-- Final Recommendation -->
-        <div class="mb-8">
-          <div class="bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl p-6 border border-gray-200">
-            <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
-              <svg class="w-5 h-5 mr-2 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
-              </svg>
-              Final Recommendation
-            </h3>
-            <div class="text-lg font-semibold ${recommendationColor} mb-2">${recommendation}</div>
-            <div class="text-gray-600">
-              Based on comprehensive analysis of communication skills, response quality, and overall presentation during the interview session.
-            </div>
-          </div>
-        </div>
-
-        <!-- Interview Questions & Responses -->
-        <div class="mb-8">
-          <h3 class="text-xl font-bold text-gray-800 mb-6 flex items-center">
-            <svg class="w-5 h-5 mr-2 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h3a1 1 0 100-2H6z" clip-rule="evenodd"/>
-            </svg>
-            Interview Responses
-          </h3>
-          <div class="space-y-4">
-            ${questions.slice(0, userResponses.length).map((question, index) => `
-              <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-                <div class="mb-4">
-                  <div class="text-sm font-medium text-indigo-600 mb-2">Question ${index + 1}</div>
-                  <div class="text-gray-800 font-medium">${question}</div>
-                </div>
-                <div class="border-t pt-4">
-                  <div class="text-sm font-medium text-green-600 mb-2">Your Response</div>
-                  <div class="text-gray-700 italic">"${userResponses[index]?.text || 'No response recorded'}"</div>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-
-        <!-- Report Footer -->
-        <div class="text-center text-gray-500 text-sm border-t pt-6">
-          <p>Report generated on ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}</p>
-          <p class="mt-1">Powered by AI Interview Assistant Technology</p>
-        </div>
-      </div>
-    </div>
-    `;
-    
-    setInterviewReport(reportContent);
+    // Store scores and recommendation for PDF generation
+    setInterviewReport(JSON.stringify({
+      scores,
+      averageScore,
+      recommendation,
+      userResponses,
+      questions: questions.slice(0, userResponses.length)
+    }));
     setShowReportModal(true);
   };
   
@@ -394,15 +228,143 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
     // We'll set isComplete when user closes the report modal
   };
   
-  // Download report as text file
+  // Download report as PDF
   const downloadReport = () => {
-    const element = document.createElement('a');
-    const file = new Blob([interviewReport], {type: 'text/plain'});
-    element.href = URL.createObjectURL(file);
-    element.download = `interview_report_${userName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.txt`;
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
+    const reportData = JSON.parse(interviewReport);
+    const pdf = new jsPDF();
+    
+    // Set up colors
+    const primaryColor = [79, 70, 229]; // Indigo
+    const secondaryColor = [107, 114, 128]; // Gray
+    const accentColor = [34, 197, 94]; // Green
+    
+    // Header
+    pdf.setFillColor(...primaryColor);
+    pdf.rect(0, 0, 210, 40, 'F');
+    
+    pdf.setTextColor(255, 255, 255);
+    pdf.setFontSize(24);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('Interview Performance Report', 20, 25);
+    
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text(`Candidate: ${userName}`, 20, 32);
+    pdf.text(`Date: ${new Date().toLocaleDateString()}`, 140, 32);
+    
+    // Reset text color
+    pdf.setTextColor(0, 0, 0);
+    
+    // Overall Score Section
+    pdf.setFontSize(18);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('Overall Performance', 20, 60);
+    
+    pdf.setFontSize(14);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text(`Overall Score: ${reportData.averageScore.toFixed(1)}/5.0`, 20, 75);
+    pdf.text(`Questions Answered: ${reportData.userResponses.length}/${reportData.questions.length}`, 20, 85);
+    pdf.text(`Interview Duration: ${Math.floor(Math.random() * 15 + 10)} minutes`, 20, 95);
+    
+    // Performance Breakdown
+    pdf.setFontSize(16);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('Performance Breakdown', 20, 115);
+    
+    const skillCategories = {
+      structure: 'Structure & Organization',
+      delivery: 'Delivery & Presentation', 
+      language: 'Language & Communication',
+      bodyLanguage: 'Body Language & Presence',
+      timeManagement: 'Time Management'
+    };
+    
+    let yPosition = 130;
+    Object.entries(reportData.scores).forEach(([skill, score]) => {
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(`${skillCategories[skill]}: ${score}/5`, 25, yPosition);
+      
+      // Draw progress bar
+      pdf.setFillColor(230, 230, 230);
+      pdf.rect(120, yPosition - 4, 60, 6, 'F');
+      
+      const barWidth = (score / 5) * 60;
+      if (score >= 4) pdf.setFillColor(...accentColor);
+      else if (score >= 3) pdf.setFillColor(234, 179, 8);
+      else pdf.setFillColor(239, 68, 68);
+      
+      pdf.rect(120, yPosition - 4, barWidth, 6, 'F');
+      
+      yPosition += 15;
+    });
+    
+    // Recommendation
+    pdf.setFontSize(16);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('Final Recommendation', 20, yPosition + 15);
+    
+    pdf.setFontSize(12);
+    pdf.setFont('helvetica', 'normal');
+    const recommendationLines = pdf.splitTextToSize(reportData.recommendation, 170);
+    pdf.text(recommendationLines, 20, yPosition + 30);
+    
+    // Questions and Responses
+    yPosition += 50;
+    if (yPosition > 250) {
+      pdf.addPage();
+      yPosition = 20;
+    }
+    
+    pdf.setFontSize(16);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('Interview Questions & Responses', 20, yPosition);
+    yPosition += 15;
+    
+    reportData.questions.forEach((question, index) => {
+      if (yPosition > 250) {
+        pdf.addPage();
+        yPosition = 20;
+      }
+      
+      // Question
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(`Q${index + 1}: `, 20, yPosition);
+      
+      pdf.setFont('helvetica', 'normal');
+      const questionLines = pdf.splitTextToSize(question, 160);
+      pdf.text(questionLines, 35, yPosition);
+      yPosition += questionLines.length * 5 + 5;
+      
+      // Response
+      if (reportData.userResponses[index]) {
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Response: ', 20, yPosition);
+        
+        pdf.setFont('helvetica', 'normal');
+        const responseLines = pdf.splitTextToSize(reportData.userResponses[index].text, 160);
+        pdf.text(responseLines, 20, yPosition + 8);
+        yPosition += responseLines.length * 5 + 15;
+      } else {
+        pdf.setFont('helvetica', 'italic');
+        pdf.text('No response recorded', 20, yPosition);
+        yPosition += 15;
+      }
+    });
+    
+    // Footer
+    const pageCount = pdf.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      pdf.setPage(i);
+      pdf.setFontSize(10);
+      pdf.setTextColor(...secondaryColor);
+      pdf.text('Generated by AI Interview Assistant', 20, 285);
+      pdf.text(`Page ${i} of ${pageCount}`, 170, 285);
+    }
+    
+    // Save the PDF
+    pdf.save(`interview-report-${userName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
   if (showCongratulations) {
