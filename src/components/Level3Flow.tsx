@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Video, VideoOff, Mic, MicOff, X } from 'lucide-react';
+import { ArrowLeft, Mic, MicOff, X } from 'lucide-react';
 import Level3CongratulationsScreen from './Level3CongratulationsScreen';
+import VideoFeed from './VideoFeed';
 
 interface Level3FlowProps {
   onBack: () => void;
@@ -22,11 +23,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
   const [isComplete, setIsComplete] = useState(false);
   const [isVideoOn, setIsVideoOn] = useState(false);
   const [isMicOn, setIsMicOn] = useState(true);
-  const [cameraError, setCameraError] = useState<string | null>(null);
-  const [isStartingCamera, setIsStartingCamera] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
 
   const questions = [
     "Hi there! I'm excited to meet you. Could you please introduce yourself and tell me a bit about your background?",
@@ -41,98 +38,33 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Log when the component mounts to track initialization
   useEffect(() => {
-    return () => {
-      console.log('Cleaning up camera stream...');
-      stopCamera();
-    };
+    console.log('Video interview component mounted');
   }, []);
 
-  const startCamera = async () => {
-    try {
-      setIsStartingCamera(true);
-      setCameraError(null);
-      console.log('Attempting to start camera...');
-      
-      // Stop any existing stream first
-      stopCamera();
-      
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: {
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-          facingMode: 'user'
-        }, 
-        audio: false 
-      });
-      
-      console.log('Got camera stream:', stream);
-      streamRef.current = stream;
-      
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        console.log('Camera stream assigned to video element');
-        
-        // Ensure video plays and update state immediately
-        await videoRef.current.play();
-        setIsVideoOn(true);
-        setIsStartingCamera(false);
-        console.log('Camera started successfully');
-      }
-    } catch (error) {
-      console.error('Error accessing camera:', error);
-      setCameraError('Unable to access camera. Please check your permissions and try again.');
-      setIsVideoOn(false);
-      setIsStartingCamera(false);
-    }
+  // Handle video status changes from the VideoFeed component
+  const handleVideoStatusChange = (status: boolean) => {
+    console.log('Video status changed:', status);
+    setIsVideoOn(status);
   };
 
-  const stopCamera = () => {
-    console.log('Stopping camera...');
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => {
-        console.log('Stopping track:', track.kind);
-        track.stop();
-      });
-      streamRef.current = null;
-    }
-    
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
-    
-    setIsVideoOn(false);
+  const toggleMic = () => {
+    setIsMicOn(!isMicOn);
   };
 
-  const toggleVideo = () => {
-    console.log('Toggle video clicked, current state:', isVideoOn);
-    if (isVideoOn) {
-      stopCamera();
-    } else {
-      startCamera();
-    }
-  };
-
-  const handleProceedToInterview = async () => {
+  const handleProceedToInterview = () => {
     console.log('Proceeding to interview...');
     setShowCongratulations(false);
     
-    // Start camera immediately with a slight delay to ensure UI is ready
-    setTimeout(async () => {
-      console.log('Starting camera for interview...');
-      await startCamera();
-      
-      // Start with the first question after camera starts
-      setTimeout(() => {
-        const firstQuestion: Message = {
-          id: Date.now(),
-          text: questions[0],
-          sender: 'ai',
-          timestamp: new Date()
-        };
-        setMessages([firstQuestion]);
-      }, 1000);
-    }, 500);
+    // Add the first question
+    const firstQuestion: Message = {
+      id: Date.now(),
+      text: questions[0],
+      sender: 'ai',
+      timestamp: new Date()
+    };
+    setMessages([firstQuestion]);
   };
 
   const handleSendMessage = () => {
@@ -215,72 +147,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
 
           {/* Your Video Feed */}
           <div className="flex-1 p-6">
-            <div className="bg-white/90 rounded-2xl p-6 h-full flex flex-col">
-              <h3 className="text-lg font-semibold text-gray-700 mb-4">Your Video</h3>
-              <div className="flex-1 bg-gray-900 rounded-xl overflow-hidden relative">
-                {isStartingCamera ? (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-center p-4">
-                    <div className="animate-spin w-12 h-12 border-4 border-pink-500 border-t-transparent rounded-full mb-4"></div>
-                    <p className="text-white text-lg">Starting camera...</p>
-                  </div>
-                ) : cameraError ? (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-center p-6">
-                    <VideoOff className="w-16 h-16 text-red-400 mb-4" />
-                    <p className="text-red-400 text-lg mb-4">{cameraError}</p>
-                    <button
-                      onClick={startCamera}
-                      className="mt-4 px-6 py-3 bg-pink-500 text-white text-lg rounded-full hover:bg-pink-600 transition-colors"
-                    >
-                      Try Again
-                    </button>
-                  </div>
-                ) : isVideoOn ? (
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    muted
-                    playsInline
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-center p-6">
-                    <VideoOff className="w-16 h-16 text-gray-400 mb-4" />
-                    <p className="text-gray-400 text-lg mb-4">Camera is off</p>
-                    <button
-                      onClick={startCamera}
-                      className="px-6 py-3 bg-pink-500 text-white text-lg rounded-full hover:bg-pink-600 transition-colors"
-                    >
-                      Start Camera
-                    </button>
-                  </div>
-                )}
-              </div>
-              
-              {/* Video Controls */}
-              <div className="flex justify-center space-x-4 mt-6">
-                <button
-                  onClick={toggleVideo}
-                  disabled={isStartingCamera}
-                  className={`p-4 rounded-full transition-colors ${
-                    isVideoOn 
-                      ? 'bg-gray-200 hover:bg-gray-300' 
-                      : 'bg-red-500 hover:bg-red-600 text-white'
-                  } ${isStartingCamera ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  {isVideoOn ? <Video className="w-6 h-6" /> : <VideoOff className="w-6 h-6" />}
-                </button>
-                <button
-                  onClick={() => setIsMicOn(!isMicOn)}
-                  className={`p-4 rounded-full transition-colors ${
-                    isMicOn 
-                      ? 'bg-gray-200 hover:bg-gray-300' 
-                      : 'bg-red-500 hover:bg-red-600 text-white'
-                  }`}
-                >
-                  {isMicOn ? <Mic className="w-6 h-6" /> : <MicOff className="w-6 h-6" />}
-                </button>
-              </div>
-            </div>
+            <VideoFeed onStatusChange={handleVideoStatusChange} />
           </div>
         </div>
 
