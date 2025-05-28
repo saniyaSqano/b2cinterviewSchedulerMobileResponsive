@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Mic, MicOff, X } from 'lucide-react';
 import Level3CongratulationsScreen from './Level3CongratulationsScreen';
@@ -6,6 +5,14 @@ import VideoFeed from './VideoFeed';
 import AISpeech from './AISpeech';
 import SpeechRecognition from './SpeechRecognition';
 import AnimatedAIInterviewer from './AnimatedAIInterviewer';
+
+// Define Message interface
+interface Message {
+  id: number;
+  text: string;
+  sender: 'user' | 'ai';
+  timestamp: Date;
+}
 
 interface Level3FlowProps {
   onBack: () => void;
@@ -24,6 +31,8 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isAsking, setIsAsking] = useState(false);
   const [responseTimer, setResponseTimer] = useState<NodeJS.Timeout | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [currentInput, setCurrentInput] = useState('');
 
   const questions = [
     "Hi there! I'm excited to meet you. Could you please introduce yourself and tell me a bit about your background?",
@@ -79,6 +88,9 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
     setIsAISpeaking(false); // Stop AI speaking when user responds
 
     // Check if we need to ask the next question
+    moveToNextQuestion();
+  };
+
   const handleQuestionComplete = () => {
     setIsAsking(false);
     
@@ -112,23 +124,11 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
         // Set the current speech text and start speaking
         setCurrentSpeechText(questions[nextQuestionIndex]);
         setIsAISpeaking(true);
-      }, 1500);
         setIsAsking(true);
-      }, 2000);
+      }, 1500);
     } else {
       // All questions completed
       setIsComplete(true);
-    }
-  };
-
-  // Cleanup timer on component unmount
-  useEffect(() => {
-    return () => {
-      if (responseTimer) {
-        clearTimeout(responseTimer);
-      }
-    };
-  }, [responseTimer]);
       setTimeout(() => {
         const completionMessage: Message = {
           id: Date.now() + 1,
@@ -137,7 +137,6 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
           timestamp: new Date()
         };
         setMessages(prev => [...prev, completionMessage]);
-        setIsComplete(true);
         
         // Set the current speech text and start speaking
         setCurrentSpeechText(completionMessage.text);
@@ -145,6 +144,15 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
       }, 1500);
     }
   };
+  
+  // Cleanup timer on component unmount
+  useEffect(() => {
+    return () => {
+      if (responseTimer) {
+        clearTimeout(responseTimer);
+      }
+    };
+  }, [responseTimer]);
   
   // Handle speech recognition result
   const handleSpeechResult = (transcript: string) => {
@@ -211,15 +219,34 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
           </div>
         </div>
 
-        {/* Right Side - Animated AI Interviewer (40%) */}
-        <AnimatedAIInterviewer
-          currentQuestion={questions[currentQuestionIndex]}
-          isAsking={isAsking}
-          onQuestionComplete={handleQuestionComplete}
-          currentQuestionIndex={currentQuestionIndex}
-          totalQuestions={questions.length}
-        />
-
+        {/* AI Interview Assistant with Voice */}
+        <div className="w-2/5 flex flex-col">
+          {/* AI Interview Assistant Header */}
+          <div className="bg-gradient-to-r from-purple-100/80 to-indigo-100/80 backdrop-blur-md p-4 border-b border-white/20">
+            <div className="flex items-center space-x-3">
+              {/* AI Avatar */}
+              <div className="relative">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-full flex items-center justify-center shadow-lg">
+                  <div className="text-2xl">🤖</div>
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
+                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">
+                  AI Interview Assistant
+                </h3>
+                <p className="text-xs text-gray-600">Professional Interview Evaluation</p>
+                <div className="flex items-center space-x-1 mt-1">
+                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-xs text-green-600 font-medium">Awaiting response...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        
         {/* Completion Overlay */}
         {isComplete && (
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
@@ -229,115 +256,103 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
               <p className="text-gray-600 mb-6">
                 Fantastic! You've completed the Pitch Yourself challenge beautifully. Your responses show great self-awareness and motivation.
               </p>
-        {/* Right Side - AI Coach and Chat (40%) */}
-        <div className="w-2/5 flex flex-col">
-          {/* AI Coach Area */}
-          <div className="bg-gradient-to-r from-pink-100/80 to-purple-100/80 backdrop-blur-md p-4 border-b border-white/20">
-            <div className="flex items-center space-x-3">
-              {/* Cartoon Lady Avatar */}
-              <div className="relative">
-                <div className="w-16 h-16 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
-                  <div className="text-2xl">👩‍💼</div>
-                </div>
-                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
-                </div>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600">
-                  AI Interview Coach
-                </h3>
-                <p className="text-xs text-gray-600">Your friendly interview companion</p>
-                <div className="flex items-center space-x-1 mt-1">
-                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-xs text-green-600 font-medium">Online</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Chat Messages */}
-          <div className="flex-1 overflow-y-auto p-3 space-y-3">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div
-                  className={`max-w-[80%] rounded-2xl p-3 ${
-                    message.sender === 'user' 
-                      ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white' 
-                      : 'bg-white/90 text-gray-800'
-                  } shadow-md`}
-                >
-                  <p className="text-sm">{message.text}</p>
-                  <div className="flex justify-between items-center mt-2">
-                    {message.sender === 'ai' && currentSpeechText === message.text && (
-                      <AISpeech 
-                        text={message.text} 
-                        onSpeechEnd={() => setIsAISpeaking(false)}
-                        autoPlay={isAISpeaking}
-                      />
-                    )}
-                    <p className="text-xs opacity-70 text-right ml-auto">
-                      {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Chat Input */}
-          {!isComplete ? (
-            <div className="p-3 bg-white/80 backdrop-blur-md border-t border-white/20">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="text"
-                  value={currentInput}
-                  onChange={(e) => setCurrentInput(e.target.value)}
-                  placeholder="Type your response..."
-                  className="flex-1 bg-white/80 border border-gray-200 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
-                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                />
-                
-                {/* Speech Recognition Button */}
-                <div className="relative">
-                  <SpeechRecognition
-                    onResult={handleSpeechResult}
-                    autoStart={false}
-                  />
-                </div>
-                
-                <button
-                  onClick={() => handleSendMessage()}
-                  disabled={!currentInput.trim()}
-                  className="p-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                  </svg>
-                </button>
-              </div>
-              
-              {/* Toggle Speech Recognition */}
-              <div className="mt-2 flex justify-end">
-                <button
-                  onClick={() => setUseSpeechRecognition(!useSpeechRecognition)}
-                  className="text-xs text-gray-500 hover:text-pink-500 transition-colors flex items-center space-x-1"
-                >
-                  <span>{useSpeechRecognition ? 'Disable' : 'Enable'} voice input</span>
-                  {useSpeechRecognition ? <MicOff className="w-3 h-3" /> : <Mic className="w-3 h-3" />}
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="p-4 bg-white/80 backdrop-blur-md border-t border-white/20 text-center">
               <button
                 onClick={onBack}
                 className="px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full shadow-lg hover:from-pink-600 hover:to-purple-600 transition-colors"
+              >
+                Continue to Next Level
+              </button>
+            </div>
+          </div>
+        )}
+
+          {/* AI Interview Content */}
+          <div className="flex-1 overflow-y-auto p-3 space-y-3 relative">
+            {/* Current Question Display */}
+            <div className="bg-white/90 rounded-2xl p-4 shadow-md mb-6">
+              <div className="flex items-start space-x-3">
+                <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-white font-bold">AI</span>
+                </div>
+                <div>
+                  <p className="text-gray-800 text-sm">{questions[currentQuestionIndex]}</p>
+                  {currentSpeechText === questions[currentQuestionIndex] && (
+                    <AISpeech 
+                      text={questions[currentQuestionIndex]} 
+                      onSpeechEnd={() => setIsAISpeaking(false)}
+                      autoPlay={isAISpeaking}
+                    />
+                  )}
+                  <div className="flex items-center mt-2">
+                    <div className="text-xs text-gray-500">
+                      Question {currentQuestionIndex + 1} of {questions.length}
+                    </div>
+                    <div className="ml-auto flex items-center">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-1"></div>
+                      <span className="text-xs text-green-600">{isAsking ? 'Speaking...' : 'Listening...'}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Instructions */}
+            <div className="text-center text-xs text-gray-500 mt-4">
+              <p>Please speak clearly and take your time. The system will automatically proceed to the next question.</p>
+              <div className="flex items-center justify-center mt-2">
+                <div className="w-2 h-2 bg-red-500 rounded-full mr-1"></div>
+                <span>{isMicOn ? 'Recording' : 'Microphone Off'}</span>
+              </div>
+            </div>
+            
+            <div ref={messagesEndRef} />
+          </div>
+          
+          {/* Response Input Area */}
+          <div className="p-3 bg-white/80 backdrop-blur-md border-t border-white/20">
+            <div className="flex items-center space-x-2">
+              <input
+                type="text"
+                value={currentInput}
+                onChange={(e) => setCurrentInput(e.target.value)}
+                placeholder="Type your response..."
+                className="flex-1 bg-white/80 border border-gray-200 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+              />
+              
+              {/* Speech Recognition Button */}
+              <div className="relative">
+                <SpeechRecognition
+                  onResult={handleSpeechResult}
+                  autoStart={isMicOn}
+                />
+              </div>
+              
+              <button
+                onClick={() => handleSendMessage()}
+                disabled={!currentInput.trim()}
+                className="p-2 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        {/* Completion Overlay */}
+        {isComplete && (
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="bg-white rounded-2xl p-8 shadow-2xl text-center max-w-md">
+              <div className="text-6xl mb-4">🎉</div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-4">Interview Complete!</h3>
+              <p className="text-gray-600 mb-6">
+                Fantastic! You've completed the Pitch Yourself challenge beautifully. Your responses show great self-awareness and motivation.
+              </p>
+              <button
+                onClick={onBack}
+                className="px-8 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-full shadow-lg hover:from-purple-600 hover:to-indigo-600 transition-colors"
               >
                 Continue to Next Level
               </button>
