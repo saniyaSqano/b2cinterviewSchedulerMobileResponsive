@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { ArrowRight } from 'lucide-react';
 import ParticleBackground from '../components/ParticleBackground';
 import AssessmentFlow from '../components/AssessmentFlow';
 import ChatFlow from '../components/ChatFlow';
@@ -234,9 +235,9 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Cards Grid */}
+        {/* Cards Grid with Flow Arrows */}
         <div className="max-w-6xl mx-auto px-6 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 relative">
             {learningSteps.map((step, index) => {
               const isCompleted = completedLevels.includes(index);
               const isActive = index === currentLevel;
@@ -258,9 +259,52 @@ const Index = () => {
                     </div>
                   </div>
                   
-                  {/* Connection Line */}
+                  {/* Flow Arrow to Next Step */}
                   {index < learningSteps.length - 1 && (
-                    <div className="hidden lg:block absolute top-4 -right-4 w-8 h-0.5 bg-slate-300 z-0" />
+                    <div className="absolute top-1/2 -translate-y-1/2 z-10">
+                      {/* Horizontal Arrow for same row */}
+                      {((index % 3) < 2) && (
+                        <div className="hidden lg:block absolute left-full ml-4 w-8">
+                          <div className={`
+                            flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300
+                            ${completedLevels.includes(index) 
+                              ? 'bg-slate-600 text-white shadow-lg' 
+                              : 'bg-slate-200 text-slate-400'
+                            }
+                          `}>
+                            <ArrowRight className="w-4 h-4" />
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Diagonal Arrow for row transitions */}
+                      {((index % 3) === 2) && (index < learningSteps.length - 1) && (
+                        <div className="hidden lg:block absolute left-1/2 top-full mt-4">
+                          <div className={`
+                            flex items-center justify-center w-8 h-8 rounded-full rotate-90 transition-all duration-300
+                            ${completedLevels.includes(index) 
+                              ? 'bg-slate-600 text-white shadow-lg' 
+                              : 'bg-slate-200 text-slate-400'
+                            }
+                          `}>
+                            <ArrowRight className="w-4 h-4" />
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Mobile Arrow (always downward) */}
+                      <div className="lg:hidden absolute left-1/2 top-full mt-4 -translate-x-1/2">
+                        <div className={`
+                          flex items-center justify-center w-8 h-8 rounded-full rotate-90 transition-all duration-300
+                          ${completedLevels.includes(index) 
+                            ? 'bg-slate-600 text-white shadow-lg' 
+                            : 'bg-slate-200 text-slate-400'
+                          }
+                        `}>
+                          <ArrowRight className="w-4 h-4" />
+                        </div>
+                      </div>
+                    </div>
                   )}
                   
                   <LearningCard
