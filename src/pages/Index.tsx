@@ -23,42 +23,42 @@ const Index = () => {
       id: 0,
       title: "Skill Assessment",
       subtitle: "Level 1",
-      description: "Evaluate your current skills and knowledge with our comprehensive assessment to identify areas for improvement and growth.",
+      description: "Evaluate your current skills and knowledge with our comprehensive assessment.",
       icon: "graduation-cap" as const,
     },
     {
       id: 1,
       title: "AI Chat Session",
       subtitle: "Level 2",
-      description: "Engage with our AI assistant for personalized feedback, guidance, and insights based on your assessment results.",
+      description: "Engage with our AI assistant for personalized feedback and guidance.",
       icon: "user" as const,
     },
     {
       id: 2,
       title: "Pitch Yourself",
       subtitle: "Level 3",
-      description: "Learn to create compelling personal pitches and develop your professional presentation skills with interactive practice.",
+      description: "Learn to create compelling personal pitches and presentation skills.",
       icon: "graduation-cap" as const,
     },
     {
       id: 3,
       title: "Self Practice",
       subtitle: "Level 4",
-      description: "Practice your skills with hands-on exercises and real-world scenarios designed to reinforce your learning.",
+      description: "Practice your skills with hands-on exercises and real-world scenarios.",
       icon: "user" as const,
     },
     {
       id: 4,
       title: "AI Proctored Interview",
       subtitle: "Level 5",
-      description: "Demonstrate your newly acquired skills in a realistic AI-proctored interview environment with real-time feedback.",
+      description: "Demonstrate your skills in a realistic AI-proctored interview environment.",
       icon: "graduation-cap" as const,
     },
     {
       id: 5,
       title: "GameOn Competition",
       subtitle: "Level 6",
-      description: "Compete with others and showcase your skills in gamified challenges and competitions to earn recognition.",
+      description: "Compete with others and showcase your skills in gamified challenges.",
       icon: "user" as const,
     }
   ];
@@ -205,23 +205,23 @@ const Index = () => {
       
       <div className="relative z-10 min-h-screen">
         {/* Header */}
-        <div className="bg-white/95 backdrop-blur-sm border-b border-gray-100 text-center py-12">
+        <div className="bg-white/95 backdrop-blur-sm border-b border-gray-100 text-center py-8">
           <div className="max-w-4xl mx-auto px-6">
-            <h1 className="text-5xl font-bold text-gray-900 mb-6 leading-tight">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4 leading-tight">
               Professional Development Platform
             </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
               Follow your personalized learning path through comprehensive skill assessment and development
             </p>
           </div>
         </div>
 
         {/* Progress Bar */}
-        <div className="bg-white/90 backdrop-blur-sm border-b border-gray-100 py-6">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="flex items-center justify-between mb-4">
+        <div className="bg-white/90 backdrop-blur-sm border-b border-gray-100 py-4">
+          <div className="max-w-6xl mx-auto px-6">
+            <div className="flex items-center justify-between mb-3">
               <span className="text-sm font-semibold text-gray-700">Learning Progress</span>
-              <span className="text-sm font-medium text-gray-600 bg-gray-100 px-4 py-2 rounded-full">
+              <span className="text-sm font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
                 {completedLevels.length} of {learningSteps.length} completed
               </span>
             </div>
@@ -235,15 +235,15 @@ const Index = () => {
         </div>
 
         {/* Horizontal Timeline */}
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          <div className="flex items-center justify-center space-x-6 overflow-x-auto pb-4">
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          <div className="flex items-center justify-center space-x-3">
             {learningSteps.map((step, index) => (
-              <div key={step.id} className="flex items-center flex-shrink-0">
+              <div key={step.id} className="flex items-center">
                 {/* Card with Step Number */}
                 <div className="relative">
-                  <div className="absolute -top-3 -left-3 z-20">
+                  <div className="absolute -top-2 -left-2 z-20">
                     <div className={`
-                      w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shadow-lg border-2 border-white
+                      w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shadow-lg border-2 border-white
                       ${completedLevels.includes(index)
                         ? 'bg-green-500 text-white' 
                         : index === currentLevel 
@@ -267,15 +267,15 @@ const Index = () => {
                 
                 {/* Arrow between cards */}
                 {index < learningSteps.length - 1 && (
-                  <div className="flex items-center justify-center mx-4">
+                  <div className="flex items-center justify-center mx-2">
                     <div className={`
-                      flex items-center justify-center w-10 h-10 rounded-full transition-all duration-300
+                      flex items-center justify-center w-8 h-8 rounded-full transition-all duration-300
                       ${completedLevels.includes(index)
-                        ? 'bg-green-500 text-white shadow-lg' 
+                        ? 'bg-green-500 text-white shadow-md' 
                         : 'bg-gray-200 text-gray-400'
                       }
                     `}>
-                      <ArrowRight className="w-5 h-5" />
+                      <ArrowRight className="w-4 h-4" />
                     </div>
                   </div>
                 )}
@@ -285,10 +285,10 @@ const Index = () => {
         </div>
 
         {/* Bottom Section */}
-        <div className="bg-white/95 backdrop-blur-sm border-t border-gray-100 py-12">
+        <div className="bg-white/95 backdrop-blur-sm border-t border-gray-100 py-8">
           <div className="max-w-4xl mx-auto px-6 text-center">
-            <h3 className="text-2xl font-semibold text-gray-800 mb-4">Ready to advance your career?</h3>
-            <p className="text-lg text-gray-600">
+            <h3 className="text-xl font-semibold text-gray-800 mb-3">Ready to advance your career?</h3>
+            <p className="text-base text-gray-600">
               Complete each level to unlock the next stage of your professional development journey.
             </p>
           </div>
