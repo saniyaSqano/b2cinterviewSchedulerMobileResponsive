@@ -1,10 +1,11 @@
-
 import React, { useState } from 'react';
-import { ArrowLeft, User, Code, Shield, Star, Users, MessageCircle, Zap, AlertTriangle, CheckCircle, Award, XCircle, TrendingUp, BarChart3 } from 'lucide-react';
+import { ArrowLeft, User, Code, Shield, Star, Users, MessageCircle, Zap, AlertTriangle, CheckCircle, Award, XCircle, TrendingUp, BarChart3, Upload, Check } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from './ui/chart';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import { uploadToS3 } from '../utils/s3Service';
+import jsPDF from 'jspdf';
 
 interface ViolationLog {
   id: number;
@@ -42,58 +43,139 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
   violationLogs,
   onBack
 }) => {
-  // Report is now generated and downloaded client-side only
+  // Report states
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [uploadUrl, setUploadUrl] = useState<string | null>(null);
   
-  // Function to generate and download the report
-  const generateAndDownloadReport = () => {
+  // Function to generate and download the report as PDF and upload to S3
+  const generateAndDownloadReport = async () => {
     try {
       setIsGeneratingReport(true);
+      setIsUploading(true);
       
-      // Create report data
-      const reportData = {
-        candidateDetails,
-        skillAssessment,
-        violationLogs,
-        timestamp: new Date().toISOString(),
-        averageScore: Math.round(
-          (skillAssessment.programming + skillAssessment.framework + skillAssessment.testing + 
-           skillAssessment.confidence + skillAssessment.leadership + skillAssessment.communication + 
-           skillAssessment.adaptability) / 7
-        ),
-        finalResult: getFinalResult()
+      // Create a new PDF document
+      const pdf = new jsPDF();
+      
+      // Define colors for the PDF
+      const colors = {
+        primary: [0, 102, 204], // Blue
+        secondary: [102, 102, 102], // Gray
+        accent: [255, 153, 0], // Orange
+        success: [0, 153, 51], // Green
+        warning: [204, 51, 0] // Red
       };
       
-      // Convert to JSON and then to Blob
-      const jsonData = JSON.stringify(reportData, null, 2);
-      const blob = new Blob([jsonData], { type: 'application/json' });
+      // Add title
+      pdf.setFontSize(22);
+      pdf.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+      pdf.text('Interview Report', 105, 20, { align: 'center' });
       
-      // Generate filename with timestamp to ensure uniqueness
-      const timestamp = new Date().getTime();
-      const fileName = `Interview-Report-${candidateDetails.fullName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.json`;
+      // Add date
+      pdf.setFontSize(12);
+      pdf.setTextColor(colors.secondary[0], colors.secondary[1], colors.secondary[2]);
+      pdf.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 30, { align: 'center' });
       
-      // Create a download link
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = fileName;
+      // Add line
+      pdf.setDrawColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+      pdf.line(20, 35, 190, 35);
       
-      // Append to the document, click and remove
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      let yPos = 45;
       
-      // Clean up the URL object
+      // Add candidate details section
+      pdf.setFontSize(16);
+      pdf.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+      pdf.text('Candidate Details', 20, yPos);
+      yPos += 10;
+      
+      pdf.setFontSize(12);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text(`Name: ${candidateDetails.fullName}`, 20, yPos);
+      yPos += 7;
+      pdf.text(`Email: ${candidateDetails.email}`, 20, yPos);
+      yPos += 7;
+      pdf.text(`Phone: ${candidateDetails.phoneNumber}`, 20, yPos);
+      yPos += 7;
+      pdf.text(`Skills: ${candidateDetails.skills}`, 20, yPos);
+      yPos += 7;
+      pdf.text(`Experience: ${candidateDetails.experience} years`, 20, yPos);
+      yPos += 15;
+      
+      // Add skill assessment section
+      pdf.setFontSize(16);
+      pdf.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+      pdf.text('Skill Assessment', 20, yPos);
+      yPos += 10;
+      
+      pdf.setFontSize(12);
+      pdf.setTextColor(0, 0, 0);
+      
+      // Add each skill with score
+      Object.entries(skillAssessment).forEach(([skill, score]) => {
+        pdf.text(`${skill}: ${score}/10`, 20, yPos);
+        yPos += 7;
+      });
+      
+      yPos += 8;
+      
+      // Add violations section
+      pdf.setFontSize(16);
+      pdf.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+      pdf.text('Violations Detected', 20, yPos);
+      yPos += 10;
+      
+      pdf.setFontSize(12);
+      pdf.setTextColor(0, 0, 0);
+      
+      if (violationLogs.length === 0) {
+        pdf.text('No violations detected during the interview.', 20, yPos);
+        yPos += 7;
+      } else {
+        // Add each violation
+        violationLogs.forEach((violation, index) => {
+          pdf.text(`${index + 1}. ${violation.type} at ${new Date(violation.timestamp).toLocaleTimeString()}`, 20, yPos);
+          yPos += 7;
+          
+          // Add violation details with proper wrapping
+          const detailLines = pdf.splitTextToSize(`   Details: ${violation.message}`, 170);
+          pdf.text(detailLines, 20, yPos);
+          yPos += detailLines.length * 7 + 3;
+        });
+      }
+      
+      // Footer
+      pdf.setFontSize(9);
+      pdf.setTextColor(colors.secondary[0], colors.secondary[1], colors.secondary[2]);
+      pdf.text('Report generated by AI Interview Assistant', 105, 285, { align: 'center' });
+      
+      // Generate PDF as blob
+      const pdfBlob = pdf.output('blob');
+      const fileName = `Interview-Report-${candidateDetails.fullName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`;
+      
+      // Create a download link and trigger download
+      const url = URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
       URL.revokeObjectURL(url);
       
-      setIsGeneratingReport(false);
+      // Upload to S3
+      console.log('Uploading PDF to S3...');
+      const s3Url = await uploadToS3(pdfBlob, fileName, 'application/pdf');
+      console.log('PDF uploaded to S3:', s3Url);
       
-      // Display a success message
-      console.log('Report generated and downloaded successfully');
-      
+      // Update state with success and URL
+      setUploadSuccess(true);
+      setUploadUrl(s3Url);
+      console.log('Report generated, downloaded and uploaded successfully');
     } catch (error) {
-      console.error('Error generating report:', error);
-      setIsGeneratingReport(false);
+      console.error('Error generating and uploading PDF report:', error);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -499,6 +581,34 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
               <div className="p-4 bg-green-50 rounded-lg border border-green-200 text-green-700">
                 <p className="font-medium">Your interview report is ready! Click the button below to download it.</p>
               </div>
+            </div>
+            
+            {/* S3 Upload Status */}
+            <div className="text-center">
+              {isUploading && (
+                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 text-blue-700 flex items-center justify-center space-x-2">
+                  <div className="animate-spin w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+                  <p className="font-medium">Uploading report to secure cloud storage...</p>
+                </div>
+              )}
+              
+              {uploadSuccess && uploadUrl && (
+                <div className="p-4 bg-purple-50 rounded-lg border border-purple-200 text-purple-700">
+                  <div className="flex items-center justify-center space-x-2 mb-2">
+                    <Check className="w-5 h-5 text-purple-600" />
+                    <p className="font-medium">Report successfully saved to secure cloud storage!</p>
+                  </div>
+                  <a 
+                    href={uploadUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-sm text-purple-600 hover:text-purple-800 underline flex items-center justify-center space-x-1"
+                  >
+                    <Upload className="w-4 h-4" />
+                    <span>View Cloud Report</span>
+                  </a>
+                </div>
+              )}
             </div>
             
             {/* Buttons */}

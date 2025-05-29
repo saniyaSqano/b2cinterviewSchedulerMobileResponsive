@@ -4,9 +4,11 @@ import Webcam from 'react-webcam';
 
 interface VideoFeedProps {
   onStatusChange?: (isVideoOn: boolean) => void;
+  videoRef?: React.RefObject<HTMLVideoElement>;
+  faceDetectionVideoRef?: React.RefObject<HTMLVideoElement>;
 }
 
-const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange }) => {
+const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange, videoRef, faceDetectionVideoRef }) => {
   const [isVideoOn, setIsVideoOn] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,12 +43,53 @@ const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange }) => {
         console.log('Camera info:', videoTracks[0].label);
         console.log('Camera settings:', videoTracks[0].getSettings());
       }
+      
+      // Notify parent component about status change with the stream
+      if (onStatusChange) {
+        // We need to call this first to ensure the parent knows the camera is on
+        onStatusChange(true);
+      }
+      
+      // Connect to external videoRef if provided
+      if (videoRef && videoRef.current) {
+        console.log('Connecting webcam stream to main video element');
+        videoRef.current.srcObject = webcamRef.current.stream;
+      }
+      
+      // Connect to face detection videoRef if provided
+      if (faceDetectionVideoRef && faceDetectionVideoRef.current) {
+        console.log('Connecting webcam stream to face detection video element');
+        faceDetectionVideoRef.current.srcObject = webcamRef.current.stream;
+        faceDetectionVideoRef.current.muted = true; // Ensure it's muted
+        faceDetectionVideoRef.current.setAttribute('playsinline', ''); // Ensure it plays inline
+        
+        // Attempt to play the video
+        const playPromise = faceDetectionVideoRef.current.play();
+        if (playPromise !== undefined) {
+          playPromise.then(() => {
+            console.log('Face detection video playing successfully');
+          }).catch(err => {
+            console.error('Error playing face detection video:', err);
+            // Try again with user interaction
+            const retryPlay = () => {
+              if (faceDetectionVideoRef.current) {
+                faceDetectionVideoRef.current.play()
+                  .then(() => console.log('Face detection video playing after retry'))
+                  .catch(e => console.error('Still failed to play video:', e));
+              }
+            };
+            
+            // Add event listener to document for user interaction
+            document.addEventListener('click', retryPlay, { once: true });
+          });
+        }
+      }
     }
     
     setIsVideoOn(true);
     setIsStarting(false);
     setError(null);
-  }, []);
+  }, [videoRef, faceDetectionVideoRef]);
 
   // Find rear camera by enumerating devices
   const findRearCamera = async () => {
@@ -114,8 +157,20 @@ const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange }) => {
 
   const stopCamera = useCallback(() => {
     console.log('Stopping camera');
+    
+    // Explicitly stop all tracks in the webcam stream
+    if (webcamRef.current && webcamRef.current.stream) {
+      const tracks = webcamRef.current.stream.getTracks();
+      tracks.forEach(track => {
+        console.log('Explicitly stopping track:', track.kind);
+        track.stop();
+      });
+      
+      // Clear the stream reference
+      webcamRef.current.stream = null;
+    }
+    
     setIsVideoOn(false);
-    // The webcam component will handle cleanup of media streams
   }, []);
 
   const toggleCamera = useCallback(() => {
@@ -132,9 +187,21 @@ const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange }) => {
     startCamera();
   }, [startCamera]);
 
-  // Auto-start camera on component mount
+  // Auto-start camera on component mount and cleanup on unmount
   useEffect(() => {
     startCamera();
+    
+    // Cleanup function to ensure camera is stopped when component unmounts
+    return () => {
+      console.log('VideoFeed component unmounting, stopping camera');
+      if (webcamRef.current && webcamRef.current.stream) {
+        const tracks = webcamRef.current.stream.getTracks();
+        tracks.forEach(track => {
+          console.log('Stopping track on unmount:', track.kind);
+          track.stop();
+        });
+      }
+    };
   }, [startCamera]);
 
   // Determine video constraints based on whether we have a rear camera ID
@@ -182,7 +249,7 @@ const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange }) => {
             className="w-full h-full object-cover"
             mirrored={false} // Never mirror to ensure rear camera displays correctly
             screenshotFormat="image/jpeg"
-            style={{ display: isVideoOn ? 'block' : 'none', transform: 'scaleX(-1)' }} // Flip horizontally to correct orientation
+            style={{ display: isVideoOn ? 'block' : 'none' }} // Don't flip horizontally to prevent overlap
           />
         )}
         

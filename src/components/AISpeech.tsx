@@ -15,7 +15,7 @@ const AISpeech: React.FC<AISpeechProps> = ({ text, onSpeechEnd, autoPlay = true 
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   
   // ElevenLabs API configuration
-  const ELEVENLABS_API_KEY = import.meta.env.VITE_ELEVENLABS_API_KEY || 'sk_08635d652c00ee4ed79e38987ec2ae2d87799b3454169f11'; // Using Vite env format
+  const ELEVENLABS_API_KEY = import.meta.env.VITE_ELEVENLABS_API_KEY || 'sk_8e90f28fc34baf9358ec7ce64ca0e8320775dd6a8d0da40d'; // Using Vite env format
   // Using one of the default ElevenLabs voices (female, professional)
   const VOICE_ID = '21m00Tcm4TlvDq8ikWAM'; // Dorothy voice
   

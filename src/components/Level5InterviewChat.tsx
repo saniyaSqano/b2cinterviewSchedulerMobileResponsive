@@ -1,6 +1,7 @@
 
-import React, { useRef, useEffect } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Mic } from 'lucide-react';
+import AISpeech from './AISpeech';
 
 interface Message {
   id: number;
@@ -11,29 +12,34 @@ interface Message {
 
 interface Level5InterviewChatProps {
   messages: Message[];
-  currentInput: string;
-  onInputChange: (value: string) => void;
-  onSendMessage: () => void;
   isComplete: boolean;
   onEndInterview: () => void;
   currentQuestionIndex: number;
   totalQuestions: number;
+  isMicOn: boolean;
 }
 
 const Level5InterviewChat: React.FC<Level5InterviewChatProps> = ({
   messages,
-  currentInput,
-  onInputChange,
-  onSendMessage,
   isComplete,
   onEndInterview,
   currentQuestionIndex,
-  totalQuestions
+  totalQuestions,
+  isMicOn
 }) => {
+  const [isAISpeaking, setIsAISpeaking] = useState(false);
+  const [currentSpeechText, setCurrentSpeechText] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    
+    // Check if the latest message is from AI and set it for speech
+    if (messages.length > 0 && messages[messages.length - 1].sender === 'ai') {
+      const latestAIMessage = messages[messages.length - 1].text;
+      setCurrentSpeechText(latestAIMessage);
+      setIsAISpeaking(true);
+    }
   }, [messages]);
 
   return (
@@ -88,6 +94,15 @@ const Level5InterviewChat: React.FC<Level5InterviewChatProps> = ({
                   }`}>
                     {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
+                  {message.sender === 'ai' && (
+                    <div className="mt-2">
+                      <AISpeech 
+                        text={message.text} 
+                        onSpeechEnd={() => {}}
+                        autoPlay={false}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -96,32 +111,27 @@ const Level5InterviewChat: React.FC<Level5InterviewChatProps> = ({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Area */}
+      {/* Hidden AI Speech component for background speech */}
+      {!isComplete && (
+        <div className="hidden">
+          <AISpeech 
+            text={currentSpeechText} 
+            onSpeechEnd={() => setIsAISpeaking(false)}
+            autoPlay={isAISpeaking}
+          />
+        </div>
+      )}
+      
+      {/* Voice Response Indicator */}
       {!isComplete && (
         <div className="bg-white/90 backdrop-blur-md border-t border-white/20 p-3">
-          <div className="flex items-end space-x-2">
-            <div className="flex-1">
-              <textarea
-                value={currentInput}
-                onChange={(e) => onInputChange(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    onSendMessage();
-                  }
-                }}
-                placeholder="Type your response here..."
-                className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
-                rows={2}
-              />
+          <div className="flex items-center justify-center space-x-2">
+            <div className={`p-2 ${isMicOn ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'} rounded-full`}>
+              <Mic className="w-5 h-5" />
             </div>
-            <button
-              onClick={onSendMessage}
-              disabled={!currentInput.trim()}
-              className="p-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-full hover:from-purple-600 hover:to-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
-            >
-              <ArrowLeft className="w-4 h-4 rotate-180" />
-            </button>
+            <p className="text-sm text-gray-700">
+              {isMicOn ? 'Voice recording active - speak your response' : 'Microphone is off'}
+            </p>
           </div>
         </div>
       )}

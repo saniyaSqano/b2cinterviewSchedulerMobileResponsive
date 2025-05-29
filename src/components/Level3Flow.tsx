@@ -562,30 +562,18 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
   // Handle report download - either from S3 or generate locally
   const downloadReport = async () => {
     try {
-      // Try to generate and upload the report to S3 first
-      setIsUploading(true);
+      // If we already have a report URL, use it
+      if (reportS3Url) {
+        window.open(reportS3Url, '_blank');
+        return;
+      }
       
-      try {
-        // If we already have a report URL, use it
-        if (reportS3Url) {
-          window.open(reportS3Url, '_blank');
-          setIsUploading(false);
-          return;
-        }
-        
-        // Otherwise generate and upload the report
-        const url = await generateAndUploadReport();
-        
-        if (url) {
-          window.open(url, '_blank');
-          setIsUploading(false);
-          return;
-        }
-      } catch (s3Error) {
-        console.error('Error with S3 download, falling back to local:', s3Error);
-        // Fall back to local download if S3 fails
-        downloadLocalPdf();
-        setIsUploading(false);
+      // Otherwise generate and upload the report
+      setIsUploading(true);
+      const url = await generateAndUploadReport();
+      
+      if (url) {
+        window.open(url, '_blank');
       }
     } catch (error) {
       console.error('Error downloading report:', error);

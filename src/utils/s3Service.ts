@@ -63,8 +63,14 @@ export const getSignedUploadUrl = async (fileName: string, contentType: string):
  */
 export const uploadToS3 = async (fileData: Blob | Buffer, fileName: string, contentType: string): Promise<string> => {
   try {
+    console.log('Starting S3 upload process for:', fileName);
+    console.log('Content type:', contentType);
+    console.log('File data type:', fileData instanceof Blob ? 'Blob' : 'Buffer');
+    
     // Get a pre-signed URL for uploading
     const { url, filePath } = await getSignedUploadUrl(fileName, contentType);
+    console.log('Got pre-signed URL:', url);
+    console.log('File path in S3:', filePath);
     
     // Convert data to Blob if needed
     let blob: Blob;
@@ -80,18 +86,30 @@ export const uploadToS3 = async (fileData: Blob | Buffer, fileName: string, cont
     }
     
     // Use fetch to upload directly with the pre-signed URL
-    const response = await fetch(url, {
-      method: 'PUT',
-      body: blob,
-      headers: {
-        'Content-Type': contentType
-        // No need to specify ACL in headers, it's determined by bucket policy
+    console.log('Sending fetch request to upload file...');
+    try {
+      const response = await fetch(url, {
+        method: 'PUT',
+        body: blob,
+        headers: {
+          'Content-Type': contentType
+          // No need to specify ACL in headers, it's determined by bucket policy
+        }
+      });
+      
+      console.log('Fetch response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Upload failed with status: ${response.status}`, errorText);
+        console.error('Response headers:', Object.fromEntries([...response.headers.entries()]));
+        throw new Error(`Upload failed with status: ${response.status} - ${errorText}`);
       }
-    });
-    
-    if (!response.ok) {
-      console.error(`Upload failed with status: ${response.status}`, await response.text());
-      throw new Error(`Upload failed with status: ${response.status}`);
+      
+      console.log('Upload successful with status:', response.status);
+    } catch (fetchError) {
+      console.error('Fetch operation failed:', fetchError);
+      throw fetchError;
     }
     
     // Generate a signed download URL instead of constructing a public URL

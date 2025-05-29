@@ -156,9 +156,10 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
       await startCamera();
       
       setTimeout(() => {
+        const firstQuestionText = interviewQuestions[0];
         const firstQuestion: Message = {
           id: Date.now(),
-          text: interviewQuestions[0],
+          text: firstQuestionText,
           sender: 'ai',
           timestamp: new Date()
         };
@@ -260,7 +261,7 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 relative overflow-hidden">
       <div className="relative z-10 h-screen flex">
-        {/* Left Side - Video Feed and Violations (60%) */}
+        {/* Left Side - Video Feed (60%) */}
         <div className="w-3/5 bg-gradient-to-br from-purple-100/80 to-indigo-100/80 backdrop-blur-md border-r border-white/20 flex flex-col">
           <Level5Header onBack={onBack} onEndInterview={handleEndInterview} />
           
@@ -275,22 +276,25 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
               isStartingCamera={isStartingCamera}
               videoRef={videoRef}
             />
-            
-            <Level5ViolationLogs violationLogs={violationLogs} />
           </div>
         </div>
 
-        {/* Right Side - AI Interview Proctor (40%) */}
-        <Level5InterviewChat
-          messages={messages}
-          currentInput={currentInput}
-          onInputChange={setCurrentInput}
-          onSendMessage={handleSendMessage}
-          isComplete={isComplete}
-          onEndInterview={handleEndInterview}
-          currentQuestionIndex={currentQuestionIndex}
-          totalQuestions={interviewQuestions.length}
-        />
+        {/* Right Side - AI Interview Proctor & Violations (40%) */}
+        <div className="w-2/5 flex flex-col">
+          <Level5InterviewChat
+            messages={messages}
+            isComplete={isComplete}
+            onEndInterview={handleEndInterview}
+            currentQuestionIndex={currentQuestionIndex}
+            totalQuestions={interviewQuestions.length}
+            isMicOn={isMicOn}
+          />
+          
+          {/* Violation Logs moved to right panel */}
+          <div className="p-3">
+            <Level5ViolationLogs violationLogs={violationLogs} />
+          </div>
+        </div>
       </div>
     </div>
   );
