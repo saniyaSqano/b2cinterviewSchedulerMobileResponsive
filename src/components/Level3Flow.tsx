@@ -204,7 +204,23 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
   
   // Generate interview report based on questions and messages with analytics
   const generateInterviewReport = () => {
-    const userResponses = messages.filter(msg => msg.sender === 'user');
+    // Use saved transcripts for more reliable response tracking
+    const userResponses = savedTranscripts.map((text, index) => ({
+      id: Date.now() + index,
+      text,
+      sender: 'user' as const,
+      timestamp: new Date()
+    }));
+    
+    // Ensure we have messages for each transcript
+    if (messages.filter(msg => msg.sender === 'user').length < userResponses.length) {
+      setMessages(prev => {
+        const aiMessages = prev.filter(msg => msg.sender === 'ai');
+        return [...aiMessages, ...userResponses];
+      });
+    }
+    
+    console.log('Generating report with responses:', userResponses);
     
     // Generate realistic scores based on response quality
     const generateSmartScore = (responseIndex: number): number => {
@@ -410,46 +426,111 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
       
       yPos += 10;
       
-      // Add each question and response
+      // Add a dedicated Questions & Answers section header
+      pdf.addPage();
+      yPos = 20;
+      
+      pdf.setFillColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+      pdf.rect(0, 0, 210, 30, 'F');
+      
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(18);
+      pdf.text('INTERVIEW QUESTIONS & ANSWERS', 105, 20, { align: 'center' });
+      
+      // Start content after header
+      yPos = 40;
+      
+      // Add each question and response in a more structured format
       reportData.questions.forEach((question: string, index: number) => {
         // Check if we need a new page
-        if (yPos > 270) {
+        if (yPos > 250) {
           pdf.addPage();
           yPos = 20;
         }
         
+        // Question number box
+        pdf.setFillColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+        pdf.roundedRect(15, yPos, 180, 10, 2, 2, 'F');
+        pdf.setTextColor(255, 255, 255);
+        pdf.setFontSize(12);
+        pdf.text(`Question ${index + 1} of ${reportData.questions.length}`, 105, yPos + 7, { align: 'center' });
+        
+        yPos += 20;
+        
+        // Question text
+        pdf.setFillColor(240, 240, 250);
+        pdf.roundedRect(15, yPos - 5, 180, 25, 2, 2, 'F');
+        
         pdf.setFontSize(11);
         pdf.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2]);
-        pdf.text(`Question ${index + 1}:`, 15, yPos);
+        pdf.text('Question:', 20, yPos);
         
-        yPos += 6;
+        yPos += 7;
         pdf.setTextColor(0, 0, 0);
-        pdf.text(question, 15, yPos, { maxWidth: 180 });
+        pdf.setFontSize(10);
+        const questionLines = pdf.splitTextToSize(question, 170);
+        pdf.text(questionLines, 20, yPos);
         
         // Calculate text height based on content length and width
-        const textLines = pdf.splitTextToSize(question, 180);
-        yPos += textLines.length * 5;
+        yPos += questionLines.length * 5 + 10;
         
         // Find corresponding response
         const response = reportData.userResponses[index];
         
-        pdf.setTextColor(colors.secondary[0], colors.secondary[1], colors.secondary[2]);
-        pdf.text('Response:', 15, yPos);
+        // Response box
+        pdf.setFillColor(245, 250, 245);
+        pdf.roundedRect(15, yPos - 5, 180, response ? 40 : 20, 2, 2, 'F');
         
-        yPos += 6;
+        pdf.setFontSize(11);
+        pdf.setTextColor(16, 185, 129); // Green color for 'Your Answer'
+        pdf.text('Your Answer:', 20, yPos);
+        
+        yPos += 7;
         pdf.setTextColor(0, 0, 0);
+        pdf.setFontSize(10);
         
         if (response) {
-          const responseText = pdf.splitTextToSize(response.text, 180);
-          pdf.text(responseText, 15, yPos);
-          yPos += responseText.length * 5 + 5;
+          const responseLines = pdf.splitTextToSize(response.text, 170);
+          pdf.text(responseLines, 20, yPos);
+          yPos += responseLines.length * 5 + 5;
         } else {
-          pdf.text('No response recorded', 15, yPos);
+          pdf.text('No response recorded', 20, yPos);
           yPos += 10;
         }
         
+        // Add analysis of the response
+        if (response) {
+          yPos += 5;
+          pdf.setFillColor(250, 250, 255);
+          pdf.roundedRect(15, yPos - 5, 180, 25, 2, 2, 'F');
+          
+          pdf.setFontSize(11);
+          pdf.setTextColor(colors.secondary[0], colors.secondary[1], colors.secondary[2]);
+          pdf.text('Analysis:', 20, yPos);
+          
+          yPos += 7;
+          pdf.setFontSize(9);
+          pdf.setTextColor(80, 80, 80);
+          
+          // Generate a simple analysis based on the response
+          const wordCount = response.text.split(' ').length;
+          let analysis = '';
+          
+          if (wordCount < 10) {
+            analysis = 'Your answer was concise. Consider providing more details in future responses.';
+          } else if (wordCount < 25) {
+            analysis = 'Good response length. You provided a clear and focused answer.';
+          } else {
+            analysis = 'Excellent detailed response. You demonstrated thorough communication skills.';
+          }
+          
+          const analysisLines = pdf.splitTextToSize(analysis, 170);
+          pdf.text(analysisLines, 20, yPos);
+          yPos += analysisLines.length * 5 + 5;
+        }
+        
         // Add some spacing between Q&A pairs
-        yPos += 5;
+        yPos += 15;
       });
       
       // Footer
@@ -1008,6 +1089,72 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
                     );
                   })}
                 </div>
+              </div>
+
+              {/* Questions and Answers Section */}
+              <div className="p-6 bg-indigo-50 border-t border-indigo-100">
+                <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                  <MessageSquare className="w-6 h-6 mr-2" />
+                  Questions & Answers
+                </h3>
+                
+                {reportData.questions.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    No questions or answers recorded yet.
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {reportData.questions.map((question: string, index: number) => {
+                      const response = reportData.userResponses[index];
+                      
+                      return (
+                        <div key={index} className="bg-white rounded-xl shadow-sm overflow-hidden">
+                          {/* Question header */}
+                          <div className="bg-indigo-600 px-4 py-2 text-white">
+                            <div className="flex items-center">
+                              <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center text-indigo-600 font-bold mr-2">
+                                {index + 1}
+                              </div>
+                              <span className="font-medium">Question {index + 1} of {reportData.questions.length}</span>
+                            </div>
+                          </div>
+                          
+                          {/* Question */}
+                          <div className="p-4 bg-indigo-50 border-b border-indigo-100">
+                            <h4 className="font-medium text-indigo-800 mb-2">Question:</h4>
+                            <p className="text-gray-800">{question}</p>
+                          </div>
+                          
+                          {/* Answer */}
+                          <div className="p-4">
+                            <h4 className="font-medium text-green-700 mb-2">Your Answer:</h4>
+                            {response ? (
+                              <div>
+                                <p className="text-gray-800 whitespace-pre-line">{response.text}</p>
+                                
+                                {/* Analysis */}
+                                <div className="mt-4 pt-4 border-t border-gray-100">
+                                  <h5 className="text-sm font-medium text-gray-600 mb-1">Analysis:</h5>
+                                  <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-700">
+                                    {response.text.split(' ').length < 10 ? (
+                                      <p>Your answer was concise. Consider providing more details in future responses.</p>
+                                    ) : response.text.split(' ').length < 25 ? (
+                                      <p>Good response length. You provided a clear and focused answer.</p>
+                                    ) : (
+                                      <p>Excellent detailed response. You demonstrated thorough communication skills.</p>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <p className="text-gray-500 italic">No response recorded</p>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* Action buttons */}
