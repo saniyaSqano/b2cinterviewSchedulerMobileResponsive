@@ -48,6 +48,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isListeningForResponse, setIsListeningForResponse] = useState(false);
   const [currentTranscript, setCurrentTranscript] = useState('');
+  const [savedTranscripts, setSavedTranscripts] = useState<string[]>([]);
 
   const questions = [
     "Hi there! I'm excited to meet you. Could you please introduce yourself and tell me a bit about your background?",
@@ -125,6 +126,9 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
     
     const timer = setTimeout(() => {
       if (transcript.trim()) {
+        // Save the final transcript
+        setSavedTranscripts(prev => [...prev, transcript]);
+        
         const userMessage: Message = {
           id: Date.now(),
           text: transcript,
@@ -663,8 +667,8 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 relative overflow-hidden">
       <div className="relative z-10 h-screen flex">
-        {/* Left Side - Video Feed (60%) */}
-        <div className="w-3/5 bg-gradient-to-br from-pink-100/80 to-purple-100/80 backdrop-blur-md border-r border-white/20 flex flex-col">
+        {/* Left Side - Video Feed (50%) */}
+        <div className="w-1/2 bg-gradient-to-br from-pink-100/80 to-purple-100/80 backdrop-blur-md border-r border-white/20 flex flex-col">
           {/* Video Header */}
           <div className="p-4 border-b border-white/20">
             <div className="flex items-center justify-between">
@@ -723,11 +727,6 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
                   <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
                   <span className="text-green-800 font-medium">Listening for your response...</span>
                 </div>
-                {currentTranscript && (
-                  <p className="text-gray-700 text-sm italic">
-                    "{currentTranscript}"
-                  </p>
-                )}
               </div>
             ) : isAISpeaking ? (
               <div className="bg-blue-100 border border-blue-300 rounded-lg p-4">
@@ -744,14 +743,137 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
           </div>
         </div>
 
-        {/* Right Side - AI Interviewer (40%) */}
-        <AnimatedAIInterviewer
-          currentQuestion={questions[currentQuestionIndex]}
-          isAsking={isAsking}
-          onQuestionComplete={handleQuestionComplete}
-          currentQuestionIndex={currentQuestionIndex}
-          totalQuestions={questions.length}
-        />
+        {/* Right Side - Speech Transcript Display (50%) */}
+        <div className="w-1/2 flex flex-col bg-white">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 border-b border-gray-200">
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                <MessageSquare className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-800">Speech Recognition</h3>
+                <p className="text-gray-600">Your spoken responses are captured here</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Current Transcript Display */}
+          <div className="p-6 border-b border-gray-200">
+            <h4 className="text-lg font-semibold text-gray-800 mb-4">Current Response</h4>
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 min-h-[120px] border border-blue-200">
+              {isListeningForResponse ? (
+                <div>
+                  {currentTranscript ? (
+                    <div>
+                      <p className="text-gray-800 text-lg leading-relaxed">{currentTranscript}</p>
+                      <div className="flex items-center space-x-2 mt-4">
+                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        <span className="text-green-600 text-sm font-medium">Speaking detected...</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-center">
+                        <div className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+                        <p className="text-blue-600 font-medium">Waiting for your response...</p>
+                        <p className="text-gray-500 text-sm mt-1">Start speaking to see your words appear</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-500">
+                  <div className="text-center">
+                    <Mic className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                    <p>Ready to capture your next response</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Saved Transcripts */}
+          <div className="flex-1 p-6 overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-lg font-semibold text-gray-800">Previous Responses</h4>
+              <span className="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-medium">
+                {savedTranscripts.length} responses
+              </span>
+            </div>
+            
+            <div className="space-y-4">
+              {savedTranscripts.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <MessageSquare className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <p className="text-gray-500">No responses recorded yet</p>
+                  <p className="text-gray-400 text-sm mt-1">Your spoken answers will appear here</p>
+                </div>
+              ) : (
+                savedTranscripts.map((transcript, index) => (
+                  <div
+                    key={index}
+                    className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-start space-x-4">
+                      <div className="flex-shrink-0">
+                        <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                          {index + 1}
+                        </div>
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <h5 className="font-semibold text-gray-800">Question {index + 1} Response</h5>
+                          <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
+                            Completed
+                          </span>
+                        </div>
+                        <p className="text-gray-700 leading-relaxed">{transcript}</p>
+                        <div className="flex items-center space-x-2 mt-3 text-xs text-gray-500">
+                          <Clock className="w-3 h-3" />
+                          <span>Recorded just now</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* Progress Indicator */}
+          <div className="bg-gray-50 p-4 border-t border-gray-200">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-gray-700">
+                Question {currentQuestionIndex + 1} of {questions.length}
+              </span>
+              <div className="flex items-center space-x-2">
+                <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-indigo-500 to-purple-600 transition-all duration-500"
+                    style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
+                  />
+                </div>
+                <span className="text-sm text-gray-600">
+                  {Math.round(((currentQuestionIndex + 1) / questions.length) * 100)}%
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Hidden AI Interviewer for questions */}
+        <div className="hidden">
+          <AnimatedAIInterviewer
+            currentQuestion={questions[currentQuestionIndex]}
+            isAsking={isAsking}
+            onQuestionComplete={handleQuestionComplete}
+            currentQuestionIndex={currentQuestionIndex}
+            totalQuestions={questions.length}
+          />
+        </div>
         
         {/* Hidden AISpeech component for voice */}
         {currentSpeechText && (
