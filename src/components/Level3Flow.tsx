@@ -38,17 +38,16 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
   const [isMicOn, setIsMicOn] = useState(true);
   const [isAISpeaking, setIsAISpeaking] = useState(false);
   const [currentSpeechText, setCurrentSpeechText] = useState('');
-  const [useSpeechRecognition, setUseSpeechRecognition] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const [isAsking, setIsAsking] = useState(false);
   const [responseTimer, setResponseTimer] = useState<NodeJS.Timeout | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [currentInput, setCurrentInput] = useState('');
   const [reportData, setReportData] = useState<any>(null);
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportS3Url, setReportS3Url] = useState<string>('');
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isListeningForResponse, setIsListeningForResponse] = useState(false);
+  const [currentTranscript, setCurrentTranscript] = useState('');
 
   const questions = [
     "Hi there! I'm excited to meet you. Could you please introduce yourself and tell me a bit about your background?",
@@ -104,26 +103,9 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
     }, 500);
   };
 
-  const handleSendMessage = (inputText = currentInput) => {
-    if (!inputText.trim()) return;
-
-    const userMessage: Message = {
-      id: Date.now(),
-      text: inputText,
-      sender: 'user',
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setCurrentInput('');
-    setIsAISpeaking(false); // Stop AI speaking when user responds
-
-    // Check if we need to ask the next question
-    moveToNextQuestion();
-  };
-
   const handleQuestionComplete = () => {
     setIsAsking(false);
+    setIsListeningForResponse(true);
     
     // Give user 30 seconds to respond before moving to next question
     const timer = setTimeout(() => {
@@ -133,11 +115,39 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
     setResponseTimer(timer);
   };
 
+  const handleSpeechResult = (transcript: string) => {
+    setCurrentTranscript(transcript);
+    
+    // Auto-proceed when user finishes speaking (after 2 seconds of silence)
+    if (responseTimer) {
+      clearTimeout(responseTimer);
+    }
+    
+    const timer = setTimeout(() => {
+      if (transcript.trim()) {
+        const userMessage: Message = {
+          id: Date.now(),
+          text: transcript,
+          sender: 'user',
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, userMessage]);
+        setCurrentTranscript('');
+        setIsListeningForResponse(false);
+        moveToNextQuestion();
+      }
+    }, 2000);
+    
+    setResponseTimer(timer);
+  };
+
   const moveToNextQuestion = () => {
     if (responseTimer) {
       clearTimeout(responseTimer);
       setResponseTimer(null);
     }
+    
+    setIsListeningForResponse(false);
 
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
@@ -187,13 +197,6 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
       }
     };
   }, [responseTimer]);
-  
-  // Handle speech recognition result
-  const handleSpeechResult = (transcript: string) => {
-    if (transcript.trim()) {
-      setCurrentInput(transcript);
-    }
-  };
   
   // Generate interview report based on questions and messages with analytics
   const generateInterviewReport = () => {
@@ -675,7 +678,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
                 Level 3 - Video Interview
               </h2>
               <button
-                onClick={handleEndRecording}
+                onClick={generateInterviewReport}
                 className="px-4 py-2 rounded-full bg-red-500 hover:bg-red-600 text-white transition-colors shadow-lg flex items-center space-x-1"
                 title="End Recording"
               >
@@ -686,11 +689,11 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
 
           {/* Your Video Feed */}
           <div className="flex-1 p-6">
-            <VideoFeed onStatusChange={handleVideoStatusChange} />
+            <VideoFeed onStatusChange={setIsVideoOn} />
           </div>
           
-          {/* Audio Controls */}
-          <div className="p-4 flex justify-center">
+          {/* Audio Controls and Speech Recognition */}
+          <div className="p-4 flex justify-center items-center space-x-4">
             <button
               onClick={() => setIsMicOn(!isMicOn)}
               className={`p-4 rounded-full transition-colors ${
@@ -702,111 +705,64 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
             >
               {isMicOn ? <Mic className="w-6 h-6" /> : <MicOff className="w-6 h-6" />}
             </button>
-          </div>
-        </div>
-
-        {/* AI Interview Assistant with Voice */}
-        <div className="w-2/5 flex flex-col">
-          {/* AI Interview Assistant Header */}
-          <div className="bg-gradient-to-r from-purple-100/80 to-indigo-100/80 backdrop-blur-md p-4 border-b border-white/20">
-            <div className="flex items-center space-x-3">
-              {/* AI Avatar */}
-              <div className="relative">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-400 to-indigo-500 rounded-full flex items-center justify-center shadow-lg">
-                  <div className="text-2xl">🤖</div>
-                </div>
-                <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
-                  <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
-                </div>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">
-                  AI Interview Assistant
-                </h3>
-                <p className="text-xs text-gray-600">Professional Interview Evaluation</p>
-                <div className="flex items-center space-x-1 mt-1">
-                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-xs text-green-600 font-medium">Awaiting response...</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* AI Interview Content */}
-          <div className="flex-1 overflow-y-auto p-3 space-y-3 relative">
-            {/* Current Question Display */}
-            <div className="bg-white/90 rounded-2xl p-4 shadow-md mb-6">
-              <div className="flex items-start space-x-3">
-                <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-white font-bold">AI</span>
-                </div>
-                <div>
-                  <p className="text-gray-800 text-sm">{questions[currentQuestionIndex]}</p>
-                  {currentSpeechText === questions[currentQuestionIndex] && (
-                    <AISpeech 
-                      text={questions[currentQuestionIndex]} 
-                      onSpeechEnd={() => setIsAISpeaking(false)}
-                      autoPlay={isAISpeaking}
-                    />
-                  )}
-                  <div className="flex items-center mt-2">
-                    <div className="text-xs text-gray-500">
-                      Question {currentQuestionIndex + 1} of {questions.length}
-                    </div>
-                    <div className="ml-auto flex items-center">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-1"></div>
-                      <span className="text-xs text-green-600">{isAsking ? 'Speaking...' : 'Listening...'}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
             
-            {/* Instructions */}
-            <div className="text-center text-xs text-gray-500 mt-4">
-              <p>Please speak clearly and take your time. The system will automatically proceed to the next question.</p>
-              <div className="flex items-center justify-center mt-2">
-                <div className="w-2 h-2 bg-red-500 rounded-full mr-1"></div>
-                <span>{isMicOn ? 'Recording' : 'Microphone Off'}</span>
-              </div>
-            </div>
-            
-            <div ref={messagesEndRef} />
-          </div>
-          
-          {/* Response Input Area */}
-          <div className="p-3 bg-white/80 backdrop-blur-md border-t border-white/20">
-            <div className="flex items-center space-x-2">
-              <input
-                type="text"
-                value={currentInput}
-                onChange={(e) => setCurrentInput(e.target.value)}
-                placeholder="Type your response..."
-                className="flex-1 bg-white/80 border border-gray-200 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+            {/* Speech Recognition Component */}
+            {isListeningForResponse && isMicOn && (
+              <SpeechRecognition
+                onResult={handleSpeechResult}
+                autoStart={true}
               />
-              
-              {/* Speech Recognition Button */}
-              <div className="relative">
-                <SpeechRecognition
-                  onResult={handleSpeechResult}
-                  autoStart={isMicOn}
-                />
+            )}
+          </div>
+
+          {/* Voice Response Status */}
+          <div className="p-4 text-center">
+            {isListeningForResponse ? (
+              <div className="bg-green-100 border border-green-300 rounded-lg p-4">
+                <div className="flex items-center justify-center space-x-2 mb-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-green-800 font-medium">Listening for your response...</span>
+                </div>
+                {currentTranscript && (
+                  <p className="text-gray-700 text-sm italic">
+                    "{currentTranscript}"
+                  </p>
+                )}
               </div>
-              
-              <button
-                onClick={() => handleSendMessage()}
-                disabled={!currentInput.trim()}
-                className="p-2 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                </svg>
-              </button>
-            </div>
+            ) : isAISpeaking ? (
+              <div className="bg-blue-100 border border-blue-300 rounded-lg p-4">
+                <div className="flex items-center justify-center space-x-2">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+                  <span className="text-blue-800 font-medium">AI is speaking...</span>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-gray-100 border border-gray-300 rounded-lg p-4">
+                <span className="text-gray-600">Ready for next question...</span>
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Right Side - AI Interviewer (40%) */}
+        <AnimatedAIInterviewer
+          currentQuestion={questions[currentQuestionIndex]}
+          isAsking={isAsking}
+          onQuestionComplete={handleQuestionComplete}
+          currentQuestionIndex={currentQuestionIndex}
+          totalQuestions={questions.length}
+        />
+        
+        {/* Hidden AISpeech component for voice */}
+        {currentSpeechText && (
+          <div className="hidden">
+            <AISpeech 
+              text={currentSpeechText} 
+              onSpeechEnd={() => setIsAISpeaking(false)}
+              autoPlay={isAISpeaking}
+            />
+          </div>
+        )}
         
         {/* Completion Overlay */}
         {isComplete && (
@@ -836,7 +792,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
           </div>
         )}
         
-        {/* Enhanced Report Modal with proper HTML display */}
+        {/* Enhanced Report Modal */}
         {showReportModal && reportData && (
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl shadow-2xl max-w-4xl max-h-[90vh] overflow-auto w-full">
