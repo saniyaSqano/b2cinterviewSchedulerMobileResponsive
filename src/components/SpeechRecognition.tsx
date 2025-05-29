@@ -52,7 +52,19 @@ const SpeechRecognition: React.FC<SpeechRecognitionProps> = ({
     
     recognition.onerror = (event: any) => {
       console.error('Speech recognition error', event.error);
-      setIsListening(false);
+      
+      // For network errors, try to restart after a short delay
+      if (event.error === 'network') {
+        console.log('Network error detected, attempting to restart speech recognition in 2 seconds...');
+        setTimeout(() => {
+          if (!isListening) {
+            console.log('Restarting speech recognition after network error');
+            startListening();
+          }
+        }, 2000);
+      } else {
+        setIsListening(false);
+      }
     };
     
     // Auto-start if enabled

@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Mic, MicOff, Download, Award, Star, TrendingUp, Clock, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Mic, MicOff, Download, Award, Star, TrendingUp, Clock, MessageSquare, Link, ExternalLink } from 'lucide-react';
 import Level3CongratulationsScreen from './Level3CongratulationsScreen';
 import VideoFeed from './VideoFeed';
 import AISpeech from './AISpeech';
 import SpeechRecognition from './SpeechRecognition';
 import AnimatedAIInterviewer from './AnimatedAIInterviewer';
 import jsPDF from 'jspdf';
+import { uploadToS3, getSignedDownloadUrl } from '../utils/s3Service';
 
 // Define Message interface
 interface Message {
@@ -45,6 +46,9 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
   const [currentInput, setCurrentInput] = useState('');
   const [reportData, setReportData] = useState<any>(null);
   const [showReportModal, setShowReportModal] = useState(false);
+  const [reportS3Url, setReportS3Url] = useState<string>('');
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const questions = [
     "Hi there! I'm excited to meet you. Could you please introduce yourself and tell me a bit about your background?",
@@ -59,6 +63,21 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
   useEffect(() => {
     console.log('Video interview component mounted');
   }, []);
+  
+  // Automatically upload report to S3 when report modal is displayed
+  useEffect(() => {
+    if (showReportModal && reportData && !reportS3Url && !isUploading) {
+      // Automatically start the upload process
+      (async () => {
+        try {
+          console.log('Auto-uploading report to S3...');
+          await generateAndUploadReport();
+        } catch (error) {
+          console.error('Error auto-uploading report to S3:', error);
+        }
+      })();
+    }
+  }, [showReportModal, reportData, reportS3Url, isUploading]);
 
   // Handle video status changes from the VideoFeed component
   const handleVideoStatusChange = (status: boolean) => {
@@ -245,156 +264,387 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
     setShowReportModal(true);
   };
   
-  // Handle end recording and generate report
+  // Handle end recording, generate report, and upload to S3
   const handleEndRecording = () => {
     generateInterviewReport();
+    // Report will be automatically uploaded to S3 when the modal opens
   };
   
-  // Enhanced download report as PDF with attractive analytics
-  const downloadReport = () => {
-    if (!reportData) return;
+  // Generate PDF and upload to S3
+  const generateAndUploadReport = async () => {
+    if (!reportData) return null;
     
-    const pdf = new jsPDF();
-    
-    // Enhanced color palette - using tuples for proper typing
-    const colors = {
-      primary: [75, 85, 235] as [number, number, number],
-      secondary: [107, 114, 128] as [number, number, number],
-      success: [16, 185, 129] as [number, number, number],
-      warning: [245, 158, 11] as [number, number, number],
-      danger: [239, 68, 68] as [number, number, number],
-      light: [248, 250, 252] as [number, number, number],
-      white: [255, 255, 255] as [number, number, number]
-    };
-    
-    // Helper function to draw rounded rectangles
-    const drawRoundedRect = (x: number, y: number, w: number, h: number, r: number, fill = false) => {
-      if (fill) {
-        pdf.roundedRect(x, y, w, h, r, r, 'F');
-      } else {
-        pdf.roundedRect(x, y, w, h, r, r, 'S');
-      }
-    };
-    
-    // Enhanced Header with gradient effect
-    pdf.setFillColor(...colors.primary);
-    pdf.rect(0, 0, 210, 50, 'F');
-    
-    // Add decorative elements
-    pdf.setFillColor(...colors.success);
-    pdf.circle(180, 15, 8, 'F');
-    pdf.setFillColor(...colors.warning);
-    pdf.circle(190, 25, 6, 'F');
-    
-    pdf.setTextColor(...colors.white);
-    pdf.setFontSize(26);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('AI INTERVIEW PERFORMANCE REPORT', 20, 28);
-    
-    pdf.setFontSize(14);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(`Candidate: ${userName}`, 20, 38);
-    pdf.text(`Assessment Date: ${new Date().toLocaleDateString()}`, 20, 45);
-    pdf.text(`Report ID: RPT-${Date.now().toString().slice(-6)}`, 140, 38);
-    pdf.text(`Duration: ${reportData.interviewDuration} minutes`, 140, 45);
-    
-    // Reset text color
-    pdf.setTextColor(0, 0, 0);
-    
-    // Executive Summary Card
-    pdf.setFillColor(...colors.light);
-    drawRoundedRect(15, 60, 180, 35, 5, true);
-    pdf.setDrawColor(...colors.primary);
-    pdf.setLineWidth(2);
-    drawRoundedRect(15, 60, 180, 35, 5, false);
-    
-    pdf.setFontSize(18);
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(...colors.primary);
-    pdf.text('📊 EXECUTIVE SUMMARY', 25, 75);
-    
-    pdf.setFontSize(12);
-    pdf.setTextColor(0, 0, 0);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text(`Overall Performance Score: ${reportData.averageScore}/5.0`, 25, 85);
-    pdf.text(`Questions Completed: ${reportData.completedQuestions}/${reportData.totalQuestions}`, 110, 85);
-    pdf.text(`Recommendation: ${reportData.recommendation.split(' - ')[0]}`, 25, 92);
-    
-    // Performance Metrics Dashboard
-    let yPos = 110;
-    pdf.setFontSize(18);
-    pdf.setFont('helvetica', 'bold');
-    pdf.setTextColor(...colors.primary);
-    pdf.text('📈 PERFORMANCE DASHBOARD', 20, yPos);
-    
-    const skillCategories: Record<keyof Scores, string> = {
-      structure: 'Structure & Organization',
-      delivery: 'Delivery & Presentation', 
-      language: 'Language & Communication',
-      bodyLanguage: 'Body Language & Presence',
-      timeManagement: 'Time Management'
-    };
-    
-    yPos += 15;
-    Object.entries(reportData.scores).forEach(([skill, scoreValue], index) => {
-      const score = scoreValue as number;
-      const skillName = skillCategories[skill as keyof Scores];
+    try {
+      setIsUploading(true);
+      setUploadError(null);
       
-      // Skill card background
-      pdf.setFillColor(250, 250, 250);
-      drawRoundedRect(20, yPos - 5, 170, 20, 3, true);
+      // Create a new jsPDF instance with portrait orientation
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      // Define colors for the report
+      const colors = {
+        primary: [75, 85, 235], // Indigo blue
+        secondary: [107, 114, 128], // Gray
+        success: [16, 185, 129], // Green
+        warning: [245, 158, 11], // Orange
+        danger: [239, 68, 68], // Red
+        light: [248, 250, 252], // Light gray
+        white: [255, 255, 255] // White
+      };
+      
+      // Header section
+      pdf.setFillColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+      pdf.rect(0, 0, 210, 40, 'F');
+      
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(22);
+      pdf.text('AI INTERVIEW PERFORMANCE REPORT', 105, 20, { align: 'center' });
+      
+      pdf.setFontSize(12);
+      pdf.text(`Candidate: ${userName}`, 15, 30);
+      pdf.text(`Date: ${new Date().toLocaleDateString()}`, 150, 30);
+      
+      // Executive Summary
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(16);
+      pdf.text('Executive Summary', 15, 50);
+      
+      pdf.setDrawColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+      pdf.setLineWidth(0.5);
+      pdf.line(15, 52, 195, 52);
+      
+      pdf.setFontSize(12);
+      pdf.text(`Overall Score: ${reportData.averageScore}/5.0`, 15, 60);
+      pdf.text(`Questions Completed: ${reportData.completedQuestions}/${reportData.totalQuestions}`, 15, 67);
+      pdf.text(`Interview Duration: ${reportData.interviewDuration} minutes`, 15, 74);
+      
+      // Recommendation box
+      pdf.setFillColor(245, 245, 250);
+      pdf.roundedRect(15, 80, 180, 20, 3, 3, 'F');
       
       pdf.setFontSize(11);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setTextColor(60, 60, 60);
-      pdf.text(skillName, 25, yPos + 5);
+      pdf.text('Recommendation:', 20, 90);
       
-      // Score display
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(10);
-      pdf.text(`${score}/5`, 160, yPos + 5);
-      
-      // Enhanced progress bar with gradient effect
-      const barWidth = 80;
-      const barHeight = 8;
-      const barX = 25;
-      const barY = yPos + 8;
-      
-      // Background bar
-      pdf.setFillColor(230, 230, 230);
-      drawRoundedRect(barX, barY, barWidth, barHeight, 2, true);
-      
-      // Progress bar with color coding
-      const progressWidth = (score / 5) * barWidth;
-      if (score >= 4) pdf.setFillColor(...colors.success);
-      else if (score >= 3) pdf.setFillColor(...colors.warning);
-      else pdf.setFillColor(...colors.danger);
-      
-      if (progressWidth > 0) {
-        drawRoundedRect(barX, barY, progressWidth, barHeight, 2, true);
+      // Set color based on recommendation
+      if (reportData.recommendation.includes('Hire')) {
+        pdf.setTextColor(colors.success[0], colors.success[1], colors.success[2]);
+      } else if (reportData.recommendation.includes('Strong')) {
+        pdf.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+      } else if (reportData.recommendation.includes('Consider')) {
+        pdf.setTextColor(colors.warning[0], colors.warning[1], colors.warning[2]);
+      } else {
+        pdf.setTextColor(colors.danger[0], colors.danger[1], colors.danger[2]);
       }
       
-      // Performance indicator
-      let indicator = '';
-      let indicatorColor = colors.secondary;
-      if (score >= 4.5) { indicator = '🌟 Excellent'; indicatorColor = colors.success; }
-      else if (score >= 4) { indicator = '✨ Very Good'; indicatorColor = colors.success; }
-      else if (score >= 3.5) { indicator = '👍 Good'; indicatorColor = colors.warning; }
-      else if (score >= 3) { indicator = '⚡ Fair'; indicatorColor = colors.warning; }
-      else { indicator = '⚠️ Needs Work'; indicatorColor = colors.danger; }
+      pdf.setFontSize(12);
+      pdf.text(reportData.recommendation, 20, 95);
+      pdf.setTextColor(0, 0, 0);
       
-      pdf.setTextColor(...indicatorColor);
+      // Performance Dashboard
+      pdf.setFontSize(16);
+      pdf.text('Performance Dashboard', 15, 110);
+      
+      pdf.setDrawColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+      pdf.line(15, 112, 195, 112);
+      
+      // Skill categories with proper labels
+      const skillCategories: Record<keyof Scores, string> = {
+        structure: 'Structure & Content',
+        delivery: 'Delivery & Engagement', 
+        language: 'Language & Tone',
+        bodyLanguage: 'Body Language & Presence',
+        timeManagement: 'Time Management'
+      };
+      
+      // Draw performance metrics
+      let yPos = 120;
+      Object.entries(reportData.scores).forEach(([skill, scoreValue]) => {
+        const score = scoreValue as number;
+        const skillName = skillCategories[skill as keyof Scores];
+        
+        // Skill name
+        pdf.setFontSize(11);
+        pdf.text(skillName, 15, yPos);
+        
+        // Score text
+        pdf.text(`${score}/5`, 180, yPos, { align: 'right' });
+        
+        // Background bar
+        pdf.setFillColor(230, 230, 230);
+        pdf.rect(15, yPos + 2, 160, 5, 'F');
+        
+        // Progress bar with color coding
+        const progressWidth = (score / 5) * 160;
+        
+        if (score >= 4) {
+          pdf.setFillColor(colors.success[0], colors.success[1], colors.success[2]);
+        } else if (score >= 3) {
+          pdf.setFillColor(colors.warning[0], colors.warning[1], colors.warning[2]);
+        } else {
+          pdf.setFillColor(colors.danger[0], colors.danger[1], colors.danger[2]);
+        }
+        
+        pdf.rect(15, yPos + 2, progressWidth, 5, 'F');
+        
+        yPos += 15;
+      });
+      
+      // Questions and Responses
+      yPos += 10;
+      pdf.setFontSize(16);
+      pdf.text('Interview Questions & Responses', 15, yPos);
+      
+      pdf.setDrawColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+      pdf.line(15, yPos + 2, 195, yPos + 2);
+      
+      yPos += 10;
+      
+      // Add each question and response
+      reportData.questions.forEach((question: string, index: number) => {
+        // Check if we need a new page
+        if (yPos > 270) {
+          pdf.addPage();
+          yPos = 20;
+        }
+        
+        pdf.setFontSize(11);
+        pdf.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+        pdf.text(`Question ${index + 1}:`, 15, yPos);
+        
+        yPos += 6;
+        pdf.setTextColor(0, 0, 0);
+        pdf.text(question, 15, yPos, { maxWidth: 180 });
+        
+        // Calculate text height based on content length and width
+        const textLines = pdf.splitTextToSize(question, 180);
+        yPos += textLines.length * 5;
+        
+        // Find corresponding response
+        const response = reportData.userResponses[index];
+        
+        pdf.setTextColor(colors.secondary[0], colors.secondary[1], colors.secondary[2]);
+        pdf.text('Response:', 15, yPos);
+        
+        yPos += 6;
+        pdf.setTextColor(0, 0, 0);
+        
+        if (response) {
+          const responseText = pdf.splitTextToSize(response.text, 180);
+          pdf.text(responseText, 15, yPos);
+          yPos += responseText.length * 5 + 5;
+        } else {
+          pdf.text('No response recorded', 15, yPos);
+          yPos += 10;
+        }
+        
+        // Add some spacing between Q&A pairs
+        yPos += 5;
+      });
+      
+      // Footer
       pdf.setFontSize(9);
-      pdf.text(indicator, 110, yPos + 12);
+      pdf.setTextColor(colors.secondary[0], colors.secondary[1], colors.secondary[2]);
+      pdf.text('Report generated by AI Interview Assistant', 105, 285, { align: 'center' });
       
-      yPos += 25;
-    });
+      // Generate PDF as blob
+      const pdfBlob = pdf.output('blob');
+      const fileName = `Interview-Report-${userName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`;
+      
+      // Upload to S3
+      console.log('Uploading PDF to S3...');
+      const s3Url = await uploadToS3(pdfBlob, fileName, 'application/pdf');
+      console.log('PDF uploaded to S3:', s3Url);
+      
+      setReportS3Url(s3Url);
+      setIsUploading(false);
+      return s3Url;
+      
+    } catch (error) {
+      console.error('Error generating and uploading PDF report:', error);
+      setUploadError('Failed to upload report. Please try again.');
+      setIsUploading(false);
+      return null;
+    }
+  };
+  
+  // Handle report download - either from S3 or generate locally
+  const downloadReport = async () => {
+    try {
+      // Try to generate and upload the report to S3 first
+      setIsUploading(true);
+      
+      try {
+        // If we already have a report URL, use it
+        if (reportS3Url) {
+          window.open(reportS3Url, '_blank');
+          setIsUploading(false);
+          return;
+        }
+        
+        // Otherwise generate and upload the report
+        const url = await generateAndUploadReport();
+        
+        if (url) {
+          window.open(url, '_blank');
+          setIsUploading(false);
+          return;
+        }
+      } catch (s3Error) {
+        console.error('Error with S3 download, falling back to local:', s3Error);
+        // Fall back to local download if S3 fails
+        downloadLocalPdf();
+        setIsUploading(false);
+      }
+    } catch (error) {
+      console.error('Error downloading report:', error);
+      setUploadError('Failed to download report. Please try again.');
+      setIsUploading(false);
+      // Try local download as a final fallback
+      downloadLocalPdf();
+    }
+  };
+  
+  // Generate a local PDF download as fallback
+  const downloadLocalPdf = () => {
+    if (!reportData) return;
     
-    // Add more content sections here...
-    
-    // Save the enhanced PDF
-    const fileName = `AI-Interview-Report-${userName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`;
-    pdf.save(fileName);
+    try {
+      console.log('Generating local PDF download...');
+      
+      // Create a new jsPDF instance with portrait orientation
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      // Define colors for the report
+      const colors = {
+        primary: [75, 85, 235], // Indigo blue
+        secondary: [107, 114, 128], // Gray
+        success: [16, 185, 129], // Green
+        warning: [245, 158, 11], // Orange
+        danger: [239, 68, 68], // Red
+        light: [248, 250, 252], // Light gray
+        white: [255, 255, 255] // White
+      };
+      
+      // Header section
+      pdf.setFillColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+      pdf.rect(0, 0, 210, 40, 'F');
+      
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFontSize(22);
+      pdf.text('AI INTERVIEW PERFORMANCE REPORT', 105, 20, { align: 'center' });
+      
+      pdf.setFontSize(12);
+      pdf.text(`Candidate: ${userName}`, 15, 30);
+      pdf.text(`Date: ${new Date().toLocaleDateString()}`, 150, 30);
+      
+      // Executive Summary
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFontSize(16);
+      pdf.text('Executive Summary', 15, 50);
+      
+      pdf.setDrawColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+      pdf.setLineWidth(0.5);
+      pdf.line(15, 52, 195, 52);
+      
+      pdf.setFontSize(12);
+      pdf.text(`Overall Score: ${reportData.averageScore}/5.0`, 15, 60);
+      pdf.text(`Questions Completed: ${reportData.completedQuestions}/${reportData.totalQuestions}`, 15, 67);
+      pdf.text(`Interview Duration: ${reportData.interviewDuration} minutes`, 15, 74);
+      
+      // Recommendation box
+      pdf.setFillColor(245, 245, 250);
+      pdf.roundedRect(15, 80, 180, 20, 3, 3, 'F');
+      
+      pdf.setFontSize(11);
+      pdf.text('Recommendation:', 20, 90);
+      
+      // Set color based on recommendation
+      if (reportData.recommendation.includes('Hire')) {
+        pdf.setTextColor(colors.success[0], colors.success[1], colors.success[2]);
+      } else if (reportData.recommendation.includes('Strong')) {
+        pdf.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+      } else if (reportData.recommendation.includes('Consider')) {
+        pdf.setTextColor(colors.warning[0], colors.warning[1], colors.warning[2]);
+      } else {
+        pdf.setTextColor(colors.danger[0], colors.danger[1], colors.danger[2]);
+      }
+      
+      pdf.setFontSize(12);
+      pdf.text(reportData.recommendation, 20, 95);
+      pdf.setTextColor(0, 0, 0);
+      
+      // Performance Dashboard
+      pdf.setFontSize(16);
+      pdf.text('Performance Dashboard', 15, 110);
+      
+      pdf.setDrawColor(colors.primary[0], colors.primary[1], colors.primary[2]);
+      pdf.line(15, 112, 195, 112);
+      
+      // Skill categories with proper labels
+      const skillCategories = {
+        structure: 'Structure & Content',
+        delivery: 'Delivery & Engagement', 
+        language: 'Language & Tone',
+        bodyLanguage: 'Body Language & Presence',
+        timeManagement: 'Time Management'
+      };
+      
+      // Draw performance metrics
+      let yPos = 120;
+      Object.entries(reportData.scores).forEach(([skill, scoreValue]) => {
+        const score = scoreValue as number;
+        const skillName = skillCategories[skill as keyof typeof skillCategories];
+        
+        // Skill name
+        pdf.setFontSize(11);
+        pdf.text(skillName, 15, yPos);
+        
+        // Score text
+        pdf.text(`${score}/5`, 180, yPos, { align: 'right' });
+        
+        // Background bar
+        pdf.setFillColor(230, 230, 230);
+        pdf.rect(15, yPos + 2, 160, 5, 'F');
+        
+        // Progress bar with color coding
+        const progressWidth = (score / 5) * 160;
+        
+        if (score >= 4) {
+          pdf.setFillColor(colors.success[0], colors.success[1], colors.success[2]);
+        } else if (score >= 3) {
+          pdf.setFillColor(colors.warning[0], colors.warning[1], colors.warning[2]);
+        } else {
+          pdf.setFillColor(colors.danger[0], colors.danger[1], colors.danger[2]);
+        }
+        
+        pdf.rect(15, yPos + 2, progressWidth, 5, 'F');
+        
+        yPos += 15;
+      });
+      
+      // Footer
+      pdf.setFontSize(9);
+      pdf.setTextColor(colors.secondary[0], colors.secondary[1], colors.secondary[2]);
+      pdf.text('Report generated by AI Interview Assistant', 105, 285, { align: 'center' });
+      
+      // Save the PDF locally
+      const fileName = `Interview-Report-${userName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`;
+      console.log('Saving local PDF with filename:', fileName);
+      pdf.save(fileName);
+      console.log('Local PDF saved successfully');
+      
+    } catch (error) {
+      console.error('Error generating local PDF:', error);
+      alert('There was an error generating the PDF. Please try again.');
+    }
   };
 
   if (showCongratulations) {
@@ -683,23 +933,64 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
               </div>
 
               {/* Action buttons */}
-              <div className="p-6 bg-gray-50 border-t flex justify-between items-center rounded-b-2xl">
-                <button
-                  onClick={() => {
-                    setShowReportModal(false);
-                    setIsComplete(true);
-                  }}
-                  className="px-6 py-3 bg-gray-200 text-gray-800 rounded-full hover:bg-gray-300 transition-colors font-medium"
-                >
-                  Continue
-                </button>
-                <button
-                  onClick={downloadReport}
-                  className="px-6 py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full shadow-lg hover:from-green-600 hover:to-teal-600 transition-colors flex items-center space-x-2 font-medium"
-                >
-                  <Download className="w-5 h-5" />
-                  <span>Download PDF Report</span>
-                </button>
+              <div className="p-6 bg-gray-50 border-t rounded-b-2xl">
+                {/* Upload Status */}
+                {uploadError && (
+                  <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg">
+                    {uploadError}
+                  </div>
+                )}
+                
+                {reportS3Url && (
+                  <div className="mb-4 p-3 bg-green-50 border border-green-200 text-green-600 rounded-lg flex items-center justify-between">
+                    <div className="flex items-center">
+                      <Link className="w-5 h-5 mr-2" />
+                      <span>Report uploaded successfully!</span>
+                    </div>
+                    <a 
+                      href={reportS3Url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:text-blue-700 flex items-center"
+                    >
+                      <ExternalLink className="w-4 h-4 mr-1" />
+                      <span>View Report</span>
+                    </a>
+                  </div>
+                )}
+                
+                <div className="flex justify-between items-center">
+                  <button
+                    onClick={() => {
+                      setShowReportModal(false);
+                      setIsComplete(true);
+                    }}
+                    className="px-6 py-3 bg-gray-200 text-gray-800 rounded-full hover:bg-gray-300 transition-colors font-medium"
+                  >
+                    Continue
+                  </button>
+                  
+                  {/* Show loader while uploading */}
+                  {isUploading && (
+                    <div className="flex items-center space-x-2 text-gray-600">
+                      <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                      <span>Saving report to cloud...</span>
+                    </div>
+                  )}
+                  
+                  {/* Show download button once uploaded */}
+                  {reportS3Url && !isUploading && (
+                    <button
+                      onClick={() => window.open(reportS3Url, '_blank')}
+                      className="px-6 py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full shadow-lg hover:from-green-600 hover:to-teal-600 transition-colors flex items-center space-x-2 font-medium"
+                    >
+                      <Download className="w-5 h-5" />
+                      <span>Download Report</span>
+                    </button>
+                  )}
+                  
+                  {/* Local download button removed as S3 upload is now working correctly */}
+                </div>
               </div>
             </div>
           </div>

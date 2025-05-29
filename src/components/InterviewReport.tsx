@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ArrowLeft, User, Code, Shield, Star, Users, MessageCircle, Zap, AlertTriangle, CheckCircle, Award, XCircle, TrendingUp, BarChart3 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -42,6 +42,61 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
   violationLogs,
   onBack
 }) => {
+  // Report is now generated and downloaded client-side only
+  const [isGeneratingReport, setIsGeneratingReport] = useState(false);
+  
+  // Function to generate and download the report
+  const generateAndDownloadReport = () => {
+    try {
+      setIsGeneratingReport(true);
+      
+      // Create report data
+      const reportData = {
+        candidateDetails,
+        skillAssessment,
+        violationLogs,
+        timestamp: new Date().toISOString(),
+        averageScore: Math.round(
+          (skillAssessment.programming + skillAssessment.framework + skillAssessment.testing + 
+           skillAssessment.confidence + skillAssessment.leadership + skillAssessment.communication + 
+           skillAssessment.adaptability) / 7
+        ),
+        finalResult: getFinalResult()
+      };
+      
+      // Convert to JSON and then to Blob
+      const jsonData = JSON.stringify(reportData, null, 2);
+      const blob = new Blob([jsonData], { type: 'application/json' });
+      
+      // Generate filename with timestamp to ensure uniqueness
+      const timestamp = new Date().getTime();
+      const fileName = `Interview-Report-${candidateDetails.fullName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.json`;
+      
+      // Create a download link
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      
+      // Append to the document, click and remove
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Clean up the URL object
+      URL.revokeObjectURL(url);
+      
+      setIsGeneratingReport(false);
+      
+      // Display a success message
+      console.log('Report generated and downloaded successfully');
+      
+    } catch (error) {
+      console.error('Error generating report:', error);
+      setIsGeneratingReport(false);
+    }
+  };
+
   // Calculate final result based on violations
   const errorViolations = violationLogs.filter(log => log.type === 'error').length;
   const warningViolations = violationLogs.filter(log => log.type === 'warning').length;
@@ -438,35 +493,32 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
           </Card>
 
           {/* Action Buttons */}
-          <div className="flex justify-center gap-6 animate-fade-in" style={{ animationDelay: '1600ms' }}>
-            <Button
-              onClick={onBack}
-              className="px-8 py-4 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white rounded-full text-lg font-medium shadow-lg transform hover:scale-105 transition-all duration-200"
-            >
-              Back to Dashboard
-            </Button>
-            <Button
-              onClick={() => window.print()}
-              variant="outline"
-              className="px-8 py-4 rounded-full text-lg font-medium border-2 border-indigo-300 text-indigo-600 hover:bg-indigo-50 shadow-lg transform hover:scale-105 transition-all duration-200"
-            >
-              📄 Print Report
-            </Button>
-            <Button
-              onClick={() => {
-                const element = document.createElement('a');
-                const file = new Blob([JSON.stringify({ candidateDetails, skillAssessment, violationLogs, finalResult, averageScore }, null, 2)], { type: 'application/json' });
-                element.href = URL.createObjectURL(file);
-                element.download = `interview-report-${candidateDetails.fullName.replace(/\s+/g, '-')}.json`;
-                document.body.appendChild(element);
-                element.click();
-                document.body.removeChild(element);
-              }}
-              variant="outline"
-              className="px-8 py-4 rounded-full text-lg font-medium border-2 border-green-300 text-green-600 hover:bg-green-50 shadow-lg transform hover:scale-105 transition-all duration-200"
-            >
-              💾 Export Data
-            </Button>
+          <div className="space-y-6 animate-fade-in" style={{ animationDelay: '1600ms' }}>
+            {/* Message */}
+            <div className="text-center">
+              <div className="p-4 bg-green-50 rounded-lg border border-green-200 text-green-700">
+                <p className="font-medium">Your interview report is ready! Click the button below to download it.</p>
+              </div>
+            </div>
+            
+            {/* Buttons */}
+            <div className="flex justify-center gap-6">
+              <Button
+                onClick={onBack}
+                className="px-8 py-4 bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white rounded-full text-lg font-medium shadow-lg transform hover:scale-105 transition-all duration-200"
+              >
+                Back to Dashboard
+              </Button>
+              
+              <Button
+                onClick={generateAndDownloadReport}
+                variant="outline"
+                className="px-8 py-4 rounded-full text-lg font-medium border-2 border-green-300 text-green-600 hover:bg-green-50 shadow-lg transform hover:scale-105 transition-all duration-200"
+                disabled={isGeneratingReport}
+              >
+                {isGeneratingReport ? '⏳ Preparing Download...' : '📥 Download Report'}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
