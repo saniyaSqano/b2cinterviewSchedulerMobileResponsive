@@ -881,10 +881,10 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-slate-50 relative overflow-hidden">
       <div className="relative z-10 h-screen flex">
         {/* Left Side - Video Feed (50%) */}
-        <div className="w-1/2 bg-gradient-to-br from-pink-100/80 to-purple-100/80 backdrop-blur-md border-r border-white/20 flex flex-col">
+        <div className="w-1/2 bg-gradient-to-br from-blue-100/80 to-indigo-100/80 backdrop-blur-md border-r border-white/20 flex flex-col">
           {/* Video Header */}
           <div className="p-4 border-b border-white/20">
             <div className="flex items-center justify-between">
@@ -894,7 +894,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
               >
                 <ArrowLeft className="w-5 h-5 text-gray-700" />
               </button>
-              <h2 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600">
+              <h2 className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
                 Level 3 - Video Interview
               </h2>
               <button
@@ -963,9 +963,9 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
         {/* Right Side - Speech Transcript Display (50%) */}
         <div className="w-1/2 flex flex-col bg-white">
           {/* Header */}
-          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 border-b border-gray-200">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 border-b border-gray-200">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
                 <MessageSquare className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -1029,7 +1029,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
                       }
                     }
                   }}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-md transition-colors flex items-center space-x-2"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md transition-colors flex items-center space-x-2"
                 >
                   <span>Next Question</span>
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1080,7 +1080,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
           <div className="flex-1 p-6 overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h4 className="text-lg font-semibold text-gray-800">Previous Responses</h4>
-              <span className="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-medium">
+              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
                 {savedTranscripts.length} responses
               </span>
             </div>
@@ -1102,7 +1102,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
                   >
                     <div className="flex items-start space-x-4">
                       <div className="flex-shrink-0">
-                        <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                        <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full flex items-center justify-center text-white font-semibold text-sm">
                           {index + 1}
                         </div>
                       </div>
@@ -1135,7 +1135,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
               <div className="flex items-center space-x-2">
                 <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-gradient-to-r from-indigo-500 to-purple-600 transition-all duration-500"
+                    className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 transition-all duration-500"
                     style={{ width: `${((currentQuestionIndex + 1) / questions.length) * 100}%` }}
                   />
                 </div>
@@ -1188,7 +1188,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
                 </button>
                 <button
                   onClick={onBack}
-                  className="px-8 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-full shadow-lg hover:from-purple-600 hover:to-indigo-600 transition-colors"
+                  className="px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full shadow-lg hover:from-blue-600 hover:to-indigo-600 transition-colors"
                 >
                   Continue to Next Level
                 </button>
@@ -1202,23 +1202,23 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl shadow-2xl max-w-4xl max-h-[90vh] overflow-auto w-full">
               {/* Report Header */}
-              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 rounded-t-2xl">
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 rounded-t-2xl">
                 <div className="text-center">
                   <div className="text-4xl mb-2">📊</div>
                   <h2 className="text-2xl font-bold mb-2">Interview Performance Report</h2>
-                  <p className="text-indigo-100">Comprehensive Analysis & Assessment</p>
+                  <p className="text-blue-100">Comprehensive Analysis & Assessment</p>
                 </div>
               </div>
 
               {/* Executive Summary */}
               <div className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-b">
-                <h3 className="text-xl font-bold text-indigo-800 mb-4 flex items-center">
+                <h3 className="text-xl font-bold text-blue-800 mb-4 flex items-center">
                   <Award className="w-6 h-6 mr-2" />
                   Executive Summary
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-white rounded-lg p-4 text-center shadow-md">
-                    <div className="text-3xl font-bold text-indigo-600">{reportData.averageScore}</div>
+                    <div className="text-3xl font-bold text-blue-600">{reportData.averageScore}</div>
                     <div className="text-gray-600">Overall Score</div>
                     <div className="text-xs text-gray-500">out of 5.0</div>
                   </div>
@@ -1228,7 +1228,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
                     <div className="text-xs text-gray-500">out of {reportData.totalQuestions}</div>
                   </div>
                   <div className="bg-white rounded-lg p-4 text-center shadow-md">
-                    <div className="text-3xl font-bold text-purple-600">{reportData.interviewDuration}</div>
+                    <div className="text-3xl font-bold text-indigo-600">{reportData.interviewDuration}</div>
                     <div className="text-gray-600">Duration</div>
                     <div className="text-xs text-gray-500">minutes</div>
                   </div>
@@ -1294,7 +1294,7 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
               </div>
 
               {/* Questions and Answers Section */}
-              <div className="p-6 bg-indigo-50 border-t border-indigo-100">
+              <div className="p-6 bg-blue-50 border-t border-blue-100">
                 <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
                   <MessageSquare className="w-6 h-6 mr-2" />
                   Questions & Answers
@@ -1455,26 +1455,17 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
                     Continue
                   </button>
                   
-                  {/* Show loader while uploading */}
-                  {isUploading && !reportData?.audioUrls && (
-                    <div className="flex items-center space-x-2 text-gray-600">
-                      <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-                      <span>Saving report to cloud...</span>
-                    </div>
-                  )}
-                  
                   {/* Show download button once uploaded */}
                   {reportS3Url && !isUploading && (
                     <button
                       onClick={() => window.open(reportS3Url, '_blank')}
-                      className="px-6 py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-full shadow-lg hover:from-green-600 hover:to-teal-600 transition-colors flex items-center space-x-2 font-medium"
+                      className="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full shadow-lg hover:from-blue-600 hover:to-indigo-600 transition-colors flex items-center space-x-2 font-medium"
                     >
                       <Download className="w-5 h-5" />
                       <span>Download Report</span>
                     </button>
                   )}
                 </div>
-                {/* Local download button removed as S3 upload is now working correctly */}
               </div>
             </div>
           </div>
