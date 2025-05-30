@@ -47,7 +47,7 @@
     "@tensorflow/tfjs-backend-cpu": "^4.22.0",
     "@tensorflow/tfjs-backend-webgl": "^4.22.0",
     "@types/dom-speech-recognition": "^0.0.6",
-    "aws-sdk": "^2.1692.0",
+
     "buffer": "^6.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

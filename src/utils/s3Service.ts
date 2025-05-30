@@ -1,9 +1,9 @@
-// Import polyfills first to ensure AWS SDK works in browser environment
-import '../utils/awsPolyfill';
-import AWS from 'aws-sdk';
+// Import AWS SDK v3 modules
+import { S3Client, PutObjectCommand, GetObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
-// Initialize AWS configuration
-const initAWS = () => {
+// Initialize AWS S3 client
+const getS3Client = () => {
   const accessKeyId = import.meta.env.VITE_AWS_ACCESS_KEY_ID;
   const secretAccessKey = import.meta.env.VITE_AWS_SECRET_ACCESS_KEY;
   const region = import.meta.env.VITE_AWS_REGION;
@@ -13,13 +13,13 @@ const initAWS = () => {
     throw new Error('AWS configuration error: Missing credentials or region');
   }
   
-  AWS.config.update({
-    accessKeyId,
-    secretAccessKey,
-    region
+  return new S3Client({
+    region,
+    credentials: {
+      accessKeyId,
+      secretAccessKey
+    }
   });
-
-  return new AWS.S3();
 };
 
 /**
@@ -30,22 +30,25 @@ const initAWS = () => {
  */
 export const getSignedUploadUrl = async (fileName: string, contentType: string): Promise<{url: string, filePath: string}> => {
   try {
-    const s3 = initAWS();
+    const s3Client = getS3Client();
     const bucketName = import.meta.env.VITE_S3_BUCKET_NAME;
+    
+    if (!bucketName) {
+      throw new Error('S3 configuration error: Missing bucket name');
+    }
     
     // Generate a unique file path with timestamp to avoid overwriting
     const timestamp = new Date().getTime();
     const filePath = `reports/${timestamp}-${fileName}`;
     
-    const params = {
+    const command = new PutObjectCommand({
       Bucket: bucketName,
       Key: filePath,
-      ContentType: contentType,
-      Expires: 300 // URL expires in 5 minutes
-      // Removed ACL: 'public-read' as it might be causing the 400 Bad Request error
-    };
+      ContentType: contentType
+    });
     
-    const url = await s3.getSignedUrlPromise('putObject', params);
+    // URL expires in 5 minutes (300 seconds)
+    const url = await getSignedUrl(s3Client, command, { expiresIn: 300 });
     console.log('Generated pre-signed upload URL for:', filePath);
     return { url, filePath };
   } catch (error) {
@@ -132,7 +135,7 @@ export const uploadToS3 = async (fileData: Blob | Buffer, fileName: string, cont
  */
 export const getSignedDownloadUrl = async (filePath: string, expirationSeconds = 3600): Promise<string> => {
   try {
-    const s3 = initAWS();
+    const s3Client = getS3Client();
     const bucketName = import.meta.env.VITE_S3_BUCKET_NAME;
     
     if (!bucketName) {
@@ -143,13 +146,12 @@ export const getSignedDownloadUrl = async (filePath: string, expirationSeconds =
     // If the filePath doesn't include the 'reports/' prefix, add it
     const fullPath = filePath.startsWith('reports/') ? filePath : `reports/${filePath}`;
     
-    const params = {
+    const command = new GetObjectCommand({
       Bucket: bucketName,
-      Key: fullPath,
-      Expires: expirationSeconds
-    };
+      Key: fullPath
+    });
     
-    const url = await s3.getSignedUrlPromise('getObject', params);
+    const url = await getSignedUrl(s3Client, command, { expiresIn: expirationSeconds });
     console.log('Generated pre-signed download URL for:', fullPath);
     return url;
   } catch (error) {
@@ -163,9 +165,9 @@ export const getSignedDownloadUrl = async (filePath: string, expirationSeconds =
  * @param prefix - The directory prefix to list files from
  * @returns Promise with an array of file information
  */
-export const listFiles = async (prefix = 'reports/'): Promise<AWS.S3.ObjectList> => {
+export const listFiles = async (prefix = 'reports/') => {
   try {
-    const s3 = initAWS();
+    const s3Client = getS3Client();
     const bucketName = import.meta.env.VITE_S3_BUCKET_NAME;
     
     if (!bucketName) {
@@ -173,13 +175,13 @@ export const listFiles = async (prefix = 'reports/'): Promise<AWS.S3.ObjectList>
       throw new Error('S3 configuration error: Missing bucket name');
     }
     
-    const params = {
+    const command = new ListObjectsV2Command({
       Bucket: bucketName,
       Prefix: prefix
-    };
+    });
     
-    const listResult = await s3.listObjectsV2(params).promise();
-    return listResult.Contents || [];
+    const response = await s3Client.send(command);
+    return response.Contents || [];
   } catch (error) {
     console.error('Error listing files from S3:', error);
     throw error;

@@ -19,18 +19,9 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  // Polyfills for AWS SDK
+  // Simplified configuration for AWS SDK v3
   define: {
-    global: 'window',
     'process.env': {}
-  },
-  optimizeDeps: {
-    esbuildOptions: {
-      // Node.js global to browser globalThis
-      define: {
-        global: 'globalThis'
-      }
-    }
   },
   build: {
     rollupOptions: {
