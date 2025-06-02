@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from './ui/chart';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
-import { uploadToS3 } from '../utils/s3Service';
+import { uploadToS3, uploadPitchPerfectToS3 } from '../utils/s3Service';
 import jsPDF from 'jspdf';
 
 interface ViolationLog {
@@ -163,10 +163,10 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       
-      // Upload to S3
-      console.log('Uploading PDF to S3...');
-      const s3Url = await uploadToS3(pdfBlob, fileName, 'application/pdf');
-      console.log('PDF uploaded to S3:', s3Url);
+      // Upload to S3 using the pitch perfect dedicated bucket
+      console.log('Uploading Pitch Perfect PDF to S3...');
+      const s3Url = await uploadPitchPerfectToS3(pdfBlob, fileName, 'application/pdf');
+      console.log('Pitch Perfect PDF uploaded to S3:', s3Url);
       
       // Update state with success and URL
       setUploadSuccess(true);

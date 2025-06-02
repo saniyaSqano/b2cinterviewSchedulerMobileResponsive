@@ -6,7 +6,7 @@ import AISpeech from './AISpeech';
 import SpeechRecognition from './SpeechRecognition';
 import AnimatedAIInterviewer from './AnimatedAIInterviewer';
 import jsPDF from 'jspdf';
-import { uploadToS3, getSignedDownloadUrl } from '../utils/s3Service';
+import { uploadToS3, getSignedDownloadUrl, uploadPitchPerfectToS3 } from '../utils/s3Service';
 
 // Define Message interface
 interface Message {
@@ -542,10 +542,10 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
       const pdfBlob = pdf.output('blob');
       const fileName = `Interview-Report-${userName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`;
       
-      // Upload to S3
-      console.log('Uploading PDF to S3...');
-      const s3Url = await uploadToS3(pdfBlob, fileName, 'application/pdf');
-      console.log('PDF uploaded to S3:', s3Url);
+      // Upload to S3 using the pitch perfect dedicated bucket
+      console.log('Uploading Pitch Perfect PDF to S3...');
+      const s3Url = await uploadPitchPerfectToS3(pdfBlob, fileName, 'application/pdf');
+      console.log('Pitch Perfect PDF uploaded to S3:', s3Url);
       
       setReportS3Url(s3Url);
       setIsUploading(false);
