@@ -1,9 +1,10 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Video, VideoOff, Mic, MicOff, Download, Square, Circle } from 'lucide-react';
+import { ArrowLeft, Video, VideoOff, Mic, MicOff, Download, Square, Circle, Upload, Check } from 'lucide-react';
 import Level4CongratulationsScreen from './Level4CongratulationsScreen';
 import VideoFeed from './VideoFeed';
 import { initFaceDetection, detectFaces } from '../utils/faceDetection';
+import { uploadMockVideo } from '../utils/s3Service';
 
 interface Level4FlowProps {
   onBack: () => void;
@@ -27,6 +28,9 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
   const [recordedChunks, setRecordedChunks] = useState<Blob[]>([]);
   const [violationLogs, setViolationLogs] = useState<ViolationLog[]>([]);
   const [hasRecording, setHasRecording] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [uploadUrl, setUploadUrl] = useState<string>('');
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const faceDetectionVideoRef = useRef<HTMLVideoElement>(null);
@@ -179,6 +183,46 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
       mediaRecorder.onstop = () => {
         setHasRecording(true);
         console.log('Recording stopped, total chunks:', recordedChunks.length);
+        
+        // Wait a short time to ensure all chunks are collected
+        setTimeout(async () => {
+          console.log('Preparing to upload recording, chunks:', recordedChunks.length);
+          
+          if (recordedChunks.length > 0) {
+            try {
+              setIsUploading(true);
+              setUploadSuccess(false);
+              
+              // Create blob from recorded chunks
+              const blob = new Blob(recordedChunks, { type: 'video/webm' });
+              console.log('Blob size for upload:', blob.size, 'bytes');
+              
+              if (blob.size === 0) {
+                console.error('Recording is empty');
+                setIsUploading(false);
+                return;
+              }
+              
+              // Generate filename with user name and timestamp
+              const fileName = `self-practice-interview-${userName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.webm`;
+              
+              // Upload to S3 using the uploadMockVideo function
+              console.log('Automatically uploading recording to S3:', fileName);
+              const downloadUrl = await uploadMockVideo(blob, fileName);
+              
+              setUploadUrl(downloadUrl);
+              setUploadSuccess(true);
+              setIsUploading(false);
+              
+              console.log('Automatic upload successful, download URL:', downloadUrl);
+              alert('Your recording has been successfully uploaded to S3 and is available for viewing.');
+            } catch (error) {
+              console.error('Error during automatic upload to S3:', error);
+              alert('There was an error uploading your recording to S3: ' + error.message);
+              setIsUploading(false);
+            }
+          }
+        }, 1500);
       };
 
       mediaRecorder.start(1000); // Collect data every second
@@ -212,7 +256,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
         }
         
         // Show a notification that recording has stopped
-        alert('Recording has been stopped. You can now download your interview recording.');
+        alert('Recording has been stopped. It will be automatically uploaded to S3.');
       } catch (error) {
         console.error('Error stopping recording:', error);
       }
@@ -249,6 +293,47 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
     } catch (error) {
       console.error('Error downloading recording:', error);
       alert('Error downloading recording: ' + error.message);
+    }
+  };
+
+  const uploadRecordingToS3 = async () => {
+    if (recordedChunks.length === 0) {
+      console.error('No recording available');
+      alert('No recording available to upload');
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+      setUploadSuccess(false);
+      
+      console.log('Creating blob for S3 upload from', recordedChunks.length, 'chunks');
+      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+      console.log('Blob size for upload:', blob.size, 'bytes');
+      
+      if (blob.size === 0) {
+        alert('Recording is empty. Please try recording again.');
+        setIsUploading(false);
+        return;
+      }
+      
+      // Generate filename with user name and timestamp
+      const fileName = `self-practice-interview-${userName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.webm`;
+      
+      // Upload to S3 using the uploadMockVideo function
+      console.log('Uploading recording to S3:', fileName);
+      const downloadUrl = await uploadMockVideo(blob, fileName);
+      
+      setUploadUrl(downloadUrl);
+      setUploadSuccess(true);
+      setIsUploading(false);
+      
+      console.log('Upload successful, download URL:', downloadUrl);
+      alert('Recording has been successfully uploaded to S3. It can be accessed using the provided link.');
+    } catch (error) {
+      console.error('Error uploading recording to S3:', error);
+      alert('Error uploading recording: ' + error.message);
+      setIsUploading(false);
     }
   };
 
@@ -302,13 +387,30 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
             )}
             
             {hasRecording && (
-              <button
-                onClick={downloadRecording}
-                className="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors shadow-md"
-              >
-                <Download className="w-4 h-4" />
-                <span>Download Recording</span>
-              </button>
+              <div className="flex space-x-2">
+                <button
+                  onClick={downloadRecording}
+                  className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium shadow-md"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Download Recording</span>
+                </button>
+                
+                {isUploading ? (
+                  <div className="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg font-medium shadow-md">
+                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+                    <span>Uploading to S3...</span>
+                  </div>
+                ) : uploadSuccess ? (
+                  <button
+                    onClick={() => window.open(uploadUrl, '_blank')}
+                    className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium shadow-md"
+                  >
+                    <Check className="w-4 h-4" />
+                    <span>View on S3</span>
+                  </button>
+                ) : null}
+              </div>
             )}
             
             <button

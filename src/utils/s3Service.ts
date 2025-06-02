@@ -267,9 +267,89 @@ export const listFiles = async (prefix = '') => {
     });
     
     const response = await s3Client.send(command);
-    return response.Contents || [];
+    
+    if (!response.Contents) {
+      return [];
+    }
+    
+    return response.Contents.map(item => ({
+      key: item.Key,
+      lastModified: item.LastModified,
+      size: item.Size
+    }));
   } catch (error) {
     console.error('Error listing files from S3:', error);
+    throw error;
+  }
+};
+
+/**
+ * Upload a mock interview video recording to the ai-mock-reports S3 bucket
+ * @param videoBlob - The video recording data as a Blob
+ * @param fileName - The name of the file to be stored in S3
+ * @returns Promise with the S3 URL of the uploaded video
+ */
+export const uploadMockVideo = async (videoBlob: Blob, fileName: string): Promise<string> => {
+  try {
+    console.log('Starting mock video upload process for:', fileName);
+    console.log('Content type:', videoBlob.type);
+    
+    const s3Client = getS3Client();
+    const bucketName = 'ai-mock-reports';
+    
+    // Generate a unique file path with timestamp to avoid overwriting
+    const timestamp = new Date().getTime();
+    const filePath = `interview-recordings/${timestamp}-${fileName}`;
+    
+    // Create a pre-signed URL for uploading
+    const command = new PutObjectCommand({
+      Bucket: bucketName,
+      Key: filePath,
+      ContentType: videoBlob.type || 'video/webm'
+    });
+    
+    // URL expires in 5 minutes (300 seconds)
+    const url = await getSignedUrl(s3Client, command, { expiresIn: 300 });
+    console.log('Generated pre-signed upload URL for mock video:', filePath);
+    
+    // Use fetch to upload directly with the pre-signed URL
+    console.log('Sending fetch request to upload mock video...');
+    try {
+      const response = await fetch(url, {
+        method: 'PUT',
+        body: videoBlob,
+        headers: {
+          'Content-Type': videoBlob.type || 'video/webm'
+        }
+      });
+      
+      console.log('Fetch response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`Upload failed with status: ${response.status}`, errorText);
+        console.error('Response headers:', Object.fromEntries([...response.headers.entries()]));
+        throw new Error(`Upload failed with status: ${response.status} - ${errorText}`);
+      }
+      
+      console.log('Mock video upload successful with status:', response.status);
+    } catch (fetchError) {
+      console.error('Fetch operation failed for mock video upload:', fetchError);
+      throw fetchError;
+    }
+    
+    // Generate a signed download URL
+    const downloadCommand = new GetObjectCommand({
+      Bucket: bucketName,
+      Key: filePath
+    });
+    
+    const downloadUrl = await getSignedUrl(s3Client, downloadCommand, { expiresIn: 3600 });
+    
+    console.log('Mock video uploaded successfully, download URL:', downloadUrl);
+    return downloadUrl;
+  } catch (error) {
+    console.error('Error uploading mock video to S3:', error);
     throw error;
   }
 };
