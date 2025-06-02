@@ -106,17 +106,63 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
     setIsVideoOn(status);
     if (status && videoRef.current) {
       streamRef.current = videoRef.current.srcObject as MediaStream;
+      console.log('Video stream captured for recording');
     }
   };
 
   const startRecording = async () => {
-    if (!streamRef.current) {
-      console.error('No stream available for recording');
+    if (!isVideoOn) {
+      console.error('Video must be enabled to start recording');
+      alert('Please enable your camera before recording');
       return;
     }
 
     try {
-      const mediaRecorder = new MediaRecorder(streamRef.current, {
+      // Get both video and audio streams
+      let combinedStream;
+      
+      if (streamRef.current) {
+        // If we already have the video stream from VideoFeed
+        const videoTracks = streamRef.current.getVideoTracks();
+        
+        if (videoTracks.length === 0) {
+          console.error('No video tracks available in the current stream');
+          alert('Camera not properly initialized. Please refresh and try again.');
+          return;
+        }
+        
+        // Get audio stream separately if needed
+        let audioStream;
+        try {
+          audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          setIsMicOn(true);
+        } catch (audioError) {
+          console.warn('Could not get audio stream:', audioError);
+          alert('Could not access microphone. Recording will proceed without audio.');
+        }
+        
+        // Combine video and audio tracks
+        const tracks = [...videoTracks];
+        if (audioStream) {
+          tracks.push(...audioStream.getAudioTracks());
+        }
+        
+        combinedStream = new MediaStream(tracks);
+      } else {
+        // If we don't have a stream yet, get both video and audio
+        combinedStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true
+        });
+        streamRef.current = combinedStream;
+        setIsVideoOn(true);
+        setIsMicOn(true);
+      }
+
+      console.log('Combined stream created with tracks:', combinedStream.getTracks().map(t => t.kind));
+      
+      // Create media recorder with the combined stream
+      const mediaRecorder = new MediaRecorder(combinedStream, {
         mimeType: 'video/webm;codecs=vp8,opus'
       });
 
@@ -126,45 +172,84 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           setRecordedChunks(prev => [...prev, event.data]);
+          console.log('Recorded chunk size:', event.data.size);
         }
       };
 
       mediaRecorder.onstop = () => {
         setHasRecording(true);
-        console.log('Recording stopped');
+        console.log('Recording stopped, total chunks:', recordedChunks.length);
       };
 
       mediaRecorder.start(1000); // Collect data every second
       setIsRecording(true);
-      console.log('Recording started');
+      console.log('Recording started successfully');
+      
+      // Reset to first question when recording starts
+      setCurrentQuestionIndex(0);
+      
     } catch (error) {
       console.error('Failed to start recording:', error);
+      alert('Failed to start recording: ' + error.message);
     }
   };
 
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-      console.log('Stopping recording');
+      try {
+        mediaRecorderRef.current.stop();
+        setIsRecording(false);
+        console.log('Stopping recording');
+        
+        // Release tracks to avoid memory leaks
+        if (streamRef.current) {
+          streamRef.current.getTracks().forEach(track => {
+            // Only stop audio tracks, keep video running for the UI
+            if (track.kind === 'audio') {
+              track.stop();
+            }
+          });
+        }
+        
+        // Show a notification that recording has stopped
+        alert('Recording has been stopped. You can now download your interview recording.');
+      } catch (error) {
+        console.error('Error stopping recording:', error);
+      }
     }
   };
 
   const downloadRecording = () => {
     if (recordedChunks.length === 0) {
       console.error('No recording available');
+      alert('No recording available to download');
       return;
     }
 
-    const blob = new Blob(recordedChunks, { type: 'video/webm' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `interview-recording-${new Date().toISOString().split('T')[0]}.webm`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    try {
+      console.log('Creating blob from', recordedChunks.length, 'chunks');
+      const blob = new Blob(recordedChunks, { type: 'video/webm' });
+      console.log('Blob size:', blob.size, 'bytes');
+      
+      if (blob.size === 0) {
+        alert('Recording is empty. Please try recording again.');
+        return;
+      }
+      
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `self-practice-interview-${userName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.webm`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      console.log('Download initiated');
+    } catch (error) {
+      console.error('Error downloading recording:', error);
+      alert('Error downloading recording: ' + error.message);
+    }
   };
 
   if (showCongratulations) {
@@ -201,15 +286,15 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
               <button
                 onClick={startRecording}
                 disabled={!isVideoOn}
-                className="flex items-center space-x-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center space-x-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium shadow-md"
               >
-                <Circle className="w-4 h-4" />
+                <Circle className="w-4 h-4 animate-pulse" />
                 <span>Start Recording</span>
               </button>
             ) : (
               <button
                 onClick={stopRecording}
-                className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors animate-pulse"
+                className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors animate-pulse shadow-md"
               >
                 <Square className="w-4 h-4" />
                 <span>Stop Recording</span>
@@ -219,16 +304,16 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
             {hasRecording && (
               <button
                 onClick={downloadRecording}
-                className="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                className="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors shadow-md"
               >
                 <Download className="w-4 h-4" />
-                <span>Download</span>
+                <span>Download Recording</span>
               </button>
             )}
             
             <button
               onClick={onBack}
-              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+              className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors shadow-md"
             >
               End Session
             </button>
@@ -264,6 +349,12 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
 
         {/* Right Side - AI Interview */}
         <div className="w-1/2 p-6 flex flex-col">
+          {/* Current Question Display */}
+          <div className="bg-indigo-50 p-4 rounded-lg mb-4">
+            <h3 className="text-sm font-medium text-indigo-800 mb-1">Current Question ({currentQuestionIndex + 1}/{questions.length})</h3>
+            <p className="text-gray-800">{questions[currentQuestionIndex]}</p>
+          </div>
+
           {/* AI Practice Coach */}
           <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
             <div className="flex items-center space-x-3 mb-4">

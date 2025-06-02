@@ -203,6 +203,34 @@ const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange, videoRef, faceDet
       }
     };
   }, [startCamera]);
+  
+  // Apply video orientation fix after component mounts
+  useEffect(() => {
+    // Function to fix video orientation
+    const fixVideoOrientation = () => {
+      if (webcamRef.current) {
+        const videoElement = webcamRef.current.video;
+        if (videoElement) {
+          console.log('Applying video orientation fix');
+          // Apply the CSS transform directly to the video element
+          // Try a different approach - set CSS directly to ensure correct orientation
+          videoElement.style.transform = 'scaleX(1)'; // Normal orientation (not mirrored)
+          
+          // Add a class to the video element for additional styling
+          videoElement.classList.add('non-mirrored-video');
+        }
+      }
+    };
+    
+    // Apply fix immediately and also set up an interval to ensure it's applied
+    // even after the video element is replaced or updated
+    fixVideoOrientation();
+    const intervalId = setInterval(fixVideoOrientation, 1000);
+    
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [isVideoOn]);
 
   // Determine video constraints based on whether we have a rear camera ID
   const videoConstraints = rearCameraId
@@ -246,10 +274,12 @@ const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange, videoRef, faceDet
                 setIsVideoOn(false);
               }
             }}
-            className="w-full h-full object-cover"
-            mirrored={false} // Never mirror to ensure rear camera displays correctly
+            className="w-full h-full object-cover mirrored-video" // Apply mirrored-video class to flip horizontally
+            mirrored={false} // Disable built-in mirroring to avoid conflicts
             screenshotFormat="image/jpeg"
-            style={{ display: isVideoOn ? 'block' : 'none' }} // Don't flip horizontally to prevent overlap
+            style={{ 
+              display: isVideoOn ? 'block' : 'none' // Control visibility based on camera state
+            }}
           />
         )}
         
