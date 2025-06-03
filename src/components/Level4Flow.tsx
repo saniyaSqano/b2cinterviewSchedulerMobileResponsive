@@ -1,10 +1,12 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Video, VideoOff, Mic, MicOff, Download, Square, Circle, Upload, Check } from 'lucide-react';
+import { ArrowLeft, Video, VideoOff, Mic, MicOff, Download, Square, Circle, Upload, Check, User, Mail, Phone, Award, Star, TrendingUp, Clock } from 'lucide-react';
 import Level4CongratulationsScreen from './Level4CongratulationsScreen';
 import VideoFeed from './VideoFeed';
+import SelfPracticeReport from './SelfPracticeReport';
 import { initFaceDetection, detectFaces } from '../utils/faceDetection';
 import { uploadMockVideo } from '../utils/s3Service';
+import jsPDF from 'jspdf';
 
 interface Level4FlowProps {
   onBack: () => void;
@@ -31,6 +33,36 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [uploadUrl, setUploadUrl] = useState<string>('');
+  const [showReport, setShowReport] = useState(false);
+  const [showCustomReport, setShowCustomReport] = useState(false);
+  
+  // Store user details from localStorage
+  const [userDetails, setUserDetails] = useState({
+    fullName: userName,
+    email: "",
+    phoneNumber: "",
+    skills: "",
+    experience: ""
+  });
+  
+  // Load user data from localStorage when component mounts
+  useEffect(() => {
+    const storedUserData = localStorage.getItem('currentUserData');
+    if (storedUserData) {
+      try {
+        const userData = JSON.parse(storedUserData);
+        setUserDetails({
+          fullName: userData.fullName || userName,
+          email: userData.email || "",
+          phoneNumber: userData.phoneNumber || "",
+          skills: userData.skills || "",
+          experience: userData.experience || ""
+        });
+      } catch (error) {
+        console.error('Error parsing user data from localStorage:', error);
+      }
+    }
+  }, [userName]);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const faceDetectionVideoRef = useRef<HTMLVideoElement>(null);
@@ -414,7 +446,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
             )}
             
             <button
-              onClick={onBack}
+              onClick={() => setIsComplete(true)}
               className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors shadow-md"
             >
               End Session
@@ -544,7 +576,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
       </div>
 
       {/* Completion Modal */}
-      {isComplete && (
+      {isComplete && !showReport && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl p-8 max-w-md mx-4">
             <h3 className="text-2xl font-bold text-gray-800 mb-4">Practice Complete!</h3>
@@ -552,24 +584,46 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
               Great job! You've completed your self-practice session. 
               {hasRecording && " Your interview has been recorded and is ready for download."}
             </p>
-            <div className="flex space-x-3">
+            <div className="flex flex-col space-y-3">
+              <button
+                onClick={() => setShowCustomReport(true)}
+                className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors flex items-center justify-center"
+              >
+                <Download className="w-5 h-5 mr-2" />
+                View Performance Report
+              </button>
               {hasRecording && (
                 <button
                   onClick={downloadRecording}
-                  className="flex-1 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                  className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center"
                 >
+                  <Download className="w-5 h-5 mr-2" />
                   Download Recording
                 </button>
               )}
               <button
                 onClick={onBack}
-                className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
               >
                 Continue
               </button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* Self Practice Report Popup */}
+      {showCustomReport && (
+        <SelfPracticeReport
+          onClose={() => setShowCustomReport(false)}
+          userDetails={{
+            fullName: userDetails.fullName,
+            email: userDetails.email,
+            phoneNumber: userDetails.phoneNumber,
+            skills: userDetails.skills,
+            experience: userDetails.experience
+          }}
+        />
       )}
     </div>
   );

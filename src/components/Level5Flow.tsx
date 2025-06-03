@@ -208,14 +208,33 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
     }
   };
 
-  // Mock candidate details and skill assessment for demonstration
-  const candidateDetails = {
+  // Get real candidate details from localStorage or use userName as fallback
+  const [candidateDetails, setCandidateDetails] = useState({
     fullName: userName,
-    email: "candidate@example.com",
-    phoneNumber: "+1 (555) 123-4567",
-    skills: "React, TypeScript, Node.js, Python",
-    experience: "3+ years in full-stack development"
-  };
+    email: "",
+    phoneNumber: "",
+    skills: "",
+    experience: ""
+  });
+
+  // Load user data from localStorage when component mounts
+  useEffect(() => {
+    const storedUserData = localStorage.getItem('currentUserData');
+    if (storedUserData) {
+      try {
+        const userData = JSON.parse(storedUserData);
+        setCandidateDetails({
+          fullName: userData.fullName || userName,
+          email: userData.email || "",
+          phoneNumber: userData.phoneNumber || "",
+          skills: userData.skills || "",
+          experience: userData.experience || ""
+        });
+      } catch (error) {
+        console.error('Error parsing user data from localStorage:', error);
+      }
+    }
+  }, [userName]);
 
   const skillAssessment = {
     programming: 85,

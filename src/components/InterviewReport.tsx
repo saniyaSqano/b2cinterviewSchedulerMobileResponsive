@@ -129,12 +129,9 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
           dynamicInsert: { [columnName]: reportUrl }
         });
         
-        // Generate a UUID for user_id since it's still required in the database schema
-        const userId = uuidv4();
-        console.log('Generated UUID for user_id in report component:', userId);
+        // No longer need to generate a user_id as it's been removed from the database schema
         
         const userData = {
-          user_id: userId, // Using UUID since it's still required in the database schema
           email: email,
           first_name: fullName.split(' ')[0],
           last_name: fullName.split(' ').slice(1).join(' '),

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Mic, MicOff, Download, Award, Star, TrendingUp, Clock, MessageSquare, Link, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Mic, MicOff, Download, Award, Star, TrendingUp, Clock, MessageSquare, Link, ExternalLink, User, Mail, Phone } from 'lucide-react';
 import Level3CongratulationsScreen from './Level3CongratulationsScreen';
 import VideoFeed from './VideoFeed';
 import AISpeech from './AISpeech';
@@ -43,8 +43,37 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [reportData, setReportData] = useState<any>(null);
   const [showReportModal, setShowReportModal] = useState(false);
-  const [reportS3Url, setReportS3Url] = useState<string>('');
+  const [reportS3Url, setReportS3Url] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  
+  // Store user details from localStorage
+  const [userDetails, setUserDetails] = useState({
+    fullName: userName,
+    email: "",
+    phoneNumber: "",
+    skills: "",
+    experience: ""
+  });
+  
+  // Load user data from localStorage when component mounts
+  useEffect(() => {
+    const storedUserData = localStorage.getItem('currentUserData');
+    if (storedUserData) {
+      try {
+        const userData = JSON.parse(storedUserData);
+        setUserDetails({
+          fullName: userData.fullName || userName,
+          email: userData.email || "",
+          phoneNumber: userData.phoneNumber || "",
+          skills: userData.skills || "",
+          experience: userData.experience || ""
+        });
+      } catch (error) {
+        console.error('Error parsing user data from localStorage:', error);
+      }
+    }
+  }, [userName]);
+  
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isListeningForResponse, setIsListeningForResponse] = useState(false);
   const [currentTranscript, setCurrentTranscript] = useState('');
@@ -328,7 +357,9 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
       pdf.text('AI INTERVIEW PERFORMANCE REPORT', 105, 20, { align: 'center' });
       
       pdf.setFontSize(12);
-      pdf.text(`Candidate: ${userName}`, 15, 30);
+      pdf.text(`Candidate: ${userDetails.fullName}`, 15, 30);
+      pdf.text(`Email: ${userDetails.email || 'N/A'}`, 15, 37);
+      pdf.text(`Phone: ${userDetails.phoneNumber || 'N/A'}`, 15, 44);
       pdf.text(`Date: ${new Date().toLocaleDateString()}`, 150, 30);
       
       // Executive Summary
@@ -618,7 +649,9 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
       pdf.text('AI INTERVIEW PERFORMANCE REPORT', 105, 20, { align: 'center' });
       
       pdf.setFontSize(12);
-      pdf.text(`Candidate: ${userName}`, 15, 30);
+      pdf.text(`Candidate: ${userDetails.fullName}`, 15, 30);
+      pdf.text(`Email: ${userDetails.email || 'N/A'}`, 15, 37);
+      pdf.text(`Phone: ${userDetails.phoneNumber || 'N/A'}`, 15, 44);
       pdf.text(`Date: ${new Date().toLocaleDateString()}`, 150, 30);
       
       // Executive Summary
@@ -996,6 +1029,55 @@ const Level3Flow: React.FC<Level3FlowProps> = ({ onBack, userName }) => {
                 </div>
               </div>
 
+              {/* Candidate Details */}
+              <div className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-b">
+                <h3 className="text-xl font-bold text-indigo-800 mb-4 flex items-center">
+                  <User className="w-6 h-6 mr-2" />
+                  Candidate Details
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  <div className="bg-white rounded-lg p-4 shadow-md">
+                    <div className="flex items-center gap-3 mb-2">
+                      <User className="w-4 h-4 text-gray-500" />
+                      <div>
+                        <p className="text-sm text-gray-500">Full Name</p>
+                        <p className="text-gray-900 font-medium">{userDetails.fullName}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 mb-2">
+                      <Mail className="w-4 h-4 text-gray-500" />
+                      <div>
+                        <p className="text-sm text-gray-500">Email</p>
+                        <p className="text-gray-900 font-medium">{userDetails.email || 'N/A'}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Phone className="w-4 h-4 text-gray-500" />
+                      <div>
+                        <p className="text-sm text-gray-500">Phone</p>
+                        <p className="text-gray-900 font-medium">{userDetails.phoneNumber || 'N/A'}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-lg p-4 shadow-md">
+                    <div className="flex items-center gap-3 mb-2">
+                      <TrendingUp className="w-4 h-4 text-gray-500" />
+                      <div>
+                        <p className="text-sm text-gray-500">Skills</p>
+                        <p className="text-gray-900 font-medium">{userDetails.skills || 'N/A'}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Clock className="w-4 h-4 text-gray-500" />
+                      <div>
+                        <p className="text-sm text-gray-500">Experience</p>
+                        <p className="text-gray-900 font-medium">{userDetails.experience || 'N/A'}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
               {/* Executive Summary */}
               <div className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-b">
                 <h3 className="text-xl font-bold text-indigo-800 mb-4 flex items-center">

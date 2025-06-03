@@ -202,6 +202,13 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack, onTestPassed })
     return (
       <TestReport
         results={testResults}
+        candidateDetails={{
+          fullName: formData.fullName,
+          email: formData.email,
+          phoneNumber: formData.phoneNumber,
+          skills: formData.skills,
+          experience: formData.experience
+        }}
         onBack={handleBackFromReport}
         onRetakeTest={handleRetakeTest}
       />
