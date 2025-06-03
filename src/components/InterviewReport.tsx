@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from './ui/chart';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { uploadToS3, uploadPitchPerfectToS3 } from '../utils/s3Service';
+import { supabase } from '../integrations/supabase/client';
 import jsPDF from 'jspdf';
 
 interface ViolationLog {
@@ -35,19 +36,59 @@ interface InterviewReportProps {
   skillAssessment: SkillAssessment;
   violationLogs: ViolationLog[];
   onBack: () => void;
+  reportType?: 'ai_proctor' | 'pitch_perfect' | 'assessment' | 'self_practice';
 }
 
 const InterviewReport: React.FC<InterviewReportProps> = ({
   candidateDetails,
   skillAssessment,
   violationLogs,
-  onBack
+  onBack,
+  reportType = 'ai_proctor'
 }) => {
   // Report states
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [uploadUrl, setUploadUrl] = useState<string | null>(null);
+  
+  // Function to save report URL to Supabase
+  const saveReportToDatabase = async (reportUrl: string, reportType: string) => {
+    try {
+      console.log('Saving report to database...', { reportUrl, reportType, email: candidateDetails.email });
+      
+      // Map report type to column name
+      const columnMap: Record<string, string> = {
+        'ai_proctor': 'ai_proctor_report',
+        'pitch_perfect': 'pitch_perfect_report',
+        'assessment': 'assessment_report',
+        'self_practice': 'self_practice_report'
+      };
+      
+      const columnName = columnMap[reportType];
+      if (!columnName) {
+        throw new Error(`Unknown report type: ${reportType}`);
+      }
+      
+      // Update the user's record with the report URL
+      const { data, error } = await supabase
+        .from('ai_procto_users')
+        .update({ [columnName]: reportUrl })
+        .eq('email', candidateDetails.email)
+        .select();
+      
+      if (error) {
+        console.error('Error saving report to database:', error);
+        throw error;
+      }
+      
+      console.log('Report saved to database successfully:', data);
+      return data;
+    } catch (error) {
+      console.error('Failed to save report to database:', error);
+      throw error;
+    }
+  };
   
   // Function to generate and download the report as PDF and upload to S3
   const generateAndDownloadReport = async () => {
@@ -163,15 +204,25 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
       
-      // Upload to S3 using the pitch perfect dedicated bucket
-      console.log('Uploading Pitch Perfect PDF to S3...');
-      const s3Url = await uploadPitchPerfectToS3(pdfBlob, fileName, 'application/pdf');
-      console.log('Pitch Perfect PDF uploaded to S3:', s3Url);
+      // Upload to S3 using the appropriate upload function based on report type
+      console.log(`Uploading ${reportType} report to S3...`);
+      let s3Url: string;
+      
+      if (reportType === 'pitch_perfect') {
+        s3Url = await uploadPitchPerfectToS3(pdfBlob, fileName, 'application/pdf');
+      } else {
+        s3Url = await uploadToS3(pdfBlob, fileName, 'application/pdf');
+      }
+      
+      console.log(`${reportType} report uploaded to S3:`, s3Url);
+      
+      // Save the report URL to the database
+      await saveReportToDatabase(s3Url, reportType);
       
       // Update state with success and URL
       setUploadSuccess(true);
       setUploadUrl(s3Url);
-      console.log('Report generated, downloaded and uploaded successfully');
+      console.log('Report generated, downloaded, uploaded, and saved to database successfully');
     } catch (error) {
       console.error('Error generating and uploading PDF report:', error);
     } finally {

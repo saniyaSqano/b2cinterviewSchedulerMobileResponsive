@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import Level5CongratulationsScreen from './Level5CongratulationsScreen';
 import InterviewReport from './InterviewReport';
@@ -244,6 +245,7 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
         skillAssessment={skillAssessment}
         violationLogs={violationLogs}
         onBack={handleBackFromReport}
+        reportType="ai_proctor"
       />
     );
   }
