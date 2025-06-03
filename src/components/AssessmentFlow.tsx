@@ -1,12 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAiProctoUser } from '../hooks/useAiProctoUser';
-import { ChevronLeft, ChevronRight, Upload, Calendar, Clock, FileText } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, Clock, FileText } from 'lucide-react';
 import { Button } from './ui/button';
 import { v4 as uuidv4 } from 'uuid';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import ParticleBackground from './ParticleBackground';
 import MCQTest from './MCQTest';
@@ -18,17 +17,6 @@ interface AssessmentFlowProps {
 }
 
 interface FormData {
-  // Personal Info
-  fullName: string;
-  email: string;
-  phoneNumber: string;
-  
-  // Professional Info
-  skills: string;
-  experience: string;
-  cv: File | null;
-  jobDescription: string;
-  
   // Test Configuration
   totalQuestions: number;
   codingQuestions: number;
@@ -46,13 +34,6 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack, onTestPassed })
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
   const { createUser, updateUserReport, loading, error } = useAiProctoUser();
   const [formData, setFormData] = useState<FormData>({
-    fullName: '',
-    email: '',
-    phoneNumber: '',
-    skills: '',
-    experience: '',
-    cv: null,
-    jobDescription: '',
     totalQuestions: 10,
     codingQuestions: 3,
     timeFrame: 60,
@@ -77,13 +58,8 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack, onTestPassed })
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] || null;
-    handleInputChange('cv', file);
-  };
-
   const handleNext = () => {
-    if (currentStep < 4) {
+    if (currentStep < 2) {
       setIsTransitioning(true);
       setTimeout(() => {
         setCurrentStep(prev => prev + 1);
@@ -107,37 +83,15 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack, onTestPassed })
     setIsTransitioning(true);
     
     try {
-      // Validate required fields
-      if (!formData.email || !formData.fullName) {
-        throw new Error('Email and full name are required');
+      // Get user data from localStorage if available
+      const userData = localStorage.getItem('currentUserData');
+      let userInfo = null;
+      
+      if (userData) {
+        userInfo = JSON.parse(userData);
       }
       
-      // Store email in localStorage for later use with reports
-      setFormData(prev => ({
-        ...prev
-      }));
-      
-      const userData = {
-        email: formData.email,
-        password_hash: 'placeholder', // Using a placeholder since empty string might cause issues
-        first_name: formData.fullName.split(' ')[0], // Extract first name
-        last_name: formData.fullName.split(' ').slice(1).join(' '), // Extract last name
-        policies_accepted: true
-      };
-      
-      console.log('Attempting to save user data:', userData);
-      
-      // Save user data to Supabase
-      const result = await createUser(userData);
-      console.log('Supabase response:', result);
-      
-      // Store the user data in localStorage for persistence across components
-      localStorage.setItem('currentUserData', JSON.stringify({
-        email: formData.email,
-        fullName: formData.fullName
-      }));
-      
-      setSaveStatus('User data saved successfully!');
+      setSaveStatus('Test starting...');
       
       // Show success feedback for 1.5 seconds before starting the test
       setTimeout(() => {
@@ -145,8 +99,8 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack, onTestPassed })
         setShowTest(true);
       }, 1500);
     } catch (err) {
-      console.error('Error saving user data:', err);
-      setSaveStatus(`Error saving user data: ${err.message || 'Unknown error'}`);
+      console.error('Error starting test:', err);
+      setSaveStatus(`Error starting test: ${err.message || 'Unknown error'}`);
       setIsTransitioning(false);
       
       // Still allow the test to start after showing error message for 2 seconds
@@ -203,11 +157,11 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack, onTestPassed })
       <TestReport
         results={testResults}
         candidateDetails={{
-          fullName: formData.fullName,
-          email: formData.email,
-          phoneNumber: formData.phoneNumber,
-          skills: formData.skills,
-          experience: formData.experience
+          fullName: 'Test User',
+          email: 'test@example.com',
+          phoneNumber: '',
+          skills: '',
+          experience: ''
         }}
         onBack={handleBackFromReport}
         onRetakeTest={handleRetakeTest}
@@ -232,114 +186,6 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack, onTestPassed })
       isTransitioning ? 'opacity-0 transform translate-x-8' : 'opacity-100 transform translate-x-0'
     }`}>
       {saveStatus && renderFeedbackMessage()}
-      <div className="mb-12 animate-fade-in">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">Help us personalize your experience</h1>
-      </div>
-      
-      <div className="space-y-8">
-        <div className="text-left transform transition-all duration-500 hover:scale-105">
-          <Label htmlFor="fullName" className="text-gray-900 text-lg block mb-3">What's your name?</Label>
-          <Input
-            id="fullName"
-            value={formData.fullName}
-            onChange={(e) => handleInputChange('fullName', e.target.value)}
-            className="bg-white border-2 border-gray-300 text-gray-900 text-lg h-14 rounded-lg focus:border-blue-500 transition-all duration-300 focus:scale-105"
-            placeholder="Enter your name"
-          />
-        </div>
-        
-        <div className="text-left transform transition-all duration-500 hover:scale-105" style={{ animationDelay: '200ms' }}>
-          <Label htmlFor="email" className="text-gray-900 text-lg block mb-3">What's your email?</Label>
-          <Input
-            id="email"
-            type="email"
-            value={formData.email}
-            onChange={(e) => handleInputChange('email', e.target.value)}
-            className="bg-white border-2 border-gray-300 text-gray-900 text-lg h-14 rounded-lg focus:border-blue-500 transition-all duration-300 focus:scale-105"
-            placeholder="Enter your email address"
-          />
-        </div>
-        
-        <div className="text-left transform transition-all duration-500 hover:scale-105" style={{ animationDelay: '400ms' }}>
-          <Label htmlFor="phoneNumber" className="text-gray-900 text-lg block mb-3">What's your phone number?</Label>
-          <Input
-            id="phoneNumber"
-            value={formData.phoneNumber}
-            onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
-            className="bg-white border-2 border-gray-300 text-gray-900 text-lg h-14 rounded-lg focus:border-blue-500 transition-all duration-300 focus:scale-105"
-            placeholder="Enter your phone number"
-          />
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderStep2 = () => (
-    <div className={`max-w-2xl mx-auto text-center space-y-8 transition-all duration-500 ease-in-out ${
-      isTransitioning ? 'opacity-0 transform translate-x-8' : 'opacity-100 transform translate-x-0'
-    }`}>
-      <div className="mb-12 animate-fade-in">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">Tell us about your professional background</h1>
-      </div>
-      
-      <div className="space-y-8">
-        <div className="text-left transform transition-all duration-500 hover:scale-105">
-          <Label htmlFor="skills" className="text-gray-900 text-lg block mb-3">What are your key skills?</Label>
-          <Textarea
-            id="skills"
-            value={formData.skills}
-            onChange={(e) => handleInputChange('skills', e.target.value)}
-            className="bg-white border-2 border-gray-300 text-gray-900 text-lg min-h-[120px] rounded-lg focus:border-blue-500 transition-all duration-300"
-            placeholder="List your technical skills (e.g., JavaScript, React, Python, etc.)"
-          />
-        </div>
-        
-        <div className="text-left transform transition-all duration-500 hover:scale-105" style={{ animationDelay: '200ms' }}>
-          <Label htmlFor="experience" className="text-gray-900 text-lg block mb-3">Tell us about your experience</Label>
-          <Textarea
-            id="experience"
-            value={formData.experience}
-            onChange={(e) => handleInputChange('experience', e.target.value)}
-            className="bg-white border-2 border-gray-300 text-gray-900 text-lg min-h-[120px] rounded-lg focus:border-blue-500 transition-all duration-300"
-            placeholder="Describe your work experience and projects"
-          />
-        </div>
-        
-        <div className="text-left transform transition-all duration-500 hover:scale-105" style={{ animationDelay: '400ms' }}>
-          <Label htmlFor="cv" className="text-gray-900 text-lg block mb-3">Upload your CV</Label>
-          <div className="relative">
-            <Input
-              id="cv"
-              type="file"
-              accept=".pdf,.doc,.docx"
-              onChange={handleFileUpload}
-              className="bg-white border-2 border-gray-300 text-gray-900 text-lg h-14 rounded-lg focus:border-blue-500 file:text-white file:bg-blue-600 file:border-0 file:rounded file:px-4 file:py-2 file:mr-4 transition-all duration-300"
-            />
-            <Upload className="absolute right-4 top-4 w-6 h-6 text-gray-500 transition-colors duration-300 hover:text-blue-500" />
-          </div>
-          {formData.cv && (
-            <p className="text-green-600 mt-2 text-sm animate-fade-in">File uploaded: {formData.cv.name}</p>
-          )}
-        </div>
-        
-        <div className="text-left transform transition-all duration-500 hover:scale-105" style={{ animationDelay: '600ms' }}>
-          <Label htmlFor="jobDescription" className="text-gray-900 text-lg block mb-3">Job description (optional)</Label>
-          <Textarea
-            id="jobDescription"
-            value={formData.jobDescription}
-            onChange={(e) => handleInputChange('jobDescription', e.target.value)}
-            className="bg-white border-2 border-gray-300 text-gray-900 text-lg min-h-[120px] rounded-lg focus:border-blue-500 transition-all duration-300"
-            placeholder="Paste the job description you're applying for"
-          />
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderStep3 = () => (
-    <div className={`max-w-2xl mx-auto text-center space-y-8 transition-all duration-500 ease-in-out ${
-      isTransitioning ? 'opacity-0 transform translate-x-8' : 'opacity-100 transform translate-x-0'
-    }`}>
       <div className="mb-12 animate-fade-in">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">Configure your test preferences</h1>
       </div>
@@ -396,7 +242,7 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack, onTestPassed })
     </div>
   );
 
-  const renderStep4 = () => (
+  const renderStep2 = () => (
     <div className={`max-w-2xl mx-auto text-center space-y-8 transition-all duration-500 ease-in-out ${
       isTransitioning ? 'opacity-0 transform translate-x-8' : 'opacity-100 transform translate-x-0'
     }`}>
@@ -485,7 +331,7 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack, onTestPassed })
         <div className="min-h-[80vh] flex flex-col justify-center">
           <div className="text-center mb-12">
             <div className="flex justify-center space-x-2 mb-8">
-              {[1, 2, 3, 4].map((step) => (
+              {[1, 2].map((step) => (
                 <div
                   key={step}
                   className={`h-3 rounded-full transition-all duration-500 transform ${
@@ -503,19 +349,13 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack, onTestPassed })
           <div className="mb-12">
             {currentStep === 1 && renderStep1()}
             {currentStep === 2 && renderStep2()}
-            {currentStep === 3 && renderStep3()}
-            {currentStep === 4 && renderStep4()}
           </div>
 
           <div className="flex justify-center">
-            {currentStep < 4 ? (
+            {currentStep < 2 ? (
               <Button
                 onClick={handleNext}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-12 py-3 text-lg rounded-full transition-all duration-300 transform hover:scale-110 hover:shadow-lg hover:shadow-blue-500/25"
-                disabled={
-                  (currentStep === 1 && (!formData.fullName || !formData.email || !formData.phoneNumber)) ||
-                  (currentStep === 2 && (!formData.skills || !formData.experience))
-                }
               >
                 Continue
                 <ChevronRight className="w-4 h-4 ml-2" />
