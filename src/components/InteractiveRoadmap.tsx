@@ -1,13 +1,14 @@
+
 import React, { useState } from 'react';
-import { CheckCircle, Circle, Lock, Target, Zap, Star, ArrowRight, Trophy } from 'lucide-react';
+import { CheckCircle, Circle, Lock, Target, Zap, Star, Trophy, User, GraduationCap } from 'lucide-react';
 
 interface RoadmapStep {
   id: number;
   title: string;
   subtitle: string;
   description: string;
-  position: { x: number; y: number };
-  icon?: string;
+  icon: string;
+  status: 'completed' | 'current' | 'available' | 'locked';
 }
 
 interface InteractiveRoadmapProps {
@@ -15,8 +16,6 @@ interface InteractiveRoadmapProps {
   completedLevels: number[];
   onStepClick: (index: number) => void;
 }
-
-type StepStatus = 'completed' | 'current' | 'available' | 'locked';
 
 const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
   currentLevel,
@@ -28,289 +27,242 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
   const roadmapSteps: RoadmapStep[] = [
     {
       id: 0,
-      title: "Assessment",
+      title: "Skill Assessment",
       subtitle: "Level 1",
-      description: "Take our comprehensive assessment to evaluate your current skills and identify areas for improvement",
-      position: { x: 15, y: 85 },
-      icon: "target"
+      description: "AI-powered evaluation of your current strengths and career growth areas",
+      icon: "target",
+      status: 'available'
     },
     {
       id: 1,
-      title: "Chat with AI",
+      title: "AI Mentor Chat",
       subtitle: "Level 2", 
-      description: "Engage with our AI assistant to get personalized feedback and guidance on your performance",
-      position: { x: 30, y: 65 },
-      icon: "zap"
+      description: "Get personalized feedback and guidance from our AI career mentor",
+      icon: "user",
+      status: 'available'
     },
     {
       id: 2,
-      title: "Pitch Yourself",
+      title: "Pitch Builder",
       subtitle: "Level 3", 
-      description: "Learn to create compelling personal pitches and develop your professional presentation skills",
-      position: { x: 50, y: 45 },
-      icon: "star"
+      description: "Craft your personal pitch with AI-guided presentation skills",
+      icon: "graduation-cap",
+      status: 'available'
     },
     {
       id: 3,
-      title: "Self Practice",
+      title: "Practice Hub",
       subtitle: "Level 4",
-      description: "Practice your skills with interactive exercises and real-world scenarios at your own pace",
-      position: { x: 70, y: 30 },
-      icon: "target"
+      description: "Hands-on exercises and real-world scenario simulations",
+      icon: "star",
+      status: 'available'
     },
     {
       id: 4,
-      title: "AI Proctored Interview",
+      title: "Proctored Interview",
       subtitle: "Level 5",
-      description: "Demonstrate your newly acquired skills in an AI-proctored interview environment",
-      position: { x: 85, y: 50 },
-      icon: "zap"
+      description: "Simulated environment with comprehensive AI-powered analysis",
+      icon: "zap",
+      status: 'available'
     },
     {
       id: 5,
-      title: "GameOn",
+      title: "Leaderboard Challenge",
       subtitle: "Level 6",
-      description: "Compete with others and showcase your skills in gamified challenges and competitions",
-      position: { x: 90, y: 75 },
-      icon: "trophy"
+      description: "Compete and rank up against other professionals",
+      icon: "trophy",
+      status: 'available'
     }
   ];
 
-  const getStepStatus = (index: number): StepStatus => {
+  const getStepStatus = (index: number) => {
     if (completedLevels.includes(index)) return 'completed';
     if (index === currentLevel) return 'current';
-    // For testing: allow access to all levels
     return 'available';
   };
 
-  const getStepIcon = (step: RoadmapStep, status: StepStatus) => {
-    if (status === 'completed') return <CheckCircle className="w-8 h-8 text-white" />;
-    if (status === 'locked') return <Lock className="w-6 h-6 text-slate-400" />;
+  const getStepIcon = (step: RoadmapStep, status: string) => {
+    if (status === 'completed') return <CheckCircle className="w-6 h-6 text-white" />;
+    if (status === 'locked') return <Lock className="w-6 h-6 text-gray-400" />;
     
+    const iconProps = "w-6 h-6 text-white";
     switch (step.icon) {
-      case 'target':
-        return <Target className="w-6 h-6" />;
-      case 'zap':
-        return <Zap className="w-6 h-6" />;
-      case 'star':
-        return <Star className="w-6 h-6" />;
-      case 'trophy':
-        return <Trophy className="w-6 h-6" />;
-      default:
-        return <Circle className="w-6 h-6" />;
+      case 'target': return <Target className={iconProps} />;
+      case 'user': return <User className={iconProps} />;
+      case 'graduation-cap': return <GraduationCap className={iconProps} />;
+      case 'star': return <Star className={iconProps} />;
+      case 'zap': return <Zap className={iconProps} />;
+      case 'trophy': return <Trophy className={iconProps} />;
+      default: return <Circle className={iconProps} />;
     }
   };
 
-  const getStatusColors = (status: StepStatus, isHovered: boolean) => {
-    const baseClasses = 'transition-all duration-300 border-3 shadow-lg';
+  const getStatusStyles = (status: string, isHovered: boolean) => {
+    const baseClasses = 'transition-all duration-300 border-2 shadow-lg hover:shadow-xl';
     
     switch (status) {
       case 'completed':
-        return `${baseClasses} bg-gradient-to-br from-slate-700 to-slate-800 border-slate-500 shadow-slate-300`;
+        return `${baseClasses} bg-gradient-to-br from-purple-500 to-purple-600 border-purple-400`;
       case 'current':
-        return `${baseClasses} bg-gradient-to-br from-blue-600 to-blue-700 border-blue-400 shadow-blue-200 ring-4 ring-blue-200`;
+        return `${baseClasses} bg-gradient-to-br from-blue-500 to-blue-600 border-blue-400 ring-4 ring-blue-200`;
       case 'available':
-        return `${baseClasses} bg-gradient-to-br from-slate-500 to-slate-600 border-slate-400 shadow-slate-200 ${isHovered ? 'shadow-xl border-slate-300' : ''}`;
+        return `${baseClasses} bg-gradient-to-br from-gray-400 to-gray-500 border-gray-300 ${isHovered ? 'bg-gradient-to-br from-gray-500 to-gray-600' : ''}`;
       default:
-        return `${baseClasses} bg-gradient-to-br from-slate-300 to-slate-400 border-slate-200 shadow-slate-100`;
+        return `${baseClasses} bg-gradient-to-br from-gray-300 to-gray-400 border-gray-200`;
     }
   };
 
-  const drawPath = () => {
-    let pathData = '';
-    roadmapSteps.forEach((step, index) => {
-      if (index === 0) {
-        pathData += `M ${step.position.x} ${step.position.y}`;
-      } else {
-        const prevStep = roadmapSteps[index - 1];
-        const controlX1 = prevStep.position.x + (step.position.x - prevStep.position.x) * 0.3;
-        const controlY1 = prevStep.position.y + (step.position.y - prevStep.position.y) * 0.3;
-        const controlX2 = prevStep.position.x + (step.position.x - prevStep.position.x) * 0.7;
-        const controlY2 = prevStep.position.y + (step.position.y - prevStep.position.y) * 0.7;
-        pathData += ` C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${step.position.x} ${step.position.y}`;
-      }
-    });
-    return pathData;
-  };
-
-  const getCompletedPath = () => {
-    if (completedLevels.length === 0) return '';
-    
-    let pathData = '';
-    const lastCompleted = Math.max(...completedLevels);
-    
-    roadmapSteps.slice(0, lastCompleted + 1).forEach((step, index) => {
-      if (index === 0) {
-        pathData += `M ${step.position.x} ${step.position.y}`;
-      } else {
-        const prevStep = roadmapSteps[index - 1];
-        const controlX1 = prevStep.position.x + (step.position.x - prevStep.position.x) * 0.3;
-        const controlY1 = prevStep.position.y + (step.position.y - prevStep.position.y) * 0.3;
-        const controlX2 = prevStep.position.x + (step.position.x - prevStep.position.x) * 0.7;
-        const controlY2 = prevStep.position.y + (step.position.y - prevStep.position.y) * 0.7;
-        pathData += ` C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${step.position.x} ${step.position.y}`;
-      }
-    });
-    return pathData;
+  const getProgressPercentage = (status: string) => {
+    switch (status) {
+      case 'completed': return 100;
+      case 'current': return 75;
+      default: return 0;
+    }
   };
 
   return (
-    <div className="h-screen flex flex-col p-4 relative overflow-hidden">
-      {/* Professional background elements */}
-      <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-slate-200/30 to-gray-300/30 rounded-full blur-xl"></div>
-      <div className="absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-br from-blue-200/30 to-slate-300/30 rounded-full blur-xl"></div>
-      
-      <div className="relative z-10 flex-1 flex flex-col">
-        {/* Roadmap container - takes most of the space */}
-        <div className="flex-1 relative mb-4">
-          {/* Professional SVG with subtle gradients */}
-          <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="pathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#e2e8f0" />
-                <stop offset="50%" stopColor="#cbd5e1" />
-                <stop offset="100%" stopColor="#94a3b8" />
-              </linearGradient>
-              <linearGradient id="completedPathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#475569" />
-                <stop offset="30%" stopColor="#3b82f6" />
-                <stop offset="60%" stopColor="#1e40af" />
-                <stop offset="100%" stopColor="#0f172a" />
-              </linearGradient>
-            </defs>
-            
-            <path
-              d={drawPath()}
-              stroke="url(#pathGradient)"
-              strokeWidth="4"
-              fill="none"
-              strokeDasharray="15,8"
-              strokeLinecap="round"
-              opacity="0.6"
-            />
-            
-            {/* Completed path with professional coloring */}
-            {completedLevels.length > 0 && (
-              <path
-                d={getCompletedPath()}
-                stroke="url(#completedPathGradient)"
-                strokeWidth="6"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            )}
-          </svg>
+    <div className="py-12">
+      {/* Section Header */}
+      <div className="text-center mb-12">
+        <div className="inline-flex items-center px-4 py-2 bg-purple-100/80 rounded-full text-purple-700 text-sm font-medium mb-4 backdrop-blur-sm">
+          🎯 Learning Roadmap
+        </div>
+        <h3 className="text-3xl font-bold text-gray-900 mb-2">Your Learning Journey</h3>
+        <p className="text-gray-600 max-w-2xl mx-auto">Progress through each level to unlock advanced features and build your professional expertise</p>
+      </div>
 
-          {/* Steps with professional styling */}
+      {/* Vertical Roadmap */}
+      <div className="max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {roadmapSteps.map((step, index) => {
             const status = getStepStatus(index);
             const isClickable = status === 'current' || status === 'available' || status === 'completed';
             const isHovered = hoveredStep === index;
+            const progress = getProgressPercentage(status);
 
             return (
               <div
                 key={step.id}
-                className="absolute transform -translate-x-1/2 -translate-y-1/2"
-                style={{
-                  left: `${step.position.x}%`,
-                  top: `${step.position.y}%`
-                }}
+                className="relative"
                 onMouseEnter={() => setHoveredStep(index)}
                 onMouseLeave={() => setHoveredStep(null)}
               >
                 <div
                   onClick={() => isClickable && onStepClick(index)}
                   className={`
-                    relative cursor-pointer
-                    ${isClickable ? 'hover:scale-105' : 'cursor-not-allowed'}
+                    relative p-6 rounded-2xl cursor-pointer transform transition-all duration-300
+                    ${isClickable ? 'hover:scale-105 hover:-translate-y-1' : 'cursor-not-allowed opacity-75'}
+                    ${isHovered ? 'shadow-2xl' : 'shadow-lg'}
+                    bg-white border border-gray-200 backdrop-blur-sm
                   `}
                 >
-                  {/* Professional Step Circle */}
-                  <div className={`
-                    w-20 h-20 rounded-full flex items-center justify-center mb-4 relative
-                    ${getStatusColors(status, isHovered)}
-                  `}>
-                    {getStepIcon(step, status)}
-                    
-                    {/* Success indicator for completed steps */}
-                    {status === 'completed' && (
-                      <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
-                        <CheckCircle className="w-3 h-3 text-white" />
+                  {/* Level Badge */}
+                  <div className="absolute -top-3 -left-3 z-10">
+                    <div className={`
+                      w-12 h-12 rounded-full flex items-center justify-center text-white font-bold shadow-lg
+                      ${getStatusStyles(status, isHovered)}
+                    `}>
+                      {getStepIcon(step, status)}
+                    </div>
+                  </div>
+
+                  {/* Status Badge */}
+                  {status === 'completed' && (
+                    <div className="absolute -top-2 -right-2 z-10">
+                      <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                        <CheckCircle className="w-4 h-4 text-white" />
                       </div>
-                    )}
-                  </div>
-
-                  {/* Professional Step Info Card */}
-                  <div className={`
-                    text-center min-w-max max-w-48 p-4 rounded-xl backdrop-blur-md border
-                    ${isHovered 
-                      ? 'bg-white/95 shadow-xl border-slate-300' 
-                      : 'bg-white/90 border-white/40'
-                    }
-                  `}>
-                    <div className="text-xs font-bold text-slate-600 mb-1 tracking-wide uppercase">
-                      {step.subtitle}
-                    </div>
-                    <div className={`text-sm font-bold mb-2 ${
-                      status === 'locked' ? 'text-slate-400' : 'text-slate-800'
-                    }`}>
-                      {step.title}
-                    </div>
-                    <div className="text-xs text-slate-600 leading-relaxed">
-                      {step.description}
-                    </div>
-                  </div>
-
-                  {/* Professional connection indicators */}
-                  {index < roadmapSteps.length - 1 && status !== 'locked' && (
-                    <div className="absolute top-10 left-16 opacity-50">
-                      <ArrowRight className="w-6 h-6 text-slate-500 drop-shadow-sm" />
                     </div>
                   )}
+
+                  {/* Content */}
+                  <div className="pt-6">
+                    <div className="text-xs font-semibold text-purple-600 uppercase tracking-wider mb-2">
+                      {step.subtitle}
+                    </div>
+                    <h4 className="text-lg font-bold text-gray-900 mb-3 leading-tight">
+                      {step.title}
+                    </h4>
+                    <p className="text-sm text-gray-600 leading-relaxed mb-4">
+                      {step.description}
+                    </p>
+
+                    {/* Progress Bar */}
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+                        <span>Progress</span>
+                        <span>{progress}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className={`h-2 rounded-full transition-all duration-1000 ${
+                            status === 'completed' 
+                              ? 'bg-gradient-to-r from-purple-500 to-purple-600' 
+                              : status === 'current'
+                                ? 'bg-gradient-to-r from-blue-500 to-blue-600'
+                                : 'bg-gray-300'
+                          }`}
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Action Button */}
+                    <button
+                      className={`
+                        w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300
+                        ${status === 'completed'
+                          ? 'bg-purple-100 text-purple-700 hover:bg-purple-200' 
+                          : status === 'current'
+                            ? 'bg-blue-600 text-white hover:bg-blue-700'
+                            : status === 'available'
+                              ? 'bg-gray-600 text-white hover:bg-gray-700'
+                              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }
+                      `}
+                      disabled={!isClickable}
+                    >
+                      {status === 'completed' ? 'Review Level' : 
+                       status === 'current' ? 'Continue' : 
+                       status === 'available' ? 'Begin Level' : 'Locked'}
+                    </button>
+                  </div>
                 </div>
               </div>
             );
           })}
         </div>
 
-        {/* Professional Progress Section at bottom */}
-        <div className="bg-white/95 backdrop-blur-md rounded-xl p-4 shadow-lg border border-white/50 mt-auto">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-base font-bold text-slate-700">
-              Learning Progress
-            </span>
-            <span className="text-xs font-semibold text-white bg-gradient-to-r from-slate-600 to-slate-700 px-3 py-1 rounded-full shadow-sm">
-              {completedLevels.length} of {roadmapSteps.length} completed
-            </span>
-          </div>
-          <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden shadow-inner">
-            <div
-              className="bg-gradient-to-r from-slate-600 to-blue-600 h-3 rounded-full relative shadow-sm transition-all duration-500"
-              style={{ width: `${(completedLevels.length / roadmapSteps.length) * 100}%` }}
-            >
-              <div className="absolute inset-0 bg-white/20 rounded-full"></div>
+        {/* Overall Progress Summary */}
+        <div className="mt-12 bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-gray-200 shadow-lg">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-600 rounded-full flex items-center justify-center">
+                <Trophy className="w-4 h-4 text-white" />
+              </div>
+              <div>
+                <h4 className="font-bold text-gray-900">Learning Progress</h4>
+                <p className="text-sm text-gray-600">Your journey to interview mastery</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-bold text-gray-900">{completedLevels.length}/6</div>
+              <div className="text-sm text-gray-600">Completed</div>
             </div>
           </div>
-        </div>
-
-        {/* Professional Legend */}
-        <div className="flex justify-center space-x-4 mt-4 text-xs">
-          <div className="flex items-center space-x-2 bg-slate-700 text-white px-3 py-1 rounded-lg shadow-sm">
-            <CheckCircle className="w-3 h-3" />
-            <span className="font-medium">Completed</span>
+          
+          <div className="w-full bg-gray-200 rounded-full h-3">
+            <div
+              className="bg-gradient-to-r from-purple-500 to-blue-600 h-3 rounded-full transition-all duration-1000 relative overflow-hidden"
+              style={{ width: `${(completedLevels.length / roadmapSteps.length) * 100}%` }}
+            >
+              <div className="absolute inset-0 bg-white/20 animate-pulse" />
+            </div>
           </div>
-          <div className="flex items-center space-x-2 bg-blue-600 text-white px-3 py-1 rounded-lg shadow-sm">
-            <Circle className="w-3 h-3" />
-            <span className="font-medium">Current</span>
-          </div>
-          <div className="flex items-center space-x-2 bg-slate-500 text-white px-3 py-1 rounded-lg shadow-sm">
-            <Circle className="w-3 h-3" />
-            <span className="font-medium">Available</span>
-          </div>
-          <div className="flex items-center space-x-2 bg-slate-400 text-white px-3 py-1 rounded-lg shadow-sm">
-            <Lock className="w-3 h-3" />
-            <span className="font-medium">Locked</span>
+          
+          <div className="flex justify-between text-xs text-gray-500 mt-2">
+            <span>33% Journey Complete</span>
+            <span>{Math.round((completedLevels.length / roadmapSteps.length) * 100)}% Overall Progress</span>
           </div>
         </div>
       </div>
