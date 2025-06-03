@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useNavigate } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,6 +16,7 @@ interface FormData {
 }
 
 const UserInfoForm: React.FC = () => {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -46,8 +46,9 @@ const UserInfoForm: React.FC = () => {
     if (currentStep < totalSteps) {
       setCurrentStep(prev => prev + 1);
     } else {
-      // Handle form submission
+      // Handle form submission and redirect to main page
       console.log('Form submitted:', formData);
+      navigate('/');
     }
   };
 
