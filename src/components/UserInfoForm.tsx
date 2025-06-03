@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -61,34 +60,34 @@ const UserInfoForm: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 relative overflow-hidden flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-purple-500 to-indigo-600 relative overflow-hidden flex items-center justify-center p-6">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         {/* Floating geometric shapes */}
-        <div className="absolute top-20 left-10 w-64 h-64 bg-blue-200/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-cyan-200/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-200/20 rounded-full blur-3xl animate-pulse delay-500"></div>
+        <div className="absolute top-20 left-10 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse delay-500"></div>
         
         {/* Animated lines */}
-        <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-300/30 to-transparent animate-pulse"></div>
-        <div className="absolute bottom-1/3 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-300/30 to-transparent animate-pulse delay-2000"></div>
+        <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse"></div>
+        <div className="absolute bottom-1/3 left-0 w-full h-px bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse delay-2000"></div>
         
         {/* Floating icons */}
         <div className="absolute top-16 right-1/4 animate-bounce" style={{ animationDelay: '1s', animationDuration: '3s' }}>
-          <Sparkles className="w-8 h-8 text-blue-300/40" />
+          <Sparkles className="w-8 h-8 text-white/40" />
         </div>
         <div className="absolute bottom-1/4 left-1/5 animate-bounce" style={{ animationDelay: '2s', animationDuration: '4s' }}>
-          <Users className="w-6 h-6 text-cyan-300/40" />
+          <Users className="w-6 h-6 text-white/40" />
         </div>
         <div className="absolute top-1/3 right-1/6 animate-bounce" style={{ animationDelay: '3s', animationDuration: '3.5s' }}>
-          <Brain className="w-7 h-7 text-indigo-300/40" />
+          <Brain className="w-7 h-7 text-white/40" />
         </div>
         
         {/* Floating particles */}
         {Array.from({ length: 15 }).map((_, i) => (
           <div
             key={i}
-            className="absolute w-2 h-2 bg-blue-300/30 rounded-full animate-float"
+            className="absolute w-2 h-2 bg-white/30 rounded-full animate-float"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
@@ -102,10 +101,10 @@ const UserInfoForm: React.FC = () => {
       <div className="w-full max-w-2xl relative z-10">
         {/* Proctoverse Header */}
         <div className="text-center mb-12 animate-fade-in">
-          <h1 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-blue-600 via-cyan-600 to-indigo-600 bg-clip-text text-transparent mb-4">
+          <h1 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-white to-purple-200 bg-clip-text text-transparent mb-4">
             Proctoverse
           </h1>
-          <div className="w-32 h-1 bg-gradient-to-r from-blue-400 to-cyan-400 mx-auto rounded-full animate-pulse"></div>
+          <div className="w-32 h-1 bg-gradient-to-r from-white/60 to-purple-200/60 mx-auto rounded-full animate-pulse"></div>
         </div>
 
         {/* Progress indicators */}
@@ -116,17 +115,17 @@ const UserInfoForm: React.FC = () => {
                 key={index}
                 className={`w-3 h-3 rounded-full transition-all duration-500 ${
                   index + 1 === currentStep
-                    ? 'bg-gradient-to-r from-blue-500 to-cyan-500 shadow-lg shadow-blue-500/50 scale-125'
+                    ? 'bg-white shadow-lg shadow-white/50 scale-125'
                     : index + 1 < currentStep
-                    ? 'bg-gradient-to-r from-blue-400 to-cyan-400'
-                    : 'bg-gray-200'
+                    ? 'bg-white/80'
+                    : 'bg-white/30'
                 }`}
               />
             ))}
           </div>
         </div>
 
-        <div className="bg-white/80 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 p-8 md:p-12 animate-scale-in" style={{ animationDelay: '0.4s' }}>
+        <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/50 p-8 md:p-12 animate-scale-in" style={{ animationDelay: '0.4s' }}>
           {currentStep === 1 && (
             <div className="space-y-8">
               <div className="text-center">
@@ -146,7 +145,7 @@ const UserInfoForm: React.FC = () => {
                     placeholder="Enter your name"
                     value={formData.name}
                     onChange={(e) => updateFormData('name', e.target.value)}
-                    className="h-14 text-lg bg-gray-50/50 border-2 border-gray-200 focus:border-blue-400 rounded-xl text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md"
+                    className="h-14 text-lg bg-gray-50/50 border-2 border-gray-200 focus:border-purple-400 rounded-xl text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md"
                   />
                 </div>
 
@@ -160,7 +159,7 @@ const UserInfoForm: React.FC = () => {
                     placeholder="Enter your email address"
                     value={formData.email}
                     onChange={(e) => updateFormData('email', e.target.value)}
-                    className="h-14 text-lg bg-gray-50/50 border-2 border-gray-200 focus:border-blue-400 rounded-xl text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md"
+                    className="h-14 text-lg bg-gray-50/50 border-2 border-gray-200 focus:border-purple-400 rounded-xl text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md"
                   />
                 </div>
 
@@ -174,7 +173,7 @@ const UserInfoForm: React.FC = () => {
                     placeholder="Enter your phone number"
                     value={formData.phone}
                     onChange={(e) => updateFormData('phone', e.target.value)}
-                    className="h-14 text-lg bg-gray-50/50 border-2 border-gray-200 focus:border-blue-400 rounded-xl text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md"
+                    className="h-14 text-lg bg-gray-50/50 border-2 border-gray-200 focus:border-purple-400 rounded-xl text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md"
                   />
                 </div>
               </div>
@@ -199,7 +198,7 @@ const UserInfoForm: React.FC = () => {
                     placeholder="List your technical skills (e.g., JavaScript, React, Python, etc.)"
                     value={formData.skills}
                     onChange={(e) => updateFormData('skills', e.target.value)}
-                    className="min-h-[120px] text-lg bg-gray-50/50 border-2 border-gray-200 focus:border-blue-400 rounded-xl resize-none text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md"
+                    className="min-h-[120px] text-lg bg-gray-50/50 border-2 border-gray-200 focus:border-purple-400 rounded-xl resize-none text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md"
                   />
                 </div>
 
@@ -212,7 +211,7 @@ const UserInfoForm: React.FC = () => {
                     placeholder="Describe your work experience and projects"
                     value={formData.experience}
                     onChange={(e) => updateFormData('experience', e.target.value)}
-                    className="min-h-[120px] text-lg bg-gray-50/50 border-2 border-gray-200 focus:border-blue-400 rounded-xl resize-none text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md"
+                    className="min-h-[120px] text-lg bg-gray-50/50 border-2 border-gray-200 focus:border-purple-400 rounded-xl resize-none text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md"
                   />
                 </div>
 
@@ -220,13 +219,13 @@ const UserInfoForm: React.FC = () => {
                   <Label htmlFor="cv" className="text-lg font-medium text-gray-700 mb-3 block">
                     Upload your CV
                   </Label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 hover:border-blue-400 transition-all duration-300 bg-gray-50/50 backdrop-blur-sm hover:shadow-md">
+                  <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 hover:border-purple-400 transition-all duration-300 bg-gray-50/50 backdrop-blur-sm hover:shadow-md">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <Button
                           type="button"
                           onClick={() => document.getElementById('cv-upload')?.click()}
-                          className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-6 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105"
+                          className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white px-6 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105"
                         >
                           Choose file
                         </Button>
@@ -255,7 +254,7 @@ const UserInfoForm: React.FC = () => {
                     placeholder="Paste the job description you're applying for"
                     value={formData.jobDescription}
                     onChange={(e) => updateFormData('jobDescription', e.target.value)}
-                    className="min-h-[120px] text-lg bg-gray-50/50 border-2 border-gray-200 focus:border-blue-400 rounded-xl resize-none text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md"
+                    className="min-h-[120px] text-lg bg-gray-50/50 border-2 border-gray-200 focus:border-purple-400 rounded-xl resize-none text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md"
                   />
                 </div>
               </div>
@@ -282,7 +281,7 @@ const UserInfoForm: React.FC = () => {
                 (currentStep === 1 && !canProceedStep1) ||
                 (currentStep === 2 && !canProceedStep2)
               }
-              className="bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 disabled:from-gray-400 disabled:to-gray-500 text-white px-8 py-3 text-lg rounded-full flex items-center space-x-2 min-w-[140px] justify-center shadow-lg shadow-blue-500/25 transition-all duration-300 hover:scale-105 disabled:hover:scale-100"
+              className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 disabled:from-gray-400 disabled:to-gray-500 text-white px-8 py-3 text-lg rounded-full flex items-center space-x-2 min-w-[140px] justify-center shadow-lg shadow-purple-500/25 transition-all duration-300 hover:scale-105 disabled:hover:scale-100"
             >
               <span>{currentStep === totalSteps ? 'Complete' : 'Continue'}</span>
               <ArrowRight className="w-5 h-5" />

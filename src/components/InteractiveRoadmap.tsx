@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { CheckCircle, Circle, Lock, Target, Zap, Star, Trophy, User, GraduationCap } from 'lucide-react';
+import { CheckCircle, Circle, Lock, Target, Zap, Star, Trophy, User, GraduationCap, Award } from 'lucide-react';
 
 interface RoadmapStep {
   id: number;
@@ -15,12 +15,14 @@ interface InteractiveRoadmapProps {
   currentLevel: number;
   completedLevels: number[];
   onStepClick: (index: number) => void;
+  levelCredits: { [key: number]: number };
 }
 
 const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
   currentLevel,
   completedLevels,
-  onStepClick
+  onStepClick,
+  levelCredits
 }) => {
   const [hoveredStep, setHoveredStep] = useState<number | null>(null);
 
@@ -104,9 +106,9 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
       case 'completed':
         return `${baseClasses} bg-gradient-to-br from-green-500 to-emerald-600 border-green-400`;
       case 'current':
-        return `${baseClasses} bg-gradient-to-br from-blue-500 to-indigo-600 border-blue-400 ring-4 ring-blue-200 animate-pulse-glow`;
+        return `${baseClasses} bg-gradient-to-br from-purple-500 to-indigo-600 border-purple-400 ring-4 ring-purple-200 animate-pulse-glow`;
       case 'available':
-        return `${baseClasses} bg-gradient-to-br from-slate-400 to-slate-500 border-slate-300 ${isHovered ? 'bg-gradient-to-br from-slate-500 to-slate-600 animate-bounce-subtle' : ''}`;
+        return `${baseClasses} bg-gradient-to-br from-purple-300 to-indigo-400 border-purple-300 ${isHovered ? 'bg-gradient-to-br from-purple-400 to-indigo-500 animate-bounce-subtle' : ''}`;
       default:
         return `${baseClasses} bg-gradient-to-br from-gray-300 to-gray-400 border-gray-200`;
     }
@@ -124,11 +126,11 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
     <div className="py-12">
       {/* Section Header */}
       <div className="text-center mb-12 animate-fade-in">
-        <div className="inline-flex items-center px-4 py-2 bg-blue-100/80 rounded-full text-blue-700 text-sm font-medium mb-4 backdrop-blur-sm animate-bounce-subtle">
+        <div className="inline-flex items-center px-4 py-2 bg-white/20 rounded-full text-white text-sm font-medium mb-4 backdrop-blur-sm animate-bounce-subtle">
           🎯 Learning Roadmap
         </div>
-        <h3 className="text-3xl font-bold text-gray-900 mb-2 animate-slide-up">Your Learning Journey</h3>
-        <p className="text-gray-600 max-w-2xl mx-auto animate-slide-up" style={{ animationDelay: '200ms' }}>Progress through each level to unlock advanced features and build your professional expertise</p>
+        <h3 className="text-3xl font-bold text-white mb-2 animate-slide-up">Your Learning Journey</h3>
+        <p className="text-purple-100 max-w-2xl mx-auto animate-slide-up" style={{ animationDelay: '200ms' }}>Progress through each level to unlock advanced features and build your professional expertise</p>
       </div>
 
       {/* Vertical Roadmap */}
@@ -139,6 +141,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
             const isClickable = status === 'current' || status === 'available' || status === 'completed';
             const isHovered = hoveredStep === index;
             const progress = getProgressPercentage(status);
+            const credits = levelCredits[index] || 0;
 
             return (
               <div
@@ -154,8 +157,8 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                     relative p-6 rounded-2xl cursor-pointer transform transition-all duration-500
                     ${isClickable ? 'hover:scale-105 hover:-translate-y-2 hover:rotate-1' : 'cursor-not-allowed opacity-75'}
                     ${isHovered ? 'shadow-2xl animate-wiggle' : 'shadow-lg'}
-                    bg-white border border-gray-200 backdrop-blur-sm
-                    hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50
+                    bg-white/90 border border-white/50 backdrop-blur-sm
+                    hover:bg-white/95
                   `}
                 >
                   {/* Floating particles for completed levels */}
@@ -178,9 +181,17 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                     </div>
                   </div>
 
+                  {/* Credits Badge */}
+                  <div className="absolute -top-2 -right-2 z-10">
+                    <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full px-2 py-1 flex items-center space-x-1 shadow-lg">
+                      <Award className="w-3 h-3 text-white" />
+                      <span className="text-white text-xs font-bold">{credits}</span>
+                    </div>
+                  </div>
+
                   {/* Status Badge */}
                   {status === 'completed' && (
-                    <div className="absolute -top-2 -right-2 z-10">
+                    <div className="absolute top-1 right-1 z-10">
                       <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center animate-pulse">
                         <CheckCircle className="w-4 h-4 text-white" />
                       </div>
@@ -189,7 +200,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
 
                   {/* Content */}
                   <div className="pt-6">
-                    <div className="text-xs font-semibold text-blue-600 uppercase tracking-wider mb-2 animate-slide-left">
+                    <div className="text-xs font-semibold text-purple-600 uppercase tracking-wider mb-2 animate-slide-left">
                       {step.subtitle}
                     </div>
                     <h4 className="text-lg font-bold text-gray-900 mb-3 leading-tight animate-slide-up" style={{ animationDelay: '100ms' }}>
@@ -211,7 +222,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                             status === 'completed' 
                               ? 'bg-gradient-to-r from-green-500 to-emerald-600' 
                               : status === 'current'
-                                ? 'bg-gradient-to-r from-blue-500 to-indigo-600'
+                                ? 'bg-gradient-to-r from-purple-500 to-indigo-600'
                                 : 'bg-gray-300'
                           }`}
                           style={{ width: `${progress}%` }}
@@ -226,9 +237,9 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                         ${status === 'completed'
                           ? 'bg-green-100 text-green-700 hover:bg-green-200 hover:scale-105' 
                           : status === 'current'
-                            ? 'bg-blue-600 text-white hover:bg-blue-700 hover:scale-105 animate-pulse-glow'
+                            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 hover:scale-105 animate-pulse-glow'
                             : status === 'available'
-                              ? 'bg-slate-600 text-white hover:bg-slate-700 hover:scale-105'
+                              ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600 hover:scale-105'
                               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                         }
                         ${isHovered && isClickable ? 'animate-bounce-subtle' : ''}
@@ -247,33 +258,33 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
         </div>
 
         {/* Overall Progress Summary */}
-        <div className="mt-12 bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-gray-200 shadow-lg animate-fade-in transform transition-all duration-500 hover:scale-105" style={{ animationDelay: '600ms' }}>
+        <div className="mt-12 bg-white/20 backdrop-blur-md rounded-2xl p-6 border border-white/30 shadow-lg animate-fade-in transform transition-all duration-500 hover:scale-105" style={{ animationDelay: '600ms' }}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center animate-spin-slow">
+              <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full flex items-center justify-center animate-spin-slow">
                 <Trophy className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h4 className="font-bold text-gray-900 animate-slide-right">Learning Progress</h4>
-                <p className="text-sm text-gray-600 animate-slide-right" style={{ animationDelay: '100ms' }}>Your journey to interview mastery</p>
+                <h4 className="font-bold text-white animate-slide-right">Learning Progress</h4>
+                <p className="text-sm text-purple-200 animate-slide-right" style={{ animationDelay: '100ms' }}>Your journey to interview mastery</p>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold text-gray-900 animate-scale-in">{completedLevels.length}/6</div>
-              <div className="text-sm text-gray-600 animate-scale-in" style={{ animationDelay: '100ms' }}>Completed</div>
+              <div className="text-2xl font-bold text-white animate-scale-in">{completedLevels.length}/6</div>
+              <div className="text-sm text-purple-200 animate-scale-in" style={{ animationDelay: '100ms' }}>Completed</div>
             </div>
           </div>
           
-          <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+          <div className="w-full bg-white/20 rounded-full h-3 overflow-hidden">
             <div
-              className="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full transition-all duration-1000 relative overflow-hidden animate-shimmer"
+              className="bg-gradient-to-r from-purple-400 to-indigo-500 h-3 rounded-full transition-all duration-1000 relative overflow-hidden animate-shimmer"
               style={{ width: `${(completedLevels.length / roadmapSteps.length) * 100}%` }}
             >
               <div className="absolute inset-0 bg-white/20 animate-pulse" />
             </div>
           </div>
           
-          <div className="flex justify-between text-xs text-gray-500 mt-2">
+          <div className="flex justify-between text-xs text-purple-200 mt-2">
             <span className="animate-fade-in">Journey Progress</span>
             <span className="animate-fade-in" style={{ animationDelay: '200ms' }}>{Math.round((completedLevels.length / roadmapSteps.length) * 100)}% Complete</span>
           </div>
