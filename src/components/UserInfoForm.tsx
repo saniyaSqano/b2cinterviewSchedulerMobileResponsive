@@ -69,12 +69,12 @@ const UserInfoForm: React.FC = () => {
         {Array.from({ length: 20 }).map((_, i) => (
           <div
             key={i}
-            className="absolute w-2 h-2 bg-white/20 rounded-full animate-float"
+            className="absolute w-2 h-2 bg-white/20 rounded-full"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${3 + Math.random() * 4}s`
+              animation: `float ${3 + Math.random() * 4}s ease-in-out infinite`,
+              animationDelay: `${Math.random() * 5}s`
             }}
           ></div>
         ))}
@@ -271,18 +271,6 @@ const UserInfoForm: React.FC = () => {
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) translateX(0px); }
-          25% { transform: translateY(-10px) translateX(5px); }
-          50% { transform: translateY(-20px) translateX(-5px); }
-          75% { transform: translateY(-10px) translateX(10px); }
-        }
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-      `}</style>
     </div>
   );
 };
