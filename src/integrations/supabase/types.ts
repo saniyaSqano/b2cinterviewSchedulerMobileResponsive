@@ -77,7 +77,6 @@ export type Database = {
           policies_accepted: boolean
           self_practice_report: string | null
           updated_at: string
-          user_id: string
         }
         Insert: {
           ai_proctor_report?: string | null
@@ -92,7 +91,6 @@ export type Database = {
           policies_accepted?: boolean
           self_practice_report?: string | null
           updated_at?: string
-          user_id: string
         }
         Update: {
           ai_proctor_report?: string | null
@@ -107,7 +105,6 @@ export type Database = {
           policies_accepted?: boolean
           self_practice_report?: string | null
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }

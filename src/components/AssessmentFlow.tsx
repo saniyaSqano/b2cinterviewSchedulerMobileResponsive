@@ -1,7 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
+import { useAiProctoUser } from '../hooks/useAiProctoUser';
 import { ChevronLeft, ChevronRight, Upload, Calendar, Clock, FileText } from 'lucide-react';
 import { Button } from './ui/button';
+import { v4 as uuidv4 } from 'uuid';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
@@ -41,6 +43,8 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack, onTestPassed })
   const [showTest, setShowTest] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [testResults, setTestResults] = useState<any>(null);
+  const [saveStatus, setSaveStatus] = useState<string | null>(null);
+  const { createUser, updateUserReport, loading, error } = useAiProctoUser();
   const [formData, setFormData] = useState<FormData>({
     fullName: '',
     email: '',
@@ -98,9 +102,58 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack, onTestPassed })
     }
   };
 
-  const handleStartTest = () => {
+  const handleStartTest = async () => {
     console.log('Starting test with data:', formData);
-    setShowTest(true);
+    setIsTransitioning(true);
+    
+    try {
+      // Validate required fields
+      if (!formData.email || !formData.fullName) {
+        throw new Error('Email and full name are required');
+      }
+      
+      // Store email in localStorage for later use with reports
+      setFormData(prev => ({
+        ...prev
+      }));
+      
+      const userData = {
+        email: formData.email,
+        password_hash: 'placeholder', // Using a placeholder since empty string might cause issues
+        first_name: formData.fullName.split(' ')[0], // Extract first name
+        last_name: formData.fullName.split(' ').slice(1).join(' '), // Extract last name
+        policies_accepted: true
+      };
+      
+      console.log('Attempting to save user data:', userData);
+      
+      // Save user data to Supabase
+      const result = await createUser(userData);
+      console.log('Supabase response:', result);
+      
+      // Store the user data in localStorage for persistence across components
+      localStorage.setItem('currentUserData', JSON.stringify({
+        email: formData.email,
+        fullName: formData.fullName
+      }));
+      
+      setSaveStatus('User data saved successfully!');
+      
+      // Show success feedback for 1.5 seconds before starting the test
+      setTimeout(() => {
+        setIsTransitioning(false);
+        setShowTest(true);
+      }, 1500);
+    } catch (err) {
+      console.error('Error saving user data:', err);
+      setSaveStatus(`Error saving user data: ${err.message || 'Unknown error'}`);
+      setIsTransitioning(false);
+      
+      // Still allow the test to start after showing error message for 2 seconds
+      setTimeout(() => {
+        setShowTest(true);
+      }, 2000);
+    }
   };
 
   const handleTestComplete = (results: any) => {
@@ -125,6 +178,23 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack, onTestPassed })
   const handleRetakeTest = () => {
     setShowReport(false);
     setShowTest(true);
+  };
+
+  // Render feedback message when saving user data
+  const renderFeedbackMessage = () => {
+    if (!saveStatus) return null;
+    
+    const isError = saveStatus.includes('Error');
+    const bgColor = isError ? 'bg-red-100' : 'bg-green-100';
+    const textColor = isError ? 'text-red-700' : 'text-green-700';
+    const borderColor = isError ? 'border-red-300' : 'border-green-300';
+    const icon = isError ? '⚠️' : '✅';
+    
+    return (
+      <div className={`${bgColor} ${textColor} ${borderColor} border p-4 rounded-md mb-6 animate-fade-in text-center`}>
+        <p className="font-medium">{icon} {saveStatus}</p>
+      </div>
+    );
   };
 
   // If showing test report, render TestReport component
@@ -154,6 +224,7 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack, onTestPassed })
     <div className={`max-w-2xl mx-auto text-center space-y-8 transition-all duration-500 ease-in-out ${
       isTransitioning ? 'opacity-0 transform translate-x-8' : 'opacity-100 transform translate-x-0'
     }`}>
+      {saveStatus && renderFeedbackMessage()}
       <div className="mb-12 animate-fade-in">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">Help us personalize your experience</h1>
       </div>

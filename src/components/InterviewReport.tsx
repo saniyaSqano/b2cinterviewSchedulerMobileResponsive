@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, User, Code, Shield, Star, Users, MessageCircle, Zap, AlertTriangle, CheckCircle, Award, XCircle, TrendingUp, BarChart3, Upload, Check } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
@@ -7,6 +7,7 @@ import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, RadarChart, PolarGrid
 import { uploadToS3, uploadPitchPerfectToS3 } from '../utils/s3Service';
 import { supabase } from '../integrations/supabase/client';
 import jsPDF from 'jspdf';
+import { v4 as uuidv4 } from 'uuid';
 
 interface ViolationLog {
   id: number;
@@ -46,6 +47,21 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
   onBack,
   reportType = 'ai_proctor'
 }) => {
+  // Try to retrieve stored user data from localStorage
+  const [storedUserData, setStoredUserData] = useState<{email: string, fullName: string} | null>(null);
+  
+  useEffect(() => {
+    try {
+      const storedData = localStorage.getItem('currentUserData');
+      if (storedData) {
+        const parsedData = JSON.parse(storedData);
+        console.log('Retrieved user data from localStorage:', parsedData);
+        setStoredUserData(parsedData);
+      }
+    } catch (error) {
+      console.error('Error retrieving user data from localStorage:', error);
+    }
+  }, []);
   // Report states
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -55,7 +71,20 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
   // Function to save report URL to Supabase
   const saveReportToDatabase = async (reportUrl: string, reportType: string) => {
     try {
-      console.log('Saving report to database...', { reportUrl, reportType, email: candidateDetails.email });
+      // Use stored user data if available, otherwise fall back to candidateDetails
+      const email = storedUserData?.email || candidateDetails.email;
+      const fullName = storedUserData?.fullName || candidateDetails.fullName;
+      
+      console.log('Saving report to database...', { 
+        reportUrl, 
+        reportType, 
+        email, 
+        fullName
+      });
+      
+      if (!email) {
+        throw new Error('Cannot save report: No email address provided');
+      }
       
       // Map report type to column name
       const columnMap: Record<string, string> = {
@@ -66,24 +95,102 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
       };
       
       const columnName = columnMap[reportType];
+      console.log('Column mapping details:', { reportType, mappedColumn: columnName });
+      
       if (!columnName) {
         throw new Error(`Unknown report type: ${reportType}`);
       }
       
-      // Update the user's record with the report URL
-      const { data, error } = await supabase
+      // Check if the user exists by email
+      const { data: existingUser, error: fetchError } = await supabase
         .from('ai_procto_users')
-        .update({ [columnName]: reportUrl })
-        .eq('email', candidateDetails.email)
-        .select();
-      
-      if (error) {
-        console.error('Error saving report to database:', error);
-        throw error;
+        .select('*')
+        .eq('email', email)
+        .single();
+        
+      if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 is 'not found'
+        console.error('Error fetching user:', fetchError);
+        throw fetchError;
       }
       
-      console.log('Report saved to database successfully:', data);
-      return data;
+      let result;
+      
+      if (!existingUser) {
+        // User doesn't exist, create a new user with the report URL
+        console.log('User not found, creating new user with report...');
+        
+        // No need to generate a user_id anymore since we're using email as the primary identifier
+        console.log('Creating new user with email:', email);
+        
+        console.log('Creating new user with report data:', {
+          email,
+          columnName,
+          reportUrl,
+          dynamicInsert: { [columnName]: reportUrl }
+        });
+        
+        // Generate a UUID for user_id since it's still required in the database schema
+        const userId = uuidv4();
+        console.log('Generated UUID for user_id in report component:', userId);
+        
+        const userData = {
+          user_id: userId, // Using UUID since it's still required in the database schema
+          email: email,
+          first_name: fullName.split(' ')[0],
+          last_name: fullName.split(' ').slice(1).join(' '),
+          password_hash: 'placeholder',
+          policies_accepted: true,
+          [columnName]: reportUrl,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        
+        console.log('Full user data being inserted:', userData);
+        
+        const { data, error } = await supabase
+          .from('ai_procto_users')
+          .insert(userData)
+          .select()
+          .single();
+          
+        if (error) {
+          console.error('Error creating user with report:', error);
+          throw error;
+        }
+        
+        result = data;
+      } else {
+        // If user exists, update the report URL
+        console.log('User found, updating with report URL...');
+        
+        // Create an update query using email as the identifier
+        console.log('Updating user record with:', {
+          email,
+          columnName,
+          reportUrl,
+          dynamicUpdate: { [columnName]: reportUrl }
+        });
+        
+        let updateQuery = supabase
+          .from('ai_procto_users')
+          .update({
+            [columnName]: reportUrl,
+            updated_at: new Date().toISOString()
+          })
+          .eq('email', email);
+        
+        const { data, error } = await updateQuery.select().single();
+        
+        if (error) {
+          console.error('Error updating user with report:', error);
+          throw error;
+        }
+        
+        result = data;
+      }
+      
+      console.log('Report saved to database successfully:', result);
+      return result;
     } catch (error) {
       console.error('Failed to save report to database:', error);
       throw error;
@@ -217,14 +324,27 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
       console.log(`${reportType} report uploaded to S3:`, s3Url);
       
       // Save the report URL to the database
-      await saveReportToDatabase(s3Url, reportType);
-      
-      // Update state with success and URL
-      setUploadSuccess(true);
-      setUploadUrl(s3Url);
-      console.log('Report generated, downloaded, uploaded, and saved to database successfully');
+      try {
+        console.log(`Attempting to save ${reportType} report to database with URL:`, s3Url);
+        console.log('Report type:', reportType);
+        console.log('Column mapping:', reportType === 'pitch_perfect' ? 'pitch_perfect_report' : 'other column');
+        
+        const savedData = await saveReportToDatabase(s3Url, reportType);
+        
+        // Update state with success and URL
+        setUploadSuccess(true);
+        setUploadUrl(s3Url);
+        console.log('Report generated, downloaded, uploaded, and saved to database successfully', savedData);
+        
+        // Show a success notification to the user
+        alert(`Report successfully saved to database for ${candidateDetails.fullName}!`);
+      } catch (dbError) {
+        console.error('Error saving report to database:', dbError);
+        alert(`Report generated and uploaded to S3, but there was an error saving to the database: ${dbError.message}`);
+      }
     } catch (error) {
       console.error('Error generating and uploading PDF report:', error);
+      alert(`Error generating report: ${error.message}`);
     } finally {
       setIsUploading(false);
     }

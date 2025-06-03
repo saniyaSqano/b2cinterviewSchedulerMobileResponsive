@@ -1,10 +1,10 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '../integrations/supabase/client';
+import { v4 as uuidv4 } from 'uuid';
 
 interface AiProctoUser {
   id: number;
-  user_id: string;
   email: string;
   first_name?: string;
   last_name?: string;
@@ -19,7 +19,6 @@ interface AiProctoUser {
 }
 
 interface CreateUserData {
-  user_id: string;
   email: string;
   password_hash: string;
   first_name?: string;
@@ -68,16 +67,48 @@ export const useAiProctoUser = (email?: string) => {
     setError(null);
     
     try {
-      const { data, error } = await supabase
-        .from('ai_procto_users')
-        .insert(userData)
-        .select()
-        .single();
-
-      if (error) throw error;
+      console.log('Creating user with data:', userData);
       
-      setUser(data);
-      return data;
+      // Add timestamps if not provided
+      const now = new Date().toISOString();
+      
+      // No longer need to generate a UUID for user_id as the column has been removed
+      
+      // Add timestamps to the user data
+      const userDataWithTimestamps = { 
+        ...userData, 
+        created_at: now, 
+        updated_at: now, 
+        policies_accepted: userData.policies_accepted ?? true
+      };
+      
+      console.log('Sending to Supabase:', userDataWithTimestamps);
+      
+      try {
+        const { data, error } = await supabase
+          .from('ai_procto_users')
+          .insert(userDataWithTimestamps)
+          .select()
+          .single();
+        
+        if (error) {
+          console.error('Supabase error details:', {
+            code: error.code,
+            message: error.message,
+            details: error.details,
+            hint: error.hint
+          });
+          throw error;
+        }
+        
+        console.log('User created successfully:', data);
+        setUser(data);
+        return data;
+      } catch (insertError) {
+        console.error('Detailed insert error:', insertError);
+        setError(insertError instanceof Error ? insertError.message : 'Failed to create user');
+        throw insertError;
+      }
     } catch (err) {
       console.error('Error creating user:', err);
       setError(err instanceof Error ? err.message : 'Failed to create user');
