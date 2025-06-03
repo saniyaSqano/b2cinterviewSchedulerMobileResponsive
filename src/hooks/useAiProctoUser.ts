@@ -15,6 +15,16 @@ interface AiProctoUser {
   policies_accepted: boolean;
   created_at: string;
   updated_at: string;
+  password_hash: string;
+}
+
+interface CreateUserData {
+  user_id: string;
+  email: string;
+  password_hash: string;
+  first_name?: string;
+  last_name?: string;
+  policies_accepted?: boolean;
 }
 
 export const useAiProctoUser = (email?: string) => {
@@ -53,14 +63,14 @@ export const useAiProctoUser = (email?: string) => {
     }
   };
 
-  const createUser = async (userData: Partial<AiProctoUser>) => {
+  const createUser = async (userData: CreateUserData) => {
     setLoading(true);
     setError(null);
     
     try {
       const { data, error } = await supabase
         .from('ai_procto_users')
-        .insert([userData])
+        .insert(userData)
         .select()
         .single();
 
