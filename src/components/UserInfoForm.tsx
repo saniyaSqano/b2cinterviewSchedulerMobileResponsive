@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -48,9 +47,9 @@ const UserInfoForm: React.FC = () => {
     if (currentStep < totalSteps) {
       setCurrentStep(prev => prev + 1);
     } else {
-      // Handle form submission and redirect to main page
+      // Handle form submission and redirect to levels page
       console.log('Form submitted:', formData);
-      navigate('/');
+      navigate('/levels');
     }
   };
 
