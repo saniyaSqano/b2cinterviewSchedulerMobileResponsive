@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Sparkles, Target, Zap } from 'lucide-react';
 import ParticleBackground from '../components/ParticleBackground';
 import AssessmentFlow from '../components/AssessmentFlow';
 import ChatFlow from '../components/ChatFlow';
@@ -201,57 +201,39 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Enhanced animated background with AI-themed elements */}
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-cyan-50">
+      {/* Enhanced animated background with light theme */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* Dynamic neural network pattern */}
-        <div className="absolute inset-0">
-          {/* Neural network nodes */}
-          {Array.from({ length: 12 }).map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-2 h-2 bg-cyan-400/40 rounded-full animate-pulse"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${i * 0.3}s`,
-                animationDuration: `${2 + Math.random() * 2}s`
-              }}
-            />
-          ))}
-          
-          {/* AI circuit patterns */}
-          <div className="absolute top-20 left-10 w-64 h-64 opacity-10">
-            <div className="w-full h-full border border-cyan-400/30 rounded-lg animate-pulse" style={{ animationDuration: '4s' }}>
-              <div className="absolute top-4 left-4 w-8 h-8 border border-cyan-400/40 rounded animate-spin" style={{ animationDuration: '8s' }}></div>
-              <div className="absolute bottom-4 right-4 w-12 h-12 border border-purple-400/40 rounded-lg animate-bounce" style={{ animationDuration: '3s' }}></div>
-            </div>
-          </div>
-          
-          {/* Floating data streams */}
-          <div className="absolute top-1/3 right-10 w-1 h-32 bg-gradient-to-b from-transparent via-cyan-400/30 to-transparent animate-pulse" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute bottom-1/3 left-1/4 w-1 h-24 bg-gradient-to-b from-transparent via-purple-400/30 to-transparent animate-pulse" style={{ animationDelay: '2s' }}></div>
+        {/* Floating geometric shapes */}
+        <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-blue-200/20 via-cyan-200/15 to-indigo-200/20 rounded-full blur-3xl animate-pulse opacity-70" style={{ animationDuration: '6s' }}></div>
+        <div className="absolute top-40 right-20 w-80 h-80 bg-gradient-to-r from-cyan-200/15 via-blue-200/20 to-indigo-200/15 rounded-full blur-2xl animate-pulse opacity-60" style={{ animationDelay: '2s', animationDuration: '8s' }}></div>
+        <div className="absolute bottom-32 left-1/4 w-72 h-72 bg-gradient-to-r from-indigo-200/15 via-cyan-200/20 to-blue-200/15 rounded-full blur-3xl animate-pulse opacity-50" style={{ animationDelay: '4s', animationDuration: '10s' }}></div>
+        
+        {/* Animated tech elements */}
+        <div className="absolute top-16 right-1/4 w-24 h-24 border-2 border-blue-300/20 rounded-lg animate-spin opacity-30" style={{ animationDuration: '20s' }}></div>
+        <div className="absolute bottom-1/4 left-1/5 w-20 h-20 border-2 border-cyan-300/25 rounded-full animate-spin opacity-40" style={{ animationDuration: '15s', animationDirection: 'reverse' }}></div>
+        <div className="absolute top-1/2 right-1/3 w-16 h-16 border border-blue-200/20 transform rotate-45 animate-pulse opacity-25" style={{ animationDuration: '3s' }}></div>
+        
+        {/* Animated gradient lines */}
+        <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-300/30 to-transparent animate-pulse opacity-60" style={{ animationDuration: '4s' }}></div>
+        <div className="absolute bottom-1/3 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-300/30 to-transparent animate-pulse opacity-50" style={{ animationDelay: '2s', animationDuration: '5s' }}></div>
+        
+        {/* Floating icons */}
+        <div className="absolute top-1/6 left-1/6 animate-bounce" style={{ animationDelay: '1s', animationDuration: '3s' }}>
+          <Sparkles className="w-8 h-8 text-blue-300/40" />
         </div>
-
-        {/* Enhanced gradient orbs with glow effects */}
-        <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-purple-600/20 via-cyan-500/15 to-blue-600/20 rounded-full blur-3xl animate-pulse opacity-70" style={{ animationDuration: '6s' }}></div>
-        <div className="absolute top-40 right-20 w-80 h-80 bg-gradient-to-r from-cyan-500/15 via-purple-600/20 to-indigo-600/15 rounded-full blur-2xl animate-pulse opacity-60" style={{ animationDelay: '2s', animationDuration: '8s' }}></div>
-        <div className="absolute bottom-32 left-1/4 w-72 h-72 bg-gradient-to-r from-indigo-600/15 via-cyan-400/20 to-purple-600/15 rounded-full blur-3xl animate-pulse opacity-50" style={{ animationDelay: '4s', animationDuration: '10s' }}></div>
-        
-        {/* AI-themed geometric shapes */}
-        <div className="absolute top-16 right-1/4 w-24 h-24 border-2 border-cyan-400/20 rounded-lg animate-spin opacity-30" style={{ animationDuration: '20s' }}></div>
-        <div className="absolute bottom-1/4 left-1/5 w-20 h-20 border-2 border-purple-400/25 rounded-full animate-spin opacity-40" style={{ animationDuration: '15s', animationDirection: 'reverse' }}></div>
-        <div className="absolute top-1/2 right-1/3 w-16 h-16 border border-cyan-300/20 transform rotate-45 animate-pulse opacity-25" style={{ animationDuration: '3s' }}></div>
-        
-        {/* Animated gradient lines representing data flow */}
-        <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent animate-pulse opacity-60" style={{ animationDuration: '4s' }}></div>
-        <div className="absolute bottom-1/3 left-0 w-full h-px bg-gradient-to-r from-transparent via-purple-400/30 to-transparent animate-pulse opacity-50" style={{ animationDelay: '2s', animationDuration: '5s' }}></div>
+        <div className="absolute bottom-1/4 right-1/5 animate-bounce" style={{ animationDelay: '2s', animationDuration: '4s' }}>
+          <Target className="w-6 h-6 text-cyan-300/40" />
+        </div>
+        <div className="absolute top-1/3 left-3/4 animate-bounce" style={{ animationDelay: '3s', animationDuration: '3.5s' }}>
+          <Zap className="w-7 h-7 text-indigo-300/40" />
+        </div>
         
         {/* Floating tech particles */}
         {Array.from({ length: 8 }).map((_, i) => (
           <div
             key={`particle-${i}`}
-            className="absolute w-1 h-1 bg-cyan-400/60 rounded-full animate-bounce opacity-70"
+            className="absolute w-1 h-1 bg-blue-400/60 rounded-full animate-bounce opacity-70"
             style={{
               left: `${20 + i * 12}%`,
               top: `${30 + (i % 3) * 20}%`,
@@ -265,54 +247,54 @@ const Index = () => {
       <ParticleBackground />
       
       <div className="relative z-10 min-h-screen">
-        {/* Enhanced header with AI glow effects */}
-        <div className="bg-gradient-to-r from-slate-900/95 via-purple-900/90 to-slate-900/95 backdrop-blur-lg border-b border-cyan-400/20 text-center py-12 relative overflow-hidden">
+        {/* Enhanced header with light theme */}
+        <div className="bg-gradient-to-r from-white/95 via-blue-50/90 to-white/95 backdrop-blur-lg border-b border-blue-200/30 text-center py-12 relative overflow-hidden">
           {/* Header background animation */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-500/5 to-transparent animate-pulse" style={{ animationDuration: '3s' }}></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-100/20 to-transparent animate-pulse" style={{ animationDuration: '3s' }}></div>
           
           <div className="max-w-4xl mx-auto px-6 relative">
-            <h1 className="text-6xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-6 leading-tight animate-fade-in relative">
+            <h1 className="text-6xl font-bold bg-gradient-to-r from-blue-600 via-cyan-600 to-indigo-600 bg-clip-text text-transparent mb-6 leading-tight animate-fade-in relative">
               Proctoverse
               {/* Glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/20 via-purple-400/20 to-blue-400/20 blur-xl -z-10 animate-pulse"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-400/20 via-cyan-400/20 to-indigo-400/20 blur-xl -z-10 animate-pulse"></div>
             </h1>
-            <p className="text-xl text-cyan-100/80 max-w-3xl mx-auto leading-relaxed animate-fade-in font-light" style={{ animationDelay: '0.3s' }}>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed animate-fade-in font-light" style={{ animationDelay: '0.3s' }}>
               Experience the future of skill assessment through AI-powered learning paths and intelligent evaluation systems
             </p>
             
             {/* AI badge */}
-            <div className="mt-6 inline-flex items-center px-4 py-2 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-full border border-cyan-400/30 animate-fade-in" style={{ animationDelay: '0.6s' }}>
-              <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse mr-2"></div>
-              <span className="text-cyan-200 text-sm font-medium">AI-Powered Platform</span>
+            <div className="mt-6 inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-100/50 to-cyan-100/50 rounded-full border border-blue-300/30 animate-fade-in backdrop-blur-sm" style={{ animationDelay: '0.6s' }}>
+              <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse mr-2"></div>
+              <span className="text-blue-700 text-sm font-medium">AI-Powered Platform</span>
             </div>
           </div>
         </div>
 
-        {/* Enhanced progress bar with tech styling */}
-        <div className="bg-gradient-to-r from-slate-900/90 via-purple-900/85 to-slate-900/90 backdrop-blur-md border-b border-purple-400/20 py-6">
+        {/* Enhanced progress bar with light theme */}
+        <div className="bg-gradient-to-r from-white/90 via-blue-50/85 to-white/90 backdrop-blur-md border-b border-blue-200/20 py-6">
           <div className="max-w-6xl mx-auto px-6">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-semibold text-cyan-300 flex items-center">
-                <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse mr-2"></div>
+              <span className="text-sm font-semibold text-blue-700 flex items-center">
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse mr-2"></div>
                 Learning Progress
               </span>
-              <span className="text-sm font-medium text-purple-200 bg-gradient-to-r from-purple-500/20 to-cyan-500/20 px-4 py-2 rounded-full border border-purple-400/30 animate-fade-in backdrop-blur-sm">
+              <span className="text-sm font-medium text-gray-700 bg-gradient-to-r from-blue-100/50 to-cyan-100/50 px-4 py-2 rounded-full border border-blue-300/30 animate-fade-in backdrop-blur-sm">
                 {completedLevels.length} of {learningSteps.length} completed
               </span>
             </div>
-            <div className="w-full bg-gradient-to-r from-slate-800 to-slate-700 rounded-full h-3 overflow-hidden border border-purple-400/20">
+            <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden border border-blue-200/20">
               <div
-                className="bg-gradient-to-r from-cyan-500 via-purple-500 to-blue-600 h-3 rounded-full transition-all duration-1000 animate-fade-in relative overflow-hidden"
+                className="bg-gradient-to-r from-blue-500 via-cyan-500 to-indigo-600 h-3 rounded-full transition-all duration-1000 animate-fade-in relative overflow-hidden"
                 style={{ width: `${(completedLevels.length / learningSteps.length) * 100}%` }}
               >
                 {/* Progress bar glow effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/50 to-purple-400/50 animate-pulse"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-400/50 to-cyan-400/50 animate-pulse"></div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Enhanced horizontal timeline with advanced animations */}
+        {/* Enhanced horizontal timeline with light theme */}
         <div className="max-w-6xl mx-auto px-4 py-12 relative">
           {/* Background tech grid */}
           <div className="absolute inset-0 opacity-5">
@@ -320,7 +302,7 @@ const Index = () => {
               {Array.from({ length: 96 }).map((_, i) => (
                 <div
                   key={i}
-                  className="border border-cyan-400/20 rounded animate-pulse"
+                  className="border border-blue-300/20 rounded animate-pulse"
                   style={{ animationDelay: `${(i % 12) * 0.1}s`, animationDuration: '3s' }}
                 ></div>
               ))}
@@ -334,23 +316,23 @@ const Index = () => {
                 <div className="relative animate-fade-in" style={{ animationDelay: `${index * 0.15}s` }}>
                   {/* Glowing background for active/completed cards */}
                   {(completedLevels.includes(index) || index === currentLevel) && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-purple-500/20 rounded-xl blur-lg animate-pulse" style={{ transform: 'scale(1.1)' }}></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-200/30 to-cyan-200/30 rounded-xl blur-lg animate-pulse" style={{ transform: 'scale(1.1)' }}></div>
                   )}
                   
                   <div className="absolute -top-3 -left-3 z-20">
                     <div className={`
                       w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shadow-2xl border-2 transition-all duration-500 hover:scale-125 relative overflow-hidden
                       ${completedLevels.includes(index)
-                        ? 'bg-gradient-to-r from-cyan-500 to-purple-600 text-white border-cyan-400 animate-pulse' 
+                        ? 'bg-gradient-to-r from-blue-500 to-cyan-600 text-white border-blue-400 animate-pulse' 
                         : index === currentLevel 
-                          ? 'bg-gradient-to-r from-purple-500 to-blue-600 text-white border-purple-400 animate-pulse'
-                          : 'bg-gradient-to-r from-slate-700 to-slate-600 text-slate-300 border-slate-500'
+                          ? 'bg-gradient-to-r from-cyan-500 to-indigo-600 text-white border-cyan-400 animate-pulse'
+                          : 'bg-gradient-to-r from-gray-300 to-gray-400 text-gray-600 border-gray-300'
                       }
                     `}>
                       {index + 1}
                       {/* Number glow effect */}
                       {(completedLevels.includes(index) || index === currentLevel) && (
-                        <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/30 to-purple-400/30 rounded-full animate-pulse"></div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-400/30 to-cyan-400/30 rounded-full animate-pulse"></div>
                       )}
                     </div>
                   </div>
@@ -366,20 +348,20 @@ const Index = () => {
                   />
                 </div>
                 
-                {/* Enhanced arrow with tech styling */}
+                {/* Enhanced arrow with light theme */}
                 {index < learningSteps.length - 1 && (
                   <div className="flex items-center justify-center mx-3">
                     <div className={`
                       flex items-center justify-center w-10 h-10 rounded-full transition-all duration-500 hover:scale-125 relative overflow-hidden border-2
                       ${completedLevels.includes(index)
-                        ? 'bg-gradient-to-r from-cyan-500 to-purple-600 border-cyan-400 text-white shadow-lg animate-pulse' 
-                        : 'bg-gradient-to-r from-slate-700 to-slate-600 border-slate-500 text-slate-300'
+                        ? 'bg-gradient-to-r from-blue-500 to-cyan-600 border-blue-400 text-white shadow-lg animate-pulse' 
+                        : 'bg-gradient-to-r from-gray-200 to-gray-300 border-gray-300 text-gray-500'
                       }
                     `}>
                       <ArrowRight className="w-5 h-5 relative z-10" />
                       {/* Arrow glow effect */}
                       {completedLevels.includes(index) && (
-                        <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/30 to-purple-400/30 rounded-full animate-pulse"></div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-400/30 to-cyan-400/30 rounded-full animate-pulse"></div>
                       )}
                     </div>
                   </div>
@@ -389,27 +371,27 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Enhanced bottom section with AI theme */}
-        <div className="bg-gradient-to-r from-slate-900/95 via-purple-900/90 to-slate-900/95 backdrop-blur-lg border-t border-cyan-400/20 py-12 relative overflow-hidden">
+        {/* Enhanced bottom section with light theme */}
+        <div className="bg-gradient-to-r from-white/95 via-blue-50/90 to-white/95 backdrop-blur-lg border-t border-blue-200/30 py-12 relative overflow-hidden">
           {/* Background tech pattern */}
           <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-4 left-10 w-32 h-32 border border-cyan-400/30 rounded-lg animate-spin" style={{ animationDuration: '30s' }}></div>
-            <div className="absolute bottom-4 right-10 w-24 h-24 border border-purple-400/30 rounded-full animate-pulse"></div>
+            <div className="absolute top-4 left-10 w-32 h-32 border border-blue-300/30 rounded-lg animate-spin" style={{ animationDuration: '30s' }}></div>
+            <div className="absolute bottom-4 right-10 w-24 h-24 border border-cyan-300/30 rounded-full animate-pulse"></div>
           </div>
           
           <div className="max-w-4xl mx-auto px-6 text-center relative">
-            <h3 className="text-3xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-blue-400 bg-clip-text text-transparent mb-4 animate-fade-in">
+            <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-cyan-600 to-indigo-600 bg-clip-text text-transparent mb-4 animate-fade-in">
               Ready to Transform Your Career?
             </h3>
-            <p className="text-lg text-cyan-100/70 animate-fade-in leading-relaxed max-w-2xl mx-auto" style={{ animationDelay: '0.2s' }}>
+            <p className="text-lg text-gray-600 animate-fade-in leading-relaxed max-w-2xl mx-auto" style={{ animationDelay: '0.2s' }}>
               Embark on an AI-guided journey through cutting-edge assessment technologies and personalized skill development pathways
             </p>
             
             {/* Tech indicators */}
             <div className="mt-8 flex justify-center space-x-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
               {['AI Analysis', 'Real-time Feedback', 'Skill Tracking'].map((feature, i) => (
-                <div key={feature} className="flex items-center text-cyan-200/80">
-                  <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse mr-2" style={{ animationDelay: `${i * 0.3}s` }}></div>
+                <div key={feature} className="flex items-center text-gray-600">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse mr-2" style={{ animationDelay: `${i * 0.3}s` }}></div>
                   <span className="text-sm font-medium">{feature}</span>
                 </div>
               ))}
