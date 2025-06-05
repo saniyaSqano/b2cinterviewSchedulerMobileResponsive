@@ -100,15 +100,15 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
   };
 
   const getStatusStyles = (status: string, isHovered: boolean) => {
-    const baseClasses = 'transition-all duration-300 border-2 shadow-lg hover:shadow-xl animate-float';
+    const baseClasses = 'transition-all duration-500 border-2 shadow-xl';
     
     switch (status) {
       case 'completed':
-        return `${baseClasses} bg-gradient-to-br from-green-500 to-emerald-600 border-green-400`;
+        return `${baseClasses} bg-gradient-to-br from-green-500 to-emerald-600 border-green-400 shadow-green-200`;
       case 'current':
-        return `${baseClasses} bg-gradient-to-br from-purple-500 to-indigo-600 border-purple-400 ring-4 ring-purple-200 animate-pulse-glow`;
+        return `${baseClasses} bg-gradient-to-br from-blue-500 to-indigo-600 border-blue-400 ring-4 ring-blue-200 animate-pulse`;
       case 'available':
-        return `${baseClasses} bg-gradient-to-br from-purple-300 to-indigo-400 border-purple-300 ${isHovered ? 'bg-gradient-to-br from-purple-400 to-indigo-500 animate-bounce-subtle' : ''}`;
+        return `${baseClasses} bg-gradient-to-br from-purple-400 to-indigo-500 border-purple-300 ${isHovered ? 'bg-gradient-to-br from-purple-500 to-indigo-600 shadow-purple-200' : 'shadow-purple-100'}`;
       default:
         return `${baseClasses} bg-gradient-to-br from-gray-300 to-gray-400 border-gray-200`;
     }
@@ -125,17 +125,21 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
   return (
     <div className="py-12">
       {/* Section Header */}
-      <div className="text-center mb-12 animate-fade-in">
-        <div className="inline-flex items-center px-4 py-2 bg-white/20 rounded-full text-white text-sm font-medium mb-4 backdrop-blur-sm animate-bounce-subtle">
+      <div className="text-center mb-16">
+        <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-100 to-indigo-100 rounded-full text-gray-700 text-sm font-semibold mb-6 backdrop-blur-sm border border-purple-200/50 shadow-lg">
           🎯 Learning Roadmap
         </div>
-        <h3 className="text-3xl font-bold text-white mb-2 animate-slide-up">Your Learning Journey</h3>
-        <p className="text-purple-100 max-w-2xl mx-auto animate-slide-up" style={{ animationDelay: '200ms' }}>Progress through each level to unlock advanced features and build your professional expertise</p>
+        <h3 className="text-4xl md:text-5xl font-bold mb-4">
+          <span className="bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Your Learning</span>
+          <br />
+          <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Journey</span>
+        </h3>
+        <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">Progress through each level to unlock advanced features and build your professional expertise</p>
       </div>
 
-      {/* Vertical Roadmap */}
-      <div className="max-w-4xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Enhanced Roadmap Grid */}
+      <div className="max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {roadmapSteps.map((step, index) => {
             const status = getStepStatus(index);
             const isClickable = status === 'current' || status === 'available' || status === 'completed';
@@ -146,109 +150,110 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
             return (
               <div
                 key={step.id}
-                className="relative animate-fade-in"
-                style={{ animationDelay: `${index * 100}ms` }}
+                className="relative"
                 onMouseEnter={() => setHoveredStep(index)}
                 onMouseLeave={() => setHoveredStep(null)}
               >
                 <div
                   onClick={() => isClickable && onStepClick(index)}
                   className={`
-                    relative p-6 rounded-2xl cursor-pointer transform transition-all duration-500
-                    ${isClickable ? 'hover:scale-105 hover:-translate-y-2 hover:rotate-1' : 'cursor-not-allowed opacity-75'}
-                    ${isHovered ? 'shadow-2xl animate-wiggle' : 'shadow-lg'}
-                    bg-white/90 border border-white/50 backdrop-blur-sm
-                    hover:bg-white/95
+                    relative p-8 rounded-3xl cursor-pointer transform transition-all duration-500
+                    ${isClickable ? 'hover:scale-105 hover:-translate-y-3' : 'cursor-not-allowed opacity-75'}
+                    ${isHovered ? 'shadow-2xl' : 'shadow-xl'}
+                    bg-white/90 border-2 border-white/50 backdrop-blur-sm
+                    hover:bg-white/95 hover:border-white/70
                   `}
                 >
                   {/* Floating particles for completed levels */}
                   {status === 'completed' && (
-                    <div className="absolute inset-0 pointer-events-none">
-                      <div className="absolute top-2 left-2 w-1 h-1 bg-green-400 rounded-full animate-floating-particle-1"></div>
-                      <div className="absolute top-4 right-3 w-1 h-1 bg-emerald-400 rounded-full animate-floating-particle-2"></div>
-                      <div className="absolute bottom-3 left-4 w-1 h-1 bg-green-500 rounded-full animate-floating-particle-3"></div>
+                    <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
+                      <div className="absolute top-4 left-4 w-2 h-2 bg-green-400 rounded-full animate-floating-particle-1"></div>
+                      <div className="absolute top-6 right-5 w-1.5 h-1.5 bg-emerald-400 rounded-full animate-floating-particle-2"></div>
+                      <div className="absolute bottom-5 left-6 w-1.5 h-1.5 bg-green-500 rounded-full animate-floating-particle-3"></div>
                     </div>
                   )}
 
                   {/* Level Badge */}
-                  <div className="absolute -top-3 -left-3 z-10">
+                  <div className="absolute -top-4 -left-4 z-10">
                     <div className={`
-                      w-12 h-12 rounded-full flex items-center justify-center text-white font-bold shadow-lg transform transition-all duration-300
+                      w-16 h-16 rounded-full flex items-center justify-center text-white font-bold shadow-xl transform transition-all duration-300
                       ${getStatusStyles(status, isHovered)}
-                      ${isHovered ? 'scale-110 animate-spin-slow' : ''}
+                      ${isHovered ? 'scale-110' : ''}
                     `}>
                       {getStepIcon(step, status)}
                     </div>
                   </div>
 
                   {/* Credits Badge */}
-                  <div className="absolute -top-2 -right-2 z-10">
-                    <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full px-2 py-1 flex items-center space-x-1 shadow-lg">
-                      <Award className="w-3 h-3 text-white" />
-                      <span className="text-white text-xs font-bold">{credits}</span>
+                  <div className="absolute -top-3 -right-3 z-10">
+                    <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-xl px-3 py-2 flex items-center space-x-1 shadow-lg border-2 border-white">
+                      <Award className="w-4 h-4 text-white" />
+                      <span className="text-white text-sm font-bold">{credits}</span>
                     </div>
                   </div>
 
                   {/* Status Badge */}
                   {status === 'completed' && (
-                    <div className="absolute top-1 right-1 z-10">
-                      <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center animate-pulse">
-                        <CheckCircle className="w-4 h-4 text-white" />
+                    <div className="absolute top-2 right-2 z-10">
+                      <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                        <CheckCircle className="w-5 h-5 text-white" />
                       </div>
                     </div>
                   )}
 
                   {/* Content */}
-                  <div className="pt-6">
-                    <div className="text-xs font-semibold text-purple-600 uppercase tracking-wider mb-2 animate-slide-left">
+                  <div className="pt-8">
+                    <div className="text-xs font-bold text-purple-600 uppercase tracking-wider mb-3 bg-purple-50 px-3 py-1 rounded-full inline-block">
                       {step.subtitle}
                     </div>
-                    <h4 className="text-lg font-bold text-gray-900 mb-3 leading-tight animate-slide-up" style={{ animationDelay: '100ms' }}>
+                    <h4 className="text-xl font-bold text-gray-900 mb-4 leading-tight">
                       {step.title}
                     </h4>
-                    <p className="text-sm text-gray-600 leading-relaxed mb-4 animate-fade-in" style={{ animationDelay: '200ms' }}>
+                    <p className="text-sm text-gray-600 leading-relaxed mb-6 min-h-[3rem]">
                       {step.description}
                     </p>
 
-                    {/* Progress Bar */}
-                    <div className="mb-4">
+                    {/* Enhanced Progress Bar */}
+                    <div className="mb-6">
                       <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
-                        <span>Progress</span>
-                        <span className="animate-pulse">{progress}%</span>
+                        <span className="font-medium">Progress</span>
+                        <span className="font-bold">{progress}%</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                      <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden shadow-inner">
                         <div
-                          className={`h-2 rounded-full transition-all duration-1000 animate-shimmer ${
+                          className={`h-3 rounded-full transition-all duration-1000 relative overflow-hidden ${
                             status === 'completed' 
-                              ? 'bg-gradient-to-r from-green-500 to-emerald-600' 
+                              ? 'bg-gradient-to-r from-green-400 to-emerald-500' 
                               : status === 'current'
-                                ? 'bg-gradient-to-r from-purple-500 to-indigo-600'
+                                ? 'bg-gradient-to-r from-blue-400 to-indigo-500'
                                 : 'bg-gray-300'
                           }`}
                           style={{ width: `${progress}%` }}
-                        />
+                        >
+                          <div className="absolute inset-0 bg-white/20 animate-shimmer" />
+                        </div>
                       </div>
                     </div>
 
-                    {/* Action Button */}
+                    {/* Enhanced Action Button */}
                     <button
                       className={`
-                        w-full py-3 px-4 rounded-xl font-semibold text-sm transition-all duration-300 transform
+                        w-full py-4 px-6 rounded-2xl font-bold text-sm transition-all duration-300 transform shadow-lg
                         ${status === 'completed'
-                          ? 'bg-green-100 text-green-700 hover:bg-green-200 hover:scale-105' 
+                          ? 'bg-gradient-to-r from-green-100 to-green-200 text-green-700 hover:from-green-200 hover:to-green-300 border-2 border-green-300' 
                           : status === 'current'
-                            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 hover:scale-105 animate-pulse-glow'
+                            ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-blue-200 border-2 border-blue-400'
                             : status === 'available'
-                              ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600 hover:scale-105'
-                              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                              ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600 shadow-purple-200 border-2 border-purple-400'
+                              : 'bg-gray-300 text-gray-500 cursor-not-allowed border-2 border-gray-400'
                         }
-                        ${isHovered && isClickable ? 'animate-bounce-subtle' : ''}
+                        ${isHovered && isClickable ? 'scale-105 shadow-xl' : ''}
                       `}
                       disabled={!isClickable}
                     >
-                      {status === 'completed' ? 'Review Level' : 
-                       status === 'current' ? 'Continue' : 
-                       status === 'available' ? 'Begin Level' : 'Locked'}
+                      {status === 'completed' ? '✅ Review Level' : 
+                       status === 'current' ? '🚀 Continue Journey' : 
+                       status === 'available' ? '▶️ Begin Level' : '🔒 Locked'}
                     </button>
                   </div>
                 </div>
@@ -258,35 +263,35 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
         </div>
 
         {/* Overall Progress Summary */}
-        <div className="mt-12 bg-white/20 backdrop-blur-md rounded-2xl p-6 border border-white/30 shadow-lg animate-fade-in transform transition-all duration-500 hover:scale-105" style={{ animationDelay: '600ms' }}>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full flex items-center justify-center animate-spin-slow">
-                <Trophy className="w-4 h-4 text-white" />
+        <div className="mt-16 bg-white/90 backdrop-blur-md rounded-3xl p-8 border-2 border-white/50 shadow-2xl transform transition-all duration-500 hover:scale-105">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <Trophy className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h4 className="font-bold text-white animate-slide-right">Learning Progress</h4>
-                <p className="text-sm text-purple-200 animate-slide-right" style={{ animationDelay: '100ms' }}>Your journey to interview mastery</p>
+                <h4 className="font-bold text-xl text-gray-800">Learning Progress</h4>
+                <p className="text-sm text-gray-600">Your journey to interview mastery</p>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold text-white animate-scale-in">{completedLevels.length}/6</div>
-              <div className="text-sm text-purple-200 animate-scale-in" style={{ animationDelay: '100ms' }}>Completed</div>
+              <div className="text-3xl font-bold text-gray-800">{completedLevels.length}/6</div>
+              <div className="text-sm text-gray-600 font-medium">Completed</div>
             </div>
           </div>
           
-          <div className="w-full bg-white/20 rounded-full h-3 overflow-hidden">
+          <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden shadow-inner">
             <div
-              className="bg-gradient-to-r from-purple-400 to-indigo-500 h-3 rounded-full transition-all duration-1000 relative overflow-hidden animate-shimmer"
+              className="bg-gradient-to-r from-purple-400 to-indigo-500 h-4 rounded-full transition-all duration-1000 relative overflow-hidden shadow-lg"
               style={{ width: `${(completedLevels.length / roadmapSteps.length) * 100}%` }}
             >
-              <div className="absolute inset-0 bg-white/20 animate-pulse" />
+              <div className="absolute inset-0 bg-white/30 animate-shimmer" />
             </div>
           </div>
           
-          <div className="flex justify-between text-xs text-purple-200 mt-2">
-            <span className="animate-fade-in">Journey Progress</span>
-            <span className="animate-fade-in" style={{ animationDelay: '200ms' }}>{Math.round((completedLevels.length / roadmapSteps.length) * 100)}% Complete</span>
+          <div className="flex justify-between text-sm text-gray-600 mt-3 font-medium">
+            <span>Journey Progress</span>
+            <span>{Math.round((completedLevels.length / roadmapSteps.length) * 100)}% Complete</span>
           </div>
         </div>
       </div>
