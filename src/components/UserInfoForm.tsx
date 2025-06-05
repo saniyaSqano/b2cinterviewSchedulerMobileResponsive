@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -140,7 +139,7 @@ const UserInfoForm: React.FC = () => {
 
       <div className="w-full max-w-3xl relative z-10">
         {/* Enhanced ProctoVerse Header */}
-        <div className="text-center mb-12 animate-fade-in">
+        <div className="text-center mb-12">
           <h1 className="text-7xl md:text-8xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 bg-clip-text text-transparent mb-6 tracking-tight">
             ProctoVerse
           </h1>
@@ -148,19 +147,19 @@ const UserInfoForm: React.FC = () => {
           
           {/* Enhanced taglines with animations */}
           <div className="space-y-3 mb-8">
-            <p className="text-xl font-semibold text-gray-700 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+            <p className="text-xl font-semibold text-gray-700">
               🚀 Master Your Interview Skills with AI-Powered Training
             </p>
-            <p className="text-lg text-gray-600 animate-slide-up" style={{ animationDelay: '0.4s' }}>
+            <p className="text-lg text-gray-600">
               ✨ Real-time Feedback • Smart Proctoring • Personalized Learning Paths
             </p>
-            <p className="text-md text-gray-500 animate-slide-up" style={{ animationDelay: '0.6s' }}>
+            <p className="text-md text-gray-500">
               🎯 Practice → Analyze → Improve → Succeed
             </p>
           </div>
           
           {/* Enhanced feature highlights */}
-          <div className="flex justify-center flex-wrap gap-6 mb-8 animate-slide-up" style={{ animationDelay: '0.8s' }}>
+          <div className="flex justify-center flex-wrap gap-6 mb-8">
             <div className="flex items-center space-x-2 text-gray-600 bg-white/60 px-4 py-2 rounded-full backdrop-blur-sm">
               <Brain className="w-5 h-5 text-blue-500" />
               <span className="text-sm font-medium">AI-Powered Mentor</span>
@@ -181,7 +180,7 @@ const UserInfoForm: React.FC = () => {
         </div>
 
         {/* Enhanced Progress indicators */}
-        <div className="flex justify-center mb-10 animate-fade-in" style={{ animationDelay: '1s' }}>
+        <div className="flex justify-center mb-10">
           <div className="flex space-x-3">
             {Array.from({ length: totalSteps }).map((_, index) => (
               <div key={index} className="flex flex-col items-center">
@@ -202,7 +201,7 @@ const UserInfoForm: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/70 p-10 md:p-12 animate-scale-in hover:shadow-3xl transition-all duration-300" style={{ animationDelay: '1.2s' }}>
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/70 p-10 md:p-12 hover:shadow-3xl transition-all duration-300">
           {currentStep === 1 && (
             <div className="space-y-8">
               <div className="text-center">
@@ -403,7 +402,7 @@ const UserInfoForm: React.FC = () => {
           )}
 
           {/* Enhanced Navigation buttons */}
-          <div className="flex justify-between items-center mt-12 animate-fade-in" style={{ animationDelay: '2.2s' }}>
+          <div className="flex justify-between items-center mt-12">
             <div>
               {currentStep > 1 && (
                 <Button
@@ -435,7 +434,7 @@ const UserInfoForm: React.FC = () => {
         </div>
 
         {/* Enhanced bottom tagline */}
-        <div className="text-center mt-10 animate-fade-in" style={{ animationDelay: '2.4s' }}>
+        <div className="text-center mt-10">
           <p className="text-gray-600 text-lg mb-2">
             🌟 Join thousands of successful professionals who've mastered their interviews
           </p>
