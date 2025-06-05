@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { CheckCircle, Circle, Lock, Target, Zap, Star, Trophy, User, GraduationCap, Award } from 'lucide-react';
 
@@ -128,129 +129,136 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
         <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">Progress through each level to unlock advanced features and build your professional expertise</p>
       </div>
 
-      {/* Enhanced Roadmap Grid */}
-      <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {roadmapSteps.map((step, index) => {
-            const status = getStepStatus(index);
-            const isClickable = status === 'current' || status === 'available' || status === 'completed';
-            const isHovered = hoveredStep === index;
-            const progress = getProgressPercentage(status);
-            const credits = levelCredits[index] || 0;
+      {/* Single Line Roadmap */}
+      <div className="max-w-7xl mx-auto px-6">
+        {/* Roadmap Container */}
+        <div className="relative">
+          {/* Connecting Line */}
+          <div className="absolute top-16 left-0 right-0 h-1 bg-gradient-to-r from-purple-200 via-blue-200 to-indigo-200 rounded-full mx-16"></div>
+          
+          {/* Cards in Single Row */}
+          <div className="flex justify-between items-start space-x-4 relative z-10">
+            {roadmapSteps.map((step, index) => {
+              const status = getStepStatus(index);
+              const isClickable = status === 'current' || status === 'available' || status === 'completed';
+              const isHovered = hoveredStep === index;
+              const progress = getProgressPercentage(status);
+              const credits = levelCredits[index] || 0;
 
-            return (
-              <div
-                key={step.id}
-                className="relative"
-                onMouseEnter={() => setHoveredStep(index)}
-                onMouseLeave={() => setHoveredStep(null)}
-              >
+              return (
                 <div
-                  onClick={() => isClickable && onStepClick(index)}
-                  className={`
-                    relative p-8 rounded-3xl cursor-pointer transform transition-all duration-500
-                    ${isClickable ? 'hover:scale-105 hover:-translate-y-3' : 'cursor-not-allowed opacity-75'}
-                    ${isHovered ? 'shadow-2xl' : 'shadow-xl'}
-                    bg-white/90 border-2 border-white/50 backdrop-blur-sm
-                    hover:bg-white/95 hover:border-white/70
-                  `}
+                  key={step.id}
+                  className="flex-1 relative max-w-xs"
+                  onMouseEnter={() => setHoveredStep(index)}
+                  onMouseLeave={() => setHoveredStep(null)}
                 >
-                  {/* Floating particles for completed levels */}
-                  {status === 'completed' && (
-                    <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
-                      <div className="absolute top-4 left-4 w-2 h-2 bg-green-400 rounded-full animate-floating-particle-1"></div>
-                      <div className="absolute top-6 right-5 w-1.5 h-1.5 bg-emerald-400 rounded-full animate-floating-particle-2"></div>
-                      <div className="absolute bottom-5 left-6 w-1.5 h-1.5 bg-green-500 rounded-full animate-floating-particle-3"></div>
-                    </div>
-                  )}
+                  <div
+                    onClick={() => isClickable && onStepClick(index)}
+                    className={`
+                      relative p-6 rounded-3xl cursor-pointer transform transition-all duration-500
+                      ${isClickable ? 'hover:scale-105 hover:-translate-y-3' : 'cursor-not-allowed opacity-75'}
+                      ${isHovered ? 'shadow-2xl' : 'shadow-xl'}
+                      bg-white/90 border-2 border-white/50 backdrop-blur-sm
+                      hover:bg-white/95 hover:border-white/70
+                    `}
+                  >
+                    {/* Floating particles for completed levels */}
+                    {status === 'completed' && (
+                      <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
+                        <div className="absolute top-4 left-4 w-2 h-2 bg-green-400 rounded-full animate-floating-particle-1"></div>
+                        <div className="absolute top-6 right-5 w-1.5 h-1.5 bg-emerald-400 rounded-full animate-floating-particle-2"></div>
+                        <div className="absolute bottom-5 left-6 w-1.5 h-1.5 bg-green-500 rounded-full animate-floating-particle-3"></div>
+                      </div>
+                    )}
 
-                  {/* Level Badge */}
-                  <div className="absolute -top-4 -left-4 z-10">
-                    <div className={`
-                      w-16 h-16 rounded-full flex items-center justify-center text-white font-bold shadow-xl transform transition-all duration-300
-                      ${getStatusStyles(status, isHovered)}
-                      ${isHovered ? 'scale-110' : ''}
-                    `}>
-                      {getStepIcon(step, status)}
-                    </div>
-                  </div>
-
-                  {/* Credits Badge */}
-                  <div className="absolute -top-3 -right-3 z-10">
-                    <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-xl px-3 py-2 flex items-center space-x-1 shadow-lg border-2 border-white">
-                      <Award className="w-4 h-4 text-white" />
-                      <span className="text-white text-sm font-bold">{credits}</span>
-                    </div>
-                  </div>
-
-                  {/* Status Badge */}
-                  {status === 'completed' && (
-                    <div className="absolute top-2 right-2 z-10">
-                      <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
-                        <CheckCircle className="w-5 h-5 text-white" />
+                    {/* Level Badge */}
+                    <div className="absolute -top-4 -left-4 z-10">
+                      <div className={`
+                        w-16 h-16 rounded-full flex items-center justify-center text-white font-bold shadow-xl transform transition-all duration-300
+                        ${getStatusStyles(status, isHovered)}
+                        ${isHovered ? 'scale-110' : ''}
+                      `}>
+                        {getStepIcon(step, status)}
                       </div>
                     </div>
-                  )}
 
-                  {/* Content */}
-                  <div className="pt-8">
-                    <div className="text-xs font-bold text-purple-600 uppercase tracking-wider mb-3 bg-purple-50 px-3 py-1 rounded-full inline-block">
-                      {step.subtitle}
-                    </div>
-                    <h4 className="text-xl font-bold text-gray-900 mb-4 leading-tight">
-                      {step.title}
-                    </h4>
-                    <p className="text-sm text-gray-600 leading-relaxed mb-6 min-h-[3rem]">
-                      {step.description}
-                    </p>
-
-                    {/* Enhanced Progress Bar */}
-                    <div className="mb-6">
-                      <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
-                        <span className="font-medium">Progress</span>
-                        <span className="font-bold">{progress}%</span>
+                    {/* Credits Badge */}
+                    <div className="absolute -top-3 -right-3 z-10">
+                      <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-xl px-3 py-2 flex items-center space-x-1 shadow-lg border-2 border-white">
+                        <Award className="w-4 h-4 text-white" />
+                        <span className="text-white text-sm font-bold">{credits}</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden shadow-inner">
-                        <div
-                          className={`h-3 rounded-full transition-all duration-1000 relative overflow-hidden ${
-                            status === 'completed' 
-                              ? 'bg-gradient-to-r from-green-400 to-emerald-500' 
-                              : status === 'current'
-                                ? 'bg-gradient-to-r from-blue-400 to-indigo-500'
-                                : 'bg-gray-300'
-                          }`}
-                          style={{ width: `${progress}%` }}
-                        >
-                          <div className="absolute inset-0 bg-white/20 animate-shimmer" />
+                    </div>
+
+                    {/* Status Badge */}
+                    {status === 'completed' && (
+                      <div className="absolute top-2 right-2 z-10">
+                        <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                          <CheckCircle className="w-5 h-5 text-white" />
                         </div>
                       </div>
-                    </div>
+                    )}
 
-                    {/* Enhanced Action Button */}
-                    <button
-                      className={`
-                        w-full py-4 px-6 rounded-2xl font-bold text-sm transition-all duration-300 transform shadow-lg
-                        ${status === 'completed'
-                          ? 'bg-gradient-to-r from-green-100 to-green-200 text-green-700 hover:from-green-200 hover:to-green-300 border-2 border-green-300' 
-                          : status === 'current'
-                            ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-blue-200 border-2 border-blue-400'
-                            : status === 'available'
-                              ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600 shadow-purple-200 border-2 border-purple-400'
-                              : 'bg-gray-300 text-gray-500 cursor-not-allowed border-2 border-gray-400'
-                        }
-                        ${isHovered && isClickable ? 'scale-105 shadow-xl' : ''}
-                      `}
-                      disabled={!isClickable}
-                    >
-                      {status === 'completed' ? '✅ Review Level' : 
-                       status === 'current' ? '🚀 Continue Journey' : 
-                       status === 'available' ? '▶️ Begin Level' : '🔒 Locked'}
-                    </button>
+                    {/* Content */}
+                    <div className="pt-8">
+                      <div className="text-xs font-bold text-purple-600 uppercase tracking-wider mb-3 bg-purple-50 px-3 py-1 rounded-full inline-block">
+                        {step.subtitle}
+                      </div>
+                      <h4 className="text-lg font-bold text-gray-900 mb-3 leading-tight">
+                        {step.title}
+                      </h4>
+                      <p className="text-xs text-gray-600 leading-relaxed mb-4 min-h-[2.5rem]">
+                        {step.description}
+                      </p>
+
+                      {/* Enhanced Progress Bar */}
+                      <div className="mb-4">
+                        <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+                          <span className="font-medium">Progress</span>
+                          <span className="font-bold">{progress}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden shadow-inner">
+                          <div
+                            className={`h-2 rounded-full transition-all duration-1000 relative overflow-hidden ${
+                              status === 'completed' 
+                                ? 'bg-gradient-to-r from-green-400 to-emerald-500' 
+                                : status === 'current'
+                                  ? 'bg-gradient-to-r from-blue-400 to-indigo-500'
+                                  : 'bg-gray-300'
+                            }`}
+                            style={{ width: `${progress}%` }}
+                          >
+                            <div className="absolute inset-0 bg-white/20 animate-shimmer" />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Enhanced Action Button */}
+                      <button
+                        className={`
+                          w-full py-3 px-4 rounded-2xl font-bold text-xs transition-all duration-300 transform shadow-lg
+                          ${status === 'completed'
+                            ? 'bg-gradient-to-r from-green-100 to-green-200 text-green-700 hover:from-green-200 hover:to-green-300 border-2 border-green-300' 
+                            : status === 'current'
+                              ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-blue-200 border-2 border-blue-400'
+                              : status === 'available'
+                                ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600 shadow-purple-200 border-2 border-purple-400'
+                                : 'bg-gray-300 text-gray-500 cursor-not-allowed border-2 border-gray-400'
+                          }
+                          ${isHovered && isClickable ? 'scale-105 shadow-xl' : ''}
+                        `}
+                        disabled={!isClickable}
+                      >
+                        {status === 'completed' ? '✅ Review' : 
+                         status === 'current' ? '🚀 Continue' : 
+                         status === 'available' ? '▶️ Begin' : '🔒 Locked'}
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
         {/* Overall Progress Summary */}
