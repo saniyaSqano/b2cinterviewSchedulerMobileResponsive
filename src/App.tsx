@@ -18,7 +18,8 @@ const App: React.FC = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<UserInfo />} />
+          <Route path="/" element={<Index />} />
+          <Route path="/user-info" element={<UserInfo />} />
           <Route path="/levels" element={<Index />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
