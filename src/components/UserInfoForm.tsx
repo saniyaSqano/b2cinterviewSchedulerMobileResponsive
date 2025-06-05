@@ -213,7 +213,7 @@ const UserInfoForm: React.FC = () => {
               </div>
 
               <div className="space-y-6">
-                <div className="animate-fade-in" style={{ animationDelay: '1.4s' }}>
+                <div>
                   <Label htmlFor="name" className="text-lg font-semibold text-gray-700 mb-3 block">
                     What's your name? ✨
                   </Label>
@@ -227,7 +227,7 @@ const UserInfoForm: React.FC = () => {
                   />
                 </div>
 
-                <div className="animate-fade-in" style={{ animationDelay: '1.6s' }}>
+                <div>
                   <Label htmlFor="email" className="text-lg font-semibold text-gray-700 mb-3 block">
                     What's your email address? 📧
                   </Label>
@@ -241,7 +241,7 @@ const UserInfoForm: React.FC = () => {
                   />
                 </div>
 
-                <div className="animate-fade-in" style={{ animationDelay: '1.8s' }}>
+                <div>
                   <Label htmlFor="phone" className="text-lg font-semibold text-gray-700 mb-3 block">
                     What's your phone number? 📱
                   </Label>
@@ -268,7 +268,7 @@ const UserInfoForm: React.FC = () => {
               </div>
 
               <div className="space-y-6">
-                <div className="animate-fade-in" style={{ animationDelay: '1.4s' }}>
+                <div>
                   <Label htmlFor="skills" className="text-lg font-semibold text-gray-700 mb-3 block">
                     What are your key skills? 🎯
                   </Label>
@@ -281,7 +281,7 @@ const UserInfoForm: React.FC = () => {
                   />
                 </div>
 
-                <div className="animate-fade-in" style={{ animationDelay: '1.6s' }}>
+                <div>
                   <Label htmlFor="experience" className="text-lg font-semibold text-gray-700 mb-3 block">
                     Tell us about your experience 💡
                   </Label>
@@ -294,7 +294,7 @@ const UserInfoForm: React.FC = () => {
                   />
                 </div>
 
-                <div className="animate-fade-in" style={{ animationDelay: '1.8s' }}>
+                <div>
                   <Label htmlFor="cv" className="text-lg font-semibold text-gray-700 mb-3 block">
                     Upload your CV/Resume 📄
                   </Label>
@@ -324,7 +324,7 @@ const UserInfoForm: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="animate-fade-in" style={{ animationDelay: '2s' }}>
+                <div>
                   <Label htmlFor="jobDescription" className="text-lg font-semibold text-gray-700 mb-3 block">
                     Target job description (optional) 🎯
                   </Label>
@@ -350,7 +350,7 @@ const UserInfoForm: React.FC = () => {
               </div>
 
               <div className="space-y-8">
-                <div className="animate-fade-in" style={{ animationDelay: '1.4s' }}>
+                <div>
                   <Label className="text-lg font-semibold text-gray-700 mb-4 block">
                     Years of Experience 📈
                   </Label>
@@ -371,7 +371,7 @@ const UserInfoForm: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="animate-fade-in" style={{ animationDelay: '1.6s' }}>
+                <div>
                   <Label className="text-lg font-semibold text-gray-700 mb-4 block">
                     Interview Confidence Level 💪
                   </Label>
