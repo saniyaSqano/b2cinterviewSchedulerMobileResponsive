@@ -1,28 +1,28 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '../integrations/supabase/client';
-import { v4 as uuidv4 } from 'uuid';
 
 interface AiProctoUser {
-  id: number;
+  user_id: number;
   email: string;
-  first_name?: string;
-  last_name?: string;
-  self_practice_report?: string;
-  ai_proctor_report?: string;
-  assessment_report?: string;
-  pitch_perfect_report?: string;
+  full_name?: string;
+  phone_number?: string;
+  skills?: string;
+  cv_file_name?: string;
+  cv_file_url?: string;
+  job_description?: string;
   policies_accepted: boolean;
   created_at: string;
-  updated_at: string;
-  password_hash: string;
 }
 
 interface CreateUserData {
   email: string;
-  password_hash: string;
-  first_name?: string;
-  last_name?: string;
+  full_name?: string;
+  phone_number?: string;
+  skills?: string;
+  cv_file_name?: string;
+  cv_file_url?: string;
+  job_description?: string;
   policies_accepted?: boolean;
 }
 
@@ -39,7 +39,7 @@ export const useAiProctoUser = (email?: string) => {
     
     try {
       const { data, error } = await supabase
-        .from('ai_procto_users')
+        .from('ai_procto_user')
         .select('*')
         .eq('email', userEmail)
         .single();
@@ -69,46 +69,32 @@ export const useAiProctoUser = (email?: string) => {
     try {
       console.log('Creating user with data:', userData);
       
-      // Add timestamps if not provided
-      const now = new Date().toISOString();
-      
-      // No longer need to generate a UUID for user_id as the column has been removed
-      
-      // Add timestamps to the user data
-      const userDataWithTimestamps = { 
+      const userDataForInsert = { 
         ...userData, 
-        created_at: now, 
-        updated_at: now, 
         policies_accepted: userData.policies_accepted ?? true
       };
       
-      console.log('Sending to Supabase:', userDataWithTimestamps);
+      console.log('Sending to Supabase:', userDataForInsert);
       
-      try {
-        const { data, error } = await supabase
-          .from('ai_procto_users')
-          .insert(userDataWithTimestamps)
-          .select()
-          .single();
-        
-        if (error) {
-          console.error('Supabase error details:', {
-            code: error.code,
-            message: error.message,
-            details: error.details,
-            hint: error.hint
-          });
-          throw error;
-        }
-        
-        console.log('User created successfully:', data);
-        setUser(data);
-        return data;
-      } catch (insertError) {
-        console.error('Detailed insert error:', insertError);
-        setError(insertError instanceof Error ? insertError.message : 'Failed to create user');
-        throw insertError;
+      const { data, error } = await supabase
+        .from('ai_procto_user')
+        .insert(userDataForInsert)
+        .select()
+        .single();
+      
+      if (error) {
+        console.error('Supabase error details:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        });
+        throw error;
       }
+      
+      console.log('User created successfully:', data);
+      setUser(data);
+      return data;
     } catch (err) {
       console.error('Error creating user:', err);
       setError(err instanceof Error ? err.message : 'Failed to create user');
@@ -118,18 +104,14 @@ export const useAiProctoUser = (email?: string) => {
     }
   };
 
-  const updateUserReport = async (
-    userEmail: string, 
-    reportType: 'self_practice_report' | 'ai_proctor_report' | 'assessment_report' | 'pitch_perfect_report',
-    reportUrl: string
-  ) => {
+  const updateUser = async (userEmail: string, updateData: Partial<CreateUserData>) => {
     setLoading(true);
     setError(null);
     
     try {
       const { data, error } = await supabase
-        .from('ai_procto_users')
-        .update({ [reportType]: reportUrl, updated_at: new Date().toISOString() })
+        .from('ai_procto_user')
+        .update(updateData)
         .eq('email', userEmail)
         .select()
         .single();
@@ -139,8 +121,8 @@ export const useAiProctoUser = (email?: string) => {
       setUser(data);
       return data;
     } catch (err) {
-      console.error('Error updating user report:', err);
-      setError(err instanceof Error ? err.message : 'Failed to update user report');
+      console.error('Error updating user:', err);
+      setError(err instanceof Error ? err.message : 'Failed to update user');
       throw err;
     } finally {
       setLoading(false);
@@ -159,7 +141,7 @@ export const useAiProctoUser = (email?: string) => {
     error,
     fetchUser,
     createUser,
-    updateUserReport,
+    updateUser,
     refetch: () => email && fetchUser(email)
   };
 };

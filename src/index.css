@@ -17,10 +17,16 @@
 /* Enhanced Animations */
 @keyframes float {
   0%, 100% {
-    transform: translateY(0px);
+    transform: translateY(0px) translateX(0px);
+  }
+  25% {
+    transform: translateY(-8px) translateX(4px);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-12px) translateX(0px);
+  }
+  75% {
+    transform: translateY(-8px) translateX(-4px);
   }
 }
 
@@ -29,7 +35,7 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-2px);
+    transform: translateY(-4px);
   }
 }
 
@@ -38,26 +44,26 @@
     transform: rotate(0deg);
   }
   25% {
-    transform: rotate(1deg);
+    transform: rotate(2deg);
   }
   75% {
-    transform: rotate(-1deg);
+    transform: rotate(-2deg);
   }
 }
 
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
   }
   50% {
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+    box-shadow: 0 0 25px rgba(59, 130, 246, 0.6);
   }
 }
 
 @keyframes slide-up {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(30px);
   }
   to {
     opacity: 1;
@@ -68,7 +74,7 @@
 @keyframes slide-down {
   from {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(-30px);
   }
   to {
     opacity: 1;
@@ -79,7 +85,7 @@
 @keyframes slide-left {
   from {
     opacity: 0;
-    transform: translateX(20px);
+    transform: translateX(30px);
   }
   to {
     opacity: 1;
@@ -90,7 +96,7 @@
 @keyframes slide-right {
   from {
     opacity: 0;
-    transform: translateX(-20px);
+    transform: translateX(-30px);
   }
   to {
     opacity: 1;
@@ -116,104 +122,161 @@
   }
 }
 
-@keyframes floating-particle-1 {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-    opacity: 0.7;
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
   }
-  33% {
-    transform: translate(10px, -5px) scale(1.2);
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
     opacity: 1;
   }
+}
+
+@keyframes floating-particle-1 {
+  0%, 100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    opacity: 0.4;
+  }
+  33% {
+    transform: translate(15px, -10px) scale(1.2) rotate(120deg);
+    opacity: 0.8;
+  }
   66% {
-    transform: translate(-5px, -10px) scale(0.8);
-    opacity: 0.5;
+    transform: translate(-10px, -15px) scale(0.8) rotate(240deg);
+    opacity: 0.6;
   }
 }
 
 @keyframes floating-particle-2 {
   0%, 100% {
-    transform: translate(0, 0) scale(0.8);
-    opacity: 0.5;
+    transform: translate(0, 0) scale(0.8) rotate(0deg);
+    opacity: 0.3;
   }
   50% {
-    transform: translate(-8px, 12px) scale(1.1);
-    opacity: 0.9;
+    transform: translate(-12px, 18px) scale(1.1) rotate(180deg);
+    opacity: 0.7;
   }
 }
 
 @keyframes floating-particle-3 {
   0%, 100% {
-    transform: translate(0, 0) scale(1.1);
-    opacity: 0.6;
+    transform: translate(0, 0) scale(1.1) rotate(0deg);
+    opacity: 0.5;
   }
   25% {
-    transform: translate(8px, -8px) scale(0.9);
-    opacity: 0.8;
+    transform: translate(12px, -12px) scale(0.9) rotate(90deg);
+    opacity: 0.9;
   }
   75% {
-    transform: translate(-12px, 5px) scale(1.3);
-    opacity: 0.4;
+    transform: translate(-18px, 8px) scale(1.3) rotate(270deg);
+    opacity: 0.3;
   }
 }
 
 .animate-float {
-  animation: float 3s ease-in-out infinite;
+  animation: float 6s ease-in-out infinite;
 }
 
 .animate-bounce-subtle {
-  animation: bounce-subtle 2s ease-in-out infinite;
+  animation: bounce-subtle 3s ease-in-out infinite;
 }
 
 .animate-wiggle {
-  animation: wiggle 0.3s ease-in-out;
+  animation: wiggle 0.5s ease-in-out;
 }
 
 .animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
+  animation: pulse-glow 3s ease-in-out infinite;
 }
 
 .animate-slide-up {
-  animation: slide-up 0.6s ease-out forwards;
+  animation: slide-up 0.8s ease-out forwards;
 }
 
 .animate-slide-down {
-  animation: slide-down 0.6s ease-out forwards;
+  animation: slide-down 0.8s ease-out forwards;
 }
 
 .animate-slide-left {
-  animation: slide-left 0.6s ease-out forwards;
+  animation: slide-left 0.8s ease-out forwards;
 }
 
 .animate-slide-right {
-  animation: slide-right 0.6s ease-out forwards;
+  animation: slide-right 0.8s ease-out forwards;
 }
 
 .animate-spin-slow {
-  animation: spin-slow 8s linear infinite;
+  animation: spin-slow 12s linear infinite;
 }
 
 .animate-shimmer {
   background-image: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.4),
     transparent
   );
   background-size: 200px 100%;
-  animation: shimmer 2s infinite;
+  animation: shimmer 3s infinite;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.6s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.8s ease-out forwards;
 }
 
 .animate-floating-particle-1 {
-  animation: floating-particle-1 4s ease-in-out infinite;
+  animation: floating-particle-1 8s ease-in-out infinite;
 }
 
 .animate-floating-particle-2 {
-  animation: floating-particle-2 3.5s ease-in-out infinite;
+  animation: floating-particle-2 6s ease-in-out infinite;
 }
 
 .animate-floating-particle-3 {
-  animation: floating-particle-3 4.5s ease-in-out infinite;
+  animation: floating-particle-3 10s ease-in-out infinite;
+}
+
+/* Additional smooth transitions */
+.transition-all-smooth {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced gradient backgrounds */
+.gradient-bg-animated {
+  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background-size: 400% 400%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 @layer base {
@@ -249,19 +312,12 @@
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 

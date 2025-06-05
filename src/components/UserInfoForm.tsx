@@ -5,7 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowRight, Upload, Sparkles, Users, Brain, Target, Award, Zap } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
+import { ArrowRight, Upload, Sparkles, Users, Brain, Target, Award, Zap, Star, Rocket, Code, Globe } from 'lucide-react';
+import { useAiProctoUser } from '@/hooks/useAiProctoUser';
+import { toast } from 'sonner';
 
 interface FormData {
   name: string;
@@ -15,11 +18,14 @@ interface FormData {
   experience: string;
   cv: File | null;
   jobDescription: string;
+  experienceLevel: number[];
+  confidenceLevel: number[];
 }
 
 const UserInfoForm: React.FC = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
+  const { createUser, loading } = useAiProctoUser();
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -27,12 +33,14 @@ const UserInfoForm: React.FC = () => {
     skills: '',
     experience: '',
     cv: null,
-    jobDescription: ''
+    jobDescription: '',
+    experienceLevel: [3],
+    confidenceLevel: [5]
   });
 
-  const totalSteps = 2;
+  const totalSteps = 3;
 
-  const updateFormData = (field: keyof FormData, value: string | File | null) => {
+  const updateFormData = (field: keyof FormData, value: string | File | null | number[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -43,14 +51,30 @@ const UserInfoForm: React.FC = () => {
 
   const canProceedStep1 = formData.name && formData.email && formData.phone;
   const canProceedStep2 = formData.skills && formData.experience;
+  const canProceedStep3 = formData.experienceLevel && formData.confidenceLevel;
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep < totalSteps) {
       setCurrentStep(prev => prev + 1);
     } else {
       // Handle form submission and redirect to levels page
-      console.log('Form submitted:', formData);
-      navigate('/levels');
+      try {
+        await createUser({
+          email: formData.email,
+          full_name: formData.name,
+          phone_number: formData.phone,
+          skills: formData.skills,
+          cv_file_name: formData.cv?.name,
+          job_description: formData.jobDescription,
+          policies_accepted: true
+        });
+        
+        toast.success('Profile created successfully! Welcome to ProctoVerse! 🚀');
+        navigate('/levels');
+      } catch (error) {
+        toast.error('Failed to create profile. Please try again.');
+        console.error('Form submission error:', error);
+      }
     }
   };
 
@@ -61,129 +85,151 @@ const UserInfoForm: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden flex items-center justify-center p-6">
-      {/* Animated Background Elements */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative overflow-hidden flex items-center justify-center p-6">
+      {/* Enhanced Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* Floating geometric shapes */}
-        <div className="absolute top-20 left-10 w-64 h-64 bg-blue-100/30 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-indigo-100/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-purple-100/30 rounded-full blur-3xl animate-pulse delay-500"></div>
+        {/* Floating geometric shapes with better animations */}
+        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-indigo-200/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-cyan-200/20 rounded-full blur-3xl animate-pulse delay-500"></div>
+        
+        {/* Moving gradient orbs */}
+        <div className="absolute top-1/4 right-1/3 w-64 h-64 bg-gradient-to-r from-blue-300/30 to-cyan-300/30 rounded-full blur-2xl animate-bounce" style={{ animationDuration: '8s' }}></div>
+        <div className="absolute bottom-1/3 left-1/4 w-48 h-48 bg-gradient-to-r from-indigo-300/30 to-purple-300/30 rounded-full blur-2xl animate-bounce delay-2000" style={{ animationDuration: '6s' }}></div>
         
         {/* Animated grid pattern */}
-        <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0 opacity-5">
           <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, rgba(59, 130, 246, 0.3) 1px, transparent 0)`,
-            backgroundSize: '40px 40px'
+            backgroundImage: `radial-gradient(circle at 1px 1px, rgba(99, 102, 241, 0.4) 1px, transparent 0)`,
+            backgroundSize: '50px 50px',
+            animation: 'float 20s ease-in-out infinite'
           }}></div>
         </div>
         
-        {/* Floating icons */}
-        <div className="absolute top-16 right-1/4 animate-bounce" style={{ animationDelay: '1s', animationDuration: '3s' }}>
-          <Target className="w-8 h-8 text-blue-400/40" />
+        {/* Enhanced floating icons with motion */}
+        <div className="absolute top-16 right-1/4 animate-bounce" style={{ animationDelay: '1s', animationDuration: '4s' }}>
+          <Target className="w-10 h-10 text-blue-400/50" />
         </div>
-        <div className="absolute bottom-1/4 left-1/5 animate-bounce" style={{ animationDelay: '2s', animationDuration: '4s' }}>
-          <Award className="w-6 h-6 text-indigo-400/40" />
+        <div className="absolute bottom-1/4 left-1/5 animate-bounce" style={{ animationDelay: '2s', animationDuration: '5s' }}>
+          <Award className="w-8 h-8 text-indigo-400/50" />
         </div>
         <div className="absolute top-1/3 right-1/6 animate-bounce" style={{ animationDelay: '3s', animationDuration: '3.5s' }}>
-          <Zap className="w-7 h-7 text-purple-400/40" />
+          <Rocket className="w-9 h-9 text-cyan-400/50" />
+        </div>
+        <div className="absolute top-3/4 left-1/3 animate-bounce" style={{ animationDelay: '4s', animationDuration: '4.5s' }}>
+          <Code className="w-7 h-7 text-purple-400/50" />
+        </div>
+        <div className="absolute bottom-1/2 right-1/5 animate-bounce" style={{ animationDelay: '5s', animationDuration: '6s' }}>
+          <Globe className="w-8 h-8 text-blue-500/50" />
         </div>
         
-        {/* Floating particles with light colors */}
-        {Array.from({ length: 20 }).map((_, i) => (
+        {/* Enhanced floating particles */}
+        {Array.from({ length: 30 }).map((_, i) => (
           <div
             key={i}
-            className="absolute w-2 h-2 bg-blue-300/20 rounded-full animate-float"
+            className="absolute w-3 h-3 bg-gradient-to-r from-blue-400/30 to-cyan-400/30 rounded-full animate-float"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              animation: `float ${3 + Math.random() * 4}s ease-in-out infinite`,
-              animationDelay: `${Math.random() * 5}s`
+              animation: `float ${4 + Math.random() * 6}s ease-in-out infinite`,
+              animationDelay: `${Math.random() * 8}s`
             }}
           ></div>
         ))}
       </div>
 
-      <div className="w-full max-w-2xl relative z-10">
-        {/* Proctoverse Header with taglines */}
+      <div className="w-full max-w-3xl relative z-10">
+        {/* Enhanced ProctoVerse Header */}
         <div className="text-center mb-12 animate-fade-in">
-          <h1 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
-            Proctoverse
+          <h1 className="text-7xl md:text-8xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 bg-clip-text text-transparent mb-6 tracking-tight">
+            ProctoVerse
           </h1>
-          <div className="w-32 h-1 bg-gradient-to-r from-blue-400 to-indigo-400 mx-auto rounded-full animate-pulse mb-6"></div>
+          <div className="w-40 h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500 mx-auto rounded-full animate-pulse mb-8"></div>
           
-          {/* Dynamic taglines */}
-          <div className="space-y-2 mb-6">
-            <p className="text-lg text-gray-600 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-              🚀 Elevate Your Career Journey
+          {/* Enhanced taglines with animations */}
+          <div className="space-y-3 mb-8">
+            <p className="text-xl font-semibold text-gray-700 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+              🚀 Master Your Interview Skills with AI-Powered Training
             </p>
-            <p className="text-md text-gray-500 animate-slide-up" style={{ animationDelay: '0.4s' }}>
-              AI-Powered Interview Preparation • Smart Assessment • Real-time Feedback
+            <p className="text-lg text-gray-600 animate-slide-up" style={{ animationDelay: '0.4s' }}>
+              ✨ Real-time Feedback • Smart Proctoring • Personalized Learning Paths
+            </p>
+            <p className="text-md text-gray-500 animate-slide-up" style={{ animationDelay: '0.6s' }}>
+              🎯 Practice → Analyze → Improve → Succeed
             </p>
           </div>
           
-          {/* Feature highlights */}
-          <div className="flex justify-center space-x-8 mb-6 animate-slide-up" style={{ animationDelay: '0.6s' }}>
-            <div className="flex items-center space-x-2 text-gray-600">
+          {/* Enhanced feature highlights */}
+          <div className="flex justify-center flex-wrap gap-6 mb-8 animate-slide-up" style={{ animationDelay: '0.8s' }}>
+            <div className="flex items-center space-x-2 text-gray-600 bg-white/60 px-4 py-2 rounded-full backdrop-blur-sm">
               <Brain className="w-5 h-5 text-blue-500" />
-              <span className="text-sm">AI Mentor</span>
+              <span className="text-sm font-medium">AI-Powered Mentor</span>
             </div>
-            <div className="flex items-center space-x-2 text-gray-600">
+            <div className="flex items-center space-x-2 text-gray-600 bg-white/60 px-4 py-2 rounded-full backdrop-blur-sm">
               <Users className="w-5 h-5 text-indigo-500" />
-              <span className="text-sm">Mock Interviews</span>
+              <span className="text-sm font-medium">Live Mock Interviews</span>
             </div>
-            <div className="flex items-center space-x-2 text-gray-600">
-              <Sparkles className="w-5 h-5 text-purple-500" />
-              <span className="text-sm">Smart Analytics</span>
+            <div className="flex items-center space-x-2 text-gray-600 bg-white/60 px-4 py-2 rounded-full backdrop-blur-sm">
+              <Sparkles className="w-5 h-5 text-cyan-500" />
+              <span className="text-sm font-medium">Performance Analytics</span>
+            </div>
+            <div className="flex items-center space-x-2 text-gray-600 bg-white/60 px-4 py-2 rounded-full backdrop-blur-sm">
+              <Star className="w-5 h-5 text-purple-500" />
+              <span className="text-sm font-medium">Skill Assessment</span>
             </div>
           </div>
         </div>
 
-        {/* Progress indicators */}
-        <div className="flex justify-center mb-8 animate-fade-in" style={{ animationDelay: '0.8s' }}>
-          <div className="flex space-x-2">
+        {/* Enhanced Progress indicators */}
+        <div className="flex justify-center mb-10 animate-fade-in" style={{ animationDelay: '1s' }}>
+          <div className="flex space-x-3">
             {Array.from({ length: totalSteps }).map((_, index) => (
-              <div
-                key={index}
-                className={`w-3 h-3 rounded-full transition-all duration-500 ${
-                  index + 1 === currentStep
-                    ? 'bg-blue-500 shadow-lg shadow-blue-500/50 scale-125'
-                    : index + 1 < currentStep
-                    ? 'bg-blue-400'
-                    : 'bg-gray-300'
-                }`}
-              />
+              <div key={index} className="flex flex-col items-center">
+                <div
+                  className={`w-4 h-4 rounded-full transition-all duration-500 ${
+                    index + 1 === currentStep
+                      ? 'bg-blue-500 shadow-lg shadow-blue-500/50 scale-125'
+                      : index + 1 < currentStep
+                      ? 'bg-blue-400'
+                      : 'bg-gray-300'
+                  }`}
+                />
+                <span className="text-xs text-gray-500 mt-2">
+                  {index === 0 ? 'Basic Info' : index === 1 ? 'Experience' : 'Skills Assessment'}
+                </span>
+              </div>
             ))}
           </div>
         </div>
 
-        <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/60 p-8 md:p-12 animate-scale-in hover:shadow-3xl transition-all duration-300" style={{ animationDelay: '1s' }}>
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/70 p-10 md:p-12 animate-scale-in hover:shadow-3xl transition-all duration-300" style={{ animationDelay: '1.2s' }}>
           {currentStep === 1 && (
             <div className="space-y-8">
               <div className="text-center">
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-                  Help us personalize your experience
+                <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                  Welcome to Your Journey! 🌟
                 </h2>
-                <p className="text-gray-600">Let's get to know you better for a tailored journey</p>
+                <p className="text-gray-600 text-lg">Let's start with some basic information to personalize your experience</p>
               </div>
 
               <div className="space-y-6">
-                <div className="animate-fade-in" style={{ animationDelay: '1.2s' }}>
-                  <Label htmlFor="name" className="text-lg font-medium text-gray-700 mb-3 block">
+                <div className="animate-fade-in" style={{ animationDelay: '1.4s' }}>
+                  <Label htmlFor="name" className="text-lg font-semibold text-gray-700 mb-3 block">
                     What's your name? ✨
                   </Label>
                   <Input
                     id="name"
                     type="text"
-                    placeholder="Enter your name"
+                    placeholder="Enter your full name"
                     value={formData.name}
                     onChange={(e) => updateFormData('name', e.target.value)}
-                    className="h-14 text-lg bg-gray-50/80 border-2 border-gray-200 focus:border-blue-400 rounded-xl text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md focus:shadow-lg"
+                    className="h-14 text-lg bg-white/90 border-2 border-gray-200 focus:border-blue-400 rounded-xl text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md focus:shadow-lg"
                   />
                 </div>
 
-                <div className="animate-fade-in" style={{ animationDelay: '1.4s' }}>
-                  <Label htmlFor="email" className="text-lg font-medium text-gray-700 mb-3 block">
-                    What's your email? 📧
+                <div className="animate-fade-in" style={{ animationDelay: '1.6s' }}>
+                  <Label htmlFor="email" className="text-lg font-semibold text-gray-700 mb-3 block">
+                    What's your email address? 📧
                   </Label>
                   <Input
                     id="email"
@@ -191,12 +237,12 @@ const UserInfoForm: React.FC = () => {
                     placeholder="Enter your email address"
                     value={formData.email}
                     onChange={(e) => updateFormData('email', e.target.value)}
-                    className="h-14 text-lg bg-gray-50/80 border-2 border-gray-200 focus:border-blue-400 rounded-xl text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md focus:shadow-lg"
+                    className="h-14 text-lg bg-white/90 border-2 border-gray-200 focus:border-blue-400 rounded-xl text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md focus:shadow-lg"
                   />
                 </div>
 
-                <div className="animate-fade-in" style={{ animationDelay: '1.6s' }}>
-                  <Label htmlFor="phone" className="text-lg font-medium text-gray-700 mb-3 block">
+                <div className="animate-fade-in" style={{ animationDelay: '1.8s' }}>
+                  <Label htmlFor="phone" className="text-lg font-semibold text-gray-700 mb-3 block">
                     What's your phone number? 📱
                   </Label>
                   <Input
@@ -205,7 +251,7 @@ const UserInfoForm: React.FC = () => {
                     placeholder="Enter your phone number"
                     value={formData.phone}
                     onChange={(e) => updateFormData('phone', e.target.value)}
-                    className="h-14 text-lg bg-gray-50/80 border-2 border-gray-200 focus:border-blue-400 rounded-xl text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md focus:shadow-lg"
+                    className="h-14 text-lg bg-white/90 border-2 border-gray-200 focus:border-blue-400 rounded-xl text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md focus:shadow-lg"
                   />
                 </div>
               </div>
@@ -215,58 +261,58 @@ const UserInfoForm: React.FC = () => {
           {currentStep === 2 && (
             <div className="space-y-8">
               <div className="text-center">
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-                  Tell us about your professional background
+                <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                  Share Your Expertise 💼
                 </h2>
-                <p className="text-gray-600">Help us understand your expertise and goals</p>
+                <p className="text-gray-600 text-lg">Help us understand your professional background and goals</p>
               </div>
 
               <div className="space-y-6">
-                <div className="animate-fade-in" style={{ animationDelay: '1.2s' }}>
-                  <Label htmlFor="skills" className="text-lg font-medium text-gray-700 mb-3 block">
+                <div className="animate-fade-in" style={{ animationDelay: '1.4s' }}>
+                  <Label htmlFor="skills" className="text-lg font-semibold text-gray-700 mb-3 block">
                     What are your key skills? 🎯
                   </Label>
                   <Textarea
                     id="skills"
-                    placeholder="List your technical skills (e.g., JavaScript, React, Python, etc.)"
+                    placeholder="List your technical skills (e.g., JavaScript, React, Python, Machine Learning, etc.)"
                     value={formData.skills}
                     onChange={(e) => updateFormData('skills', e.target.value)}
-                    className="min-h-[120px] text-lg bg-gray-50/80 border-2 border-gray-200 focus:border-blue-400 rounded-xl resize-none text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md focus:shadow-lg"
-                  />
-                </div>
-
-                <div className="animate-fade-in" style={{ animationDelay: '1.4s' }}>
-                  <Label htmlFor="experience" className="text-lg font-medium text-gray-700 mb-3 block">
-                    Tell us about your experience 💼
-                  </Label>
-                  <Textarea
-                    id="experience"
-                    placeholder="Describe your work experience and projects"
-                    value={formData.experience}
-                    onChange={(e) => updateFormData('experience', e.target.value)}
-                    className="min-h-[120px] text-lg bg-gray-50/80 border-2 border-gray-200 focus:border-blue-400 rounded-xl resize-none text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md focus:shadow-lg"
+                    className="min-h-[120px] text-lg bg-white/90 border-2 border-gray-200 focus:border-blue-400 rounded-xl resize-none text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md focus:shadow-lg"
                   />
                 </div>
 
                 <div className="animate-fade-in" style={{ animationDelay: '1.6s' }}>
-                  <Label htmlFor="cv" className="text-lg font-medium text-gray-700 mb-3 block">
-                    Upload your CV 📄
+                  <Label htmlFor="experience" className="text-lg font-semibold text-gray-700 mb-3 block">
+                    Tell us about your experience 💡
                   </Label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 hover:border-blue-400 transition-all duration-300 bg-gray-50/80 backdrop-blur-sm hover:shadow-md">
+                  <Textarea
+                    id="experience"
+                    placeholder="Describe your work experience, projects, and achievements"
+                    value={formData.experience}
+                    onChange={(e) => updateFormData('experience', e.target.value)}
+                    className="min-h-[120px] text-lg bg-white/90 border-2 border-gray-200 focus:border-blue-400 rounded-xl resize-none text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md focus:shadow-lg"
+                  />
+                </div>
+
+                <div className="animate-fade-in" style={{ animationDelay: '1.8s' }}>
+                  <Label htmlFor="cv" className="text-lg font-semibold text-gray-700 mb-3 block">
+                    Upload your CV/Resume 📄
+                  </Label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 hover:border-blue-400 transition-all duration-300 bg-white/80 backdrop-blur-sm hover:shadow-md">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
+                      <div className="flex items-center space-x-4">
                         <Button
                           type="button"
                           onClick={() => document.getElementById('cv-upload')?.click()}
-                          className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-6 py-2 rounded-lg shadow-lg transition-all duration-300 hover:scale-105"
+                          className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white px-6 py-3 rounded-lg shadow-lg transition-all duration-300 hover:scale-105"
                         >
                           Choose file
                         </Button>
-                        <span className="text-gray-600">
+                        <span className="text-gray-600 font-medium">
                           {formData.cv ? formData.cv.name : 'No file chosen'}
                         </span>
                       </div>
-                      <Upload className="w-6 h-6 text-gray-400" />
+                      <Upload className="w-8 h-8 text-gray-400" />
                     </div>
                     <input
                       id="cv-upload"
@@ -278,24 +324,86 @@ const UserInfoForm: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="animate-fade-in" style={{ animationDelay: '1.8s' }}>
-                  <Label htmlFor="jobDescription" className="text-lg font-medium text-gray-700 mb-3 block">
-                    Job description (optional) 🎪
+                <div className="animate-fade-in" style={{ animationDelay: '2s' }}>
+                  <Label htmlFor="jobDescription" className="text-lg font-semibold text-gray-700 mb-3 block">
+                    Target job description (optional) 🎯
                   </Label>
                   <Textarea
                     id="jobDescription"
-                    placeholder="Paste the job description you're applying for"
+                    placeholder="Paste the job description you're targeting for better preparation"
                     value={formData.jobDescription}
                     onChange={(e) => updateFormData('jobDescription', e.target.value)}
-                    className="min-h-[120px] text-lg bg-gray-50/80 border-2 border-gray-200 focus:border-blue-400 rounded-xl resize-none text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md focus:shadow-lg"
+                    className="min-h-[120px] text-lg bg-white/90 border-2 border-gray-200 focus:border-blue-400 rounded-xl resize-none text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md focus:shadow-lg"
                   />
                 </div>
               </div>
             </div>
           )}
 
-          {/* Navigation buttons */}
-          <div className="flex justify-between items-center mt-12 animate-fade-in" style={{ animationDelay: '2s' }}>
+          {currentStep === 3 && (
+            <div className="space-y-8">
+              <div className="text-center">
+                <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                  Almost Ready! 🚀
+                </h2>
+                <p className="text-gray-600 text-lg">Let's assess your current skill level to personalize your training</p>
+              </div>
+
+              <div className="space-y-8">
+                <div className="animate-fade-in" style={{ animationDelay: '1.4s' }}>
+                  <Label className="text-lg font-semibold text-gray-700 mb-4 block">
+                    Years of Experience 📈
+                  </Label>
+                  <div className="px-4 py-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
+                    <Slider
+                      value={formData.experienceLevel}
+                      onValueChange={(value) => updateFormData('experienceLevel', value)}
+                      max={10}
+                      min={0}
+                      step={1}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-sm text-gray-600 mt-2">
+                      <span>0 years</span>
+                      <span className="font-semibold text-blue-600">{formData.experienceLevel[0]} years</span>
+                      <span>10+ years</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="animate-fade-in" style={{ animationDelay: '1.6s' }}>
+                  <Label className="text-lg font-semibold text-gray-700 mb-4 block">
+                    Interview Confidence Level 💪
+                  </Label>
+                  <div className="px-4 py-6 bg-gradient-to-r from-cyan-50 to-blue-50 rounded-xl">
+                    <Slider
+                      value={formData.confidenceLevel}
+                      onValueChange={(value) => updateFormData('confidenceLevel', value)}
+                      max={10}
+                      min={1}
+                      step={1}
+                      className="w-full"
+                    />
+                    <div className="flex justify-between text-sm text-gray-600 mt-2">
+                      <span>Beginner</span>
+                      <span className="font-semibold text-cyan-600">
+                        Level {formData.confidenceLevel[0]}/10
+                      </span>
+                      <span>Expert</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-center bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">Ready to Begin Your Journey? 🎉</h3>
+                  <p className="text-gray-600">We'll create a personalized learning path based on your profile</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Enhanced Navigation buttons */}
+          <div className="flex justify-between items-center mt-12 animate-fade-in" style={{ animationDelay: '2.2s' }}>
             <div>
               {currentStep > 1 && (
                 <Button
@@ -312,20 +420,27 @@ const UserInfoForm: React.FC = () => {
               onClick={handleNext}
               disabled={
                 (currentStep === 1 && !canProceedStep1) ||
-                (currentStep === 2 && !canProceedStep2)
+                (currentStep === 2 && !canProceedStep2) ||
+                (currentStep === 3 && !canProceedStep3) ||
+                loading
               }
-              className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 disabled:from-gray-400 disabled:to-gray-500 text-white px-8 py-3 text-lg rounded-full flex items-center space-x-2 min-w-[140px] justify-center shadow-lg shadow-blue-500/25 transition-all duration-300 hover:scale-105 disabled:hover:scale-100"
+              className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 disabled:from-gray-400 disabled:to-gray-500 text-white px-8 py-3 text-lg rounded-full flex items-center space-x-2 min-w-[160px] justify-center shadow-lg shadow-blue-500/25 transition-all duration-300 hover:scale-105 disabled:hover:scale-100"
             >
-              <span>{currentStep === totalSteps ? 'Complete' : 'Continue'}</span>
-              <ArrowRight className="w-5 h-5" />
+              <span>
+                {loading ? 'Creating...' : currentStep === totalSteps ? 'Start Journey' : 'Continue'}
+              </span>
+              {!loading && <ArrowRight className="w-5 h-5" />}
             </Button>
           </div>
         </div>
 
-        {/* Bottom tagline */}
-        <div className="text-center mt-8 animate-fade-in" style={{ animationDelay: '2.2s' }}>
+        {/* Enhanced bottom tagline */}
+        <div className="text-center mt-10 animate-fade-in" style={{ animationDelay: '2.4s' }}>
+          <p className="text-gray-600 text-lg mb-2">
+            🌟 Join thousands of successful professionals who've mastered their interviews
+          </p>
           <p className="text-gray-500 text-sm">
-            Trusted by professionals worldwide • Join 10k+ successful candidates
+            Trusted by top companies • 95% success rate • AI-powered insights
           </p>
         </div>
       </div>
