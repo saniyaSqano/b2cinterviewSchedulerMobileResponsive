@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import Question from './Question';
@@ -83,7 +84,12 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack, onTestPassed })
       }
     });
     setScore(correctCount);
-    onTestPassed();
+    
+    // Only call onTestPassed if the score is 70% or higher
+    const percentage = Math.round((correctCount / questions.length) * 100);
+    if (percentage >= 70) {
+      onTestPassed();
+    }
   };
 
   const formatTime = (time: number): string => {
@@ -92,12 +98,21 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack, onTestPassed })
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
-  // Try to get user details from localStorage
+  // Get user details from localStorage
   const getUserDetails = () => {
     try {
       const storedData = localStorage.getItem('currentUserData');
+      console.log('Stored user data:', storedData);
       if (storedData) {
-        return JSON.parse(storedData);
+        const parsedData = JSON.parse(storedData);
+        console.log('Parsed user data:', parsedData);
+        return {
+          fullName: parsedData.fullName || parsedData.full_name || 'N/A',
+          email: parsedData.email || 'N/A',
+          phoneNumber: parsedData.phoneNumber || parsedData.phone_number || 'N/A',
+          skills: parsedData.skills || 'N/A',
+          experience: parsedData.experience || 'N/A'
+        };
       }
     } catch (error) {
       console.error('Error retrieving user data:', error);

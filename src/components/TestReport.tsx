@@ -19,7 +19,7 @@ interface TestReportProps {
     phoneNumber: string;
     skills: string;
     experience: string;
-  };
+  } | null;
 }
 
 const TestReport: React.FC<TestReportProps> = ({
@@ -35,6 +35,31 @@ const TestReport: React.FC<TestReportProps> = ({
   const percentage = Math.round((score / totalQuestions) * 100);
   const passed = percentage >= 70;
   const timeEfficiency = Math.round((timeUsed / totalTime) * 100);
+
+  // Get user details from localStorage if not provided
+  const getUserDetails = () => {
+    if (userDetails) return userDetails;
+    
+    try {
+      const storedData = localStorage.getItem('currentUserData');
+      if (storedData) {
+        const parsedData = JSON.parse(storedData);
+        console.log('Retrieved user data from localStorage:', parsedData);
+        return {
+          fullName: parsedData.fullName || parsedData.full_name || 'N/A',
+          email: parsedData.email || 'N/A',
+          phoneNumber: parsedData.phoneNumber || parsedData.phone_number || 'N/A',
+          skills: parsedData.skills || 'N/A',
+          experience: parsedData.experience || 'N/A'
+        };
+      }
+    } catch (error) {
+      console.error('Error retrieving user data:', error);
+    }
+    return null;
+  };
+
+  const candidateDetails = getUserDetails();
 
   const generatePdfReport = () => {
     const pdf = new jsPDF();
@@ -58,16 +83,16 @@ const TestReport: React.FC<TestReportProps> = ({
     
     yPos += 10;
     pdf.setFontSize(12);
-    if (userDetails) {
-      pdf.text(`Name: ${userDetails.fullName}`, 20, yPos);
+    if (candidateDetails) {
+      pdf.text(`Name: ${candidateDetails.fullName}`, 20, yPos);
       yPos += 7;
-      pdf.text(`Email: ${userDetails.email}`, 20, yPos);
+      pdf.text(`Email: ${candidateDetails.email}`, 20, yPos);
       yPos += 7;
-      pdf.text(`Phone: ${userDetails.phoneNumber}`, 20, yPos);
+      pdf.text(`Phone: ${candidateDetails.phoneNumber}`, 20, yPos);
       yPos += 7;
-      pdf.text(`Skills: ${userDetails.skills}`, 20, yPos);
+      pdf.text(`Skills: ${candidateDetails.skills}`, 20, yPos);
       yPos += 7;
-      pdf.text(`Experience: ${userDetails.experience}`, 20, yPos);
+      pdf.text(`Experience: ${candidateDetails.experience}`, 20, yPos);
     } else {
       pdf.text('No candidate details available', 20, yPos);
     }
@@ -87,7 +112,7 @@ const TestReport: React.FC<TestReportProps> = ({
     yPos += 10;
     pdf.text(`Time Efficiency: ${timeEfficiency}%`, 20, yPos);
     
-    const fileName = `Assessment-Report-${userDetails?.fullName?.replace(/\s+/g, '-') || 'Candidate'}-${new Date().toISOString().split('T')[0]}.pdf`;
+    const fileName = `Assessment-Report-${candidateDetails?.fullName?.replace(/\s+/g, '-') || 'Candidate'}-${new Date().toISOString().split('T')[0]}.pdf`;
     pdf.save(fileName);
   };
 
@@ -201,14 +226,14 @@ const TestReport: React.FC<TestReportProps> = ({
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {userDetails ? (
+                {candidateDetails ? (
                   <div className="grid gap-4">
                     <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200/50">
                       <div className="flex items-center gap-3 mb-2">
                         <User className="w-5 h-5 text-indigo-600" />
                         <div>
                           <p className="text-sm text-gray-500 font-medium">Full Name</p>
-                          <p className="text-gray-900 font-semibold text-lg">{userDetails.fullName}</p>
+                          <p className="text-gray-900 font-semibold text-lg">{candidateDetails.fullName}</p>
                         </div>
                       </div>
                     </div>
@@ -218,7 +243,7 @@ const TestReport: React.FC<TestReportProps> = ({
                         <Mail className="w-5 h-5 text-purple-600" />
                         <div>
                           <p className="text-sm text-gray-500 font-medium">Email Address</p>
-                          <p className="text-gray-900 font-semibold">{userDetails.email}</p>
+                          <p className="text-gray-900 font-semibold">{candidateDetails.email}</p>
                         </div>
                       </div>
                     </div>
@@ -228,7 +253,7 @@ const TestReport: React.FC<TestReportProps> = ({
                         <Phone className="w-5 h-5 text-green-600" />
                         <div>
                           <p className="text-sm text-gray-500 font-medium">Phone Number</p>
-                          <p className="text-gray-900 font-semibold">{userDetails.phoneNumber}</p>
+                          <p className="text-gray-900 font-semibold">{candidateDetails.phoneNumber}</p>
                         </div>
                       </div>
                     </div>
@@ -238,7 +263,7 @@ const TestReport: React.FC<TestReportProps> = ({
                         <TrendingUp className="w-5 h-5 text-amber-600" />
                         <div>
                           <p className="text-sm text-gray-500 font-medium">Skills</p>
-                          <p className="text-gray-900 font-semibold">{userDetails.skills}</p>
+                          <p className="text-gray-900 font-semibold">{candidateDetails.skills}</p>
                         </div>
                       </div>
                     </div>
@@ -248,7 +273,7 @@ const TestReport: React.FC<TestReportProps> = ({
                         <Clock className="w-5 h-5 text-cyan-600" />
                         <div>
                           <p className="text-sm text-gray-500 font-medium">Experience</p>
-                          <p className="text-gray-900 font-semibold">{userDetails.experience}</p>
+                          <p className="text-gray-900 font-semibold">{candidateDetails.experience}</p>
                         </div>
                       </div>
                     </div>
@@ -256,7 +281,8 @@ const TestReport: React.FC<TestReportProps> = ({
                 ) : (
                   <div className="text-center py-8">
                     <User className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500">No candidate details available</p>
+                    <p className="text-gray-500 mb-2">No candidate details available</p>
+                    <p className="text-sm text-gray-400">Please ensure you have filled out your profile information</p>
                   </div>
                 )}
               </CardContent>
