@@ -1,375 +1,382 @@
-
 import React, { useState } from 'react';
-import { ArrowLeft, Trophy, Star, Award, Brain, Users, Sparkles, Target, Rocket, Code, Globe } from 'lucide-react';
-import ParticleBackground from '../components/ParticleBackground';
-import AssessmentFlow from '../components/AssessmentFlow';
-import ChatFlow from '../components/ChatFlow';
-import Level3Flow from '../components/Level3Flow';
-import Level4Flow from '../components/Level4Flow';
-import GamethonFlow from '../components/GamethonFlow';
-import InteractiveRoadmap from '../components/InteractiveRoadmap';
+import { motion } from 'framer-motion';
+import { 
+  Play, 
+  Users, 
+  Brain, 
+  Trophy, 
+  Zap, 
+  Code, 
+  Target, 
+  Star,
+  Gamepad2,
+  Timer,
+  Award,
+  ChevronRight,
+  Sparkles
+} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import UserInfoForm from '@/components/UserInfoForm';
+import AssessmentFlow from '@/components/AssessmentFlow';
+import Level3Flow from '@/components/Level3Flow';
+import Level4Flow from '@/components/Level4Flow';
+import Level5Flow from '@/components/Level5Flow';
+import GamethonFlow from '@/components/GamethonFlow';
+import InteractiveRoadmap from '@/components/InteractiveRoadmap';
 
 const Index = () => {
-  const [currentLevel, setCurrentLevel] = useState(0);
-  const [completedLevels, setCompletedLevels] = useState<number[]>([]);
-  const [showAssessment, setShowAssessment] = useState(false);
-  const [showChat, setShowChat] = useState(false);
-  const [showLevel3, setShowLevel3] = useState(false);
-  const [showLevel4, setShowLevel4] = useState(false);
-  const [showGamethon, setShowGamethon] = useState(false);
-  const [assessmentScore] = useState(70);
+  const [currentView, setCurrentView] = useState('home');
+  const [userName, setUserName] = useState('');
+  const [assessmentPassed, setAssessmentPassed] = useState(false);
 
-  // Credits earned per level (updated for 5 levels)
-  const levelCredits = {
-    0: 100, // Skill Assessment
-    1: 150, // AI Mentor Chat
-    2: 200, // Pitch Builder
-    3: 250, // Proctored Interview
-    4: 500  // Gamethon
+  const handleUserSubmit = (userData: { name: string; email: string; phone: string }) => {
+    setUserName(userData.name);
+    setCurrentView('roadmap');
   };
 
-  const getTotalCredits = () => {
-    return completedLevels.reduce((total, level) => total + (levelCredits[level as keyof typeof levelCredits] || 0), 0);
+  const handleAssessmentPass = () => {
+    setAssessmentPassed(true);
   };
 
-  const handleCardClick = (index: number) => {
-    console.log(`Starting level ${index}`);
-    
-    if (index === 0) {
-      setShowAssessment(true);
-      return;
-    }
-    
-    if (index === 1) {
-      setShowChat(true);
-      return;
-    }
-
-    if (index === 2) {
-      setShowLevel3(true);
-      return;
-    }
-
-    if (index === 3) {
-      setShowLevel4(true);
-      return;
-    }
-
-    if (index === 4) {
-      setShowGamethon(true);
-      return;
-    }
-    
-    setTimeout(() => {
-      if (!completedLevels.includes(index)) {
-        setCompletedLevels(prev => [...prev, index]);
-        if (index === currentLevel && currentLevel < 4) {
-          setCurrentLevel(prev => prev + 1);
-        }
-      }
-    }, 2000);
-  };
-
-  const handleTestPassed = () => {
-    if (!completedLevels.includes(0)) {
-      setCompletedLevels(prev => [...prev, 0]);
-      setCurrentLevel(1);
-    }
-  };
-
-  const handleChatCompleted = () => {
-    if (!completedLevels.includes(1)) {
-      setCompletedLevels(prev => [...prev, 1]);
-      setCurrentLevel(2);
-    }
-  };
-
-  const handleLevel3Completed = () => {
-    if (!completedLevels.includes(2)) {
-      setCompletedLevels(prev => [...prev, 2]);
-      setCurrentLevel(3);
-    }
-  };
-
-  const handleLevel4Completed = () => {
-    if (!completedLevels.includes(3)) {
-      setCompletedLevels(prev => [...prev, 3]);
-      setCurrentLevel(4);
-    }
-  };
-
-  const handleGamethonCompleted = () => {
-    if (!completedLevels.includes(4)) {
-      setCompletedLevels(prev => [...prev, 4]);
-    }
-  };
-
-  if (showAssessment) {
-    return (
-      <AssessmentFlow 
-        onBack={() => setShowAssessment(false)}
-        onTestPassed={handleTestPassed}
-      />
-    );
+  if (currentView === 'userInfo') {
+    return <UserInfoForm onSubmit={handleUserSubmit} />;
   }
 
-  if (showChat) {
-    return (
-      <ChatFlow 
-        onBack={() => {
-          setShowChat(false);
-          handleChatCompleted();
-        }}
-        userName="Revati"
-        assessmentScore={assessmentScore}
-      />
-    );
+  if (currentView === 'roadmap') {
+    return <InteractiveRoadmap onBack={() => setCurrentView('home')} userName={userName} />;
   }
 
-  if (showLevel3) {
-    return (
-      <Level3Flow 
-        onBack={() => {
-          setShowLevel3(false);
-          handleLevel3Completed();
-        }}
-        userName="Revati"
-      />
-    );
+  if (currentView === 'assessment') {
+    return <AssessmentFlow onBack={() => setCurrentView('home')} onTestPassed={handleAssessmentPass} />;
   }
 
-  if (showLevel4) {
-    return (
-      <Level4Flow 
-        onBack={() => {
-          setShowLevel4(false);
-          handleLevel4Completed();
-        }}
-        userName="Revati"
-      />
-    );
+  if (currentView === 'level3') {
+    return <Level3Flow onBack={() => setCurrentView('home')} userName={userName} />;
   }
 
-  if (showGamethon) {
-    return (
-      <GamethonFlow 
-        onBack={() => {
-          setShowGamethon(false);
-          handleGamethonCompleted();
-        }}
-        userName="Revati"
-      />
-    );
+  if (currentView === 'level4') {
+    return <Level4Flow onBack={() => setCurrentView('home')} userName={userName} />;
   }
+
+  if (currentView === 'level5') {
+    return <Level5Flow onBack={() => setCurrentView('home')} userName={userName} />;
+  }
+
+  if (currentView === 'gamethon') {
+    return <GamethonFlow onBack={() => setCurrentView('home')} userName={userName} />;
+  }
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        delayChildren: 0.3,
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const cardVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.4,
+        ease: "easeInOut",
+      },
+    },
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative overflow-hidden">
-      {/* Enhanced Animated Background Elements */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+      {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* Floating geometric shapes with better animations */}
-        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-200/20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-indigo-200/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-cyan-200/20 rounded-full blur-3xl animate-pulse delay-500"></div>
-        
-        {/* Moving gradient orbs */}
-        <div className="absolute top-1/4 right-1/3 w-64 h-64 bg-gradient-to-r from-blue-300/30 to-cyan-300/30 rounded-full blur-2xl animate-bounce" style={{ animationDuration: '8s' }}></div>
-        <div className="absolute bottom-1/3 left-1/4 w-48 h-48 bg-gradient-to-r from-indigo-300/30 to-purple-300/30 rounded-full blur-2xl animate-bounce delay-2000" style={{ animationDuration: '6s' }}></div>
-        
-        {/* Enhanced floating icons with motion */}
-        <div className="absolute top-16 right-1/4 animate-bounce" style={{ animationDelay: '1s', animationDuration: '4s' }}>
-          <Target className="w-10 h-10 text-blue-400/50" />
-        </div>
-        <div className="absolute bottom-1/4 left-1/5 animate-bounce" style={{ animationDelay: '2s', animationDuration: '5s' }}>
-          <Award className="w-8 h-8 text-indigo-400/50" />
-        </div>
-        <div className="absolute top-1/3 right-1/6 animate-bounce" style={{ animationDelay: '3s', animationDuration: '3.5s' }}>
-          <Rocket className="w-9 h-9 text-cyan-400/50" />
-        </div>
-        <div className="absolute top-3/4 left-1/3 animate-bounce" style={{ animationDelay: '4s', animationDuration: '4.5s' }}>
-          <Code className="w-7 h-7 text-purple-400/50" />
-        </div>
-        <div className="absolute bottom-1/2 right-1/5 animate-bounce" style={{ animationDelay: '5s', animationDuration: '6s' }}>
-          <Globe className="w-8 h-8 text-blue-500/50" />
-        </div>
-        
-        {/* Enhanced floating particles */}
-        {Array.from({ length: 20 }).map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-2 h-2 bg-gradient-to-r from-blue-400/30 to-cyan-400/30 rounded-full animate-float"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animation: `float ${4 + Math.random() * 6}s ease-in-out infinite`,
-              animationDelay: `${Math.random() * 8}s`
-            }}
-          ></div>
-        ))}
       </div>
 
-      {/* Top Navigation Bar */}
-      <div className="relative z-20 bg-white/90 backdrop-blur-md border-b border-white/30 shadow-lg">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <button 
-                onClick={() => window.history.back()}
-                className="p-3 hover:bg-gradient-to-r hover:from-purple-100 hover:to-indigo-100 rounded-xl transition-all duration-300 hover:scale-105 shadow-md"
+      <div className="relative z-10 container mx-auto px-4 py-12">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-16 animate-fade-in">
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-6">
+              🚀 AI-Powered Interview Platform
+            </h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Master your skills through comprehensive assessments, interactive learning, and AI-driven feedback
+            </p>
+          </div>
+
+          {/* Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* User Info Card */}
+            <Card className="bg-white/90 backdrop-blur-md shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 animate-fade-in border border-white/50" onClick={() => setCurrentView('userInfo')}>
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                    Step 1
+                  </Badge>
+                  <Users className="w-6 h-6 text-blue-600" />
+                </div>
+                <CardTitle className="text-xl text-gray-800">Personal Information</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 mb-4">Start your journey by providing your basic information for a personalized experience.</p>
+                <Button className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white">
+                  <Play className="w-4 h-4 mr-2" />
+                  Get Started
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Learning Roadmap Card */}
+            <Card className="bg-white/90 backdrop-blur-md shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 animate-fade-in border border-white/50" style={{ animationDelay: '200ms' }} onClick={() => setCurrentView('roadmap')}>
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <Badge variant="secondary" className="bg-purple-100 text-purple-700">
+                    Explore
+                  </Badge>
+                  <Target className="w-6 h-6 text-purple-600" />
+                </div>
+                <CardTitle className="text-xl text-gray-800">Interactive Roadmap</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 mb-4">Explore our comprehensive learning path designed to guide you through skill development.</p>
+                <Button className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white">
+                  <Target className="w-4 h-4 mr-2" />
+                  View Roadmap
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Gamethon Card - Enhanced with Motion Graphics */}
+            <motion.div
+              className="relative group"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <Card 
+                className="bg-gradient-to-br from-purple-500/10 via-pink-500/10 to-indigo-500/10 backdrop-blur-md shadow-2xl hover:shadow-3xl transition-all duration-500 cursor-pointer border-2 border-purple-200/50 hover:border-purple-400/70 relative overflow-hidden"
+                onClick={() => setCurrentView('gamethon')}
               >
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
-              </button>
-              <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  ProctoVerse
-                </h1>
-                <div className="w-20 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
-              </div>
-            </div>
-            
-            {/* User Profile & Credits */}
-            <div className="flex items-center space-x-6">
-              <div className="flex items-center space-x-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl px-6 py-3 border border-blue-200/50 shadow-lg backdrop-blur-sm">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center animate-pulse">
-                    <Trophy className="w-4 h-4 text-white" />
+                {/* Animated Background Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-400/20 via-pink-400/20 to-indigo-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                
+                {/* Floating Particles */}
+                <div className="absolute top-4 right-4 w-2 h-2 bg-purple-400 rounded-full animate-floating-particle-1"></div>
+                <div className="absolute top-8 right-8 w-1 h-1 bg-pink-400 rounded-full animate-floating-particle-2"></div>
+                <div className="absolute top-6 right-12 w-1.5 h-1.5 bg-indigo-400 rounded-full animate-floating-particle-3"></div>
+                
+                {/* Sparkle Effect */}
+                <motion.div
+                  className="absolute top-2 left-2"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                >
+                  <Sparkles className="w-4 h-4 text-yellow-400 opacity-70" />
+                </motion.div>
+
+                <CardHeader className="pb-4 relative z-10">
+                  <div className="flex items-center justify-between mb-3">
+                    <motion.div
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      <Badge 
+                        variant="secondary" 
+                        className="bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 border border-purple-200/50 shadow-sm"
+                      >
+                        🎮 Gaming
+                      </Badge>
+                    </motion.div>
+                    <motion.div
+                      animate={{ 
+                        rotate: [0, 10, -10, 0],
+                        scale: [1, 1.1, 1]
+                      }}
+                      transition={{ 
+                        duration: 2, 
+                        repeat: Infinity, 
+                        repeatType: "reverse" 
+                      }}
+                    >
+                      <Gamepad2 className="w-7 h-7 text-purple-600" />
+                    </motion.div>
                   </div>
-                  <div>
-                    <span className="text-gray-700 font-bold text-lg">{getTotalCredits()}</span>
-                    <span className="text-gray-600 text-sm ml-1">Credits</span>
-                  </div>
+                  
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.6 }}
+                  >
+                    <CardTitle className="text-2xl text-gray-800 flex items-center gap-2">
+                      <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 bg-clip-text text-transparent font-bold">
+                        Gamethon Challenge
+                      </span>
+                    </CardTitle>
+                  </motion.div>
+                </CardHeader>
+
+                <CardContent className="relative z-10">
+                  <motion.p 
+                    className="text-gray-700 mb-6 text-lg leading-relaxed"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.8 }}
+                  >
+                    🚀 Level up your coding skills through gamified challenges! Complete interactive coding puzzles, earn points, and climb the leaderboard.
+                  </motion.p>
+                  
+                  {/* Feature highlights with animations */}
+                  <motion.div 
+                    className="grid grid-cols-2 gap-3 mb-6"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1 }}
+                  >
+                    <motion.div 
+                      className="flex items-center gap-2 text-sm text-purple-700 bg-purple-50 rounded-lg p-2"
+                      whileHover={{ scale: 1.05, backgroundColor: "rgb(237 233 254)" }}
+                    >
+                      <Code className="w-4 h-4" />
+                      <span className="font-medium">Live Coding</span>
+                    </motion.div>
+                    <motion.div 
+                      className="flex items-center gap-2 text-sm text-pink-700 bg-pink-50 rounded-lg p-2"
+                      whileHover={{ scale: 1.05, backgroundColor: "rgb(253 242 248)" }}
+                    >
+                      <Timer className="w-4 h-4" />
+                      <span className="font-medium">Time Challenges</span>
+                    </motion.div>
+                    <motion.div 
+                      className="flex items-center gap-2 text-sm text-indigo-700 bg-indigo-50 rounded-lg p-2"
+                      whileHover={{ scale: 1.05, backgroundColor: "rgb(238 242 255)" }}
+                    >
+                      <Trophy className="w-4 h-4" />
+                      <span className="font-medium">Score Points</span>
+                    </motion.div>
+                    <motion.div 
+                      className="flex items-center gap-2 text-sm text-green-700 bg-green-50 rounded-lg p-2"
+                      whileHover={{ scale: 1.05, backgroundColor: "rgb(240 253 244)" }}
+                    >
+                      <Award className="w-4 h-4" />
+                      <span className="font-medium">Achievements</span>
+                    </motion.div>
+                  </motion.div>
+
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <Button className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-500 hover:from-purple-600 hover:via-pink-600 hover:to-indigo-600 text-white text-lg py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group relative overflow-hidden">
+                      {/* Button animation overlay */}
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent"
+                        initial={{ x: "-100%" }}
+                        whileHover={{ x: "100%" }}
+                        transition={{ duration: 0.6 }}
+                      />
+                      <div className="relative flex items-center justify-center gap-2">
+                        <Zap className="w-5 h-5 group-hover:animate-bounce" />
+                        <span className="font-semibold">Start Gaming</span>
+                        <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </Button>
+                  </motion.div>
+                </CardContent>
+
+                {/* Hover glow effect */}
+                <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-purple-400/20 via-pink-400/20 to-indigo-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+              </Card>
+            </motion.div>
+
+            {/* Assessment Card */}
+            <Card className="bg-white/90 backdrop-blur-md shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 animate-fade-in border border-white/50" style={{ animationDelay: '600ms' }} onClick={() => setCurrentView('assessment')}>
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <Badge variant="secondary" className="bg-green-100 text-green-700">
+                    Level 1
+                  </Badge>
+                  <Brain className="w-6 h-6 text-green-600" />
                 </div>
-              </div>
-              <div className="flex items-center space-x-3 bg-white/80 rounded-2xl px-4 py-3 shadow-lg backdrop-blur-sm border border-white/50">
-                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full flex items-center justify-center shadow-lg">
-                  <span className="text-white font-bold text-lg">R</span>
+                <CardTitle className="text-xl text-gray-800">Skill Assessment</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 mb-4">Test your knowledge with our comprehensive assessment to unlock advanced features.</p>
+                <Button className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white">
+                  <Brain className="w-4 h-4 mr-2" />
+                  Take Assessment
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Level 3 Card */}
+            <Card className="bg-white/90 backdrop-blur-md shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 animate-fade-in border border-white/50" style={{ animationDelay: '800ms' }} onClick={() => setCurrentView('level3')}>
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <Badge variant="secondary" className="bg-orange-100 text-orange-700">
+                    Level 3
+                  </Badge>
+                  <Star className="w-6 h-6 text-orange-600" />
                 </div>
-                <div>
-                  <span className="text-gray-800 font-semibold">Revati</span>
-                  <div className="text-xs text-gray-500">Level {currentLevel + 1}</div>
+                <CardTitle className="text-xl text-gray-800">Advanced Practice</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 mb-4">Advanced interview scenarios with real-time feedback and performance analytics.</p>
+                <Button className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white">
+                  <Star className="w-4 h-4 mr-2" />
+                  Start Practice
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Level 4 Card */}
+            <Card className="bg-white/90 backdrop-blur-md shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 animate-fade-in border border-white/50" style={{ animationDelay: '1000ms' }} onClick={() => setCurrentView('level4')}>
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <Badge variant="secondary" className="bg-red-100 text-red-700">
+                    Level 4
+                  </Badge>
+                  <Trophy className="w-6 h-6 text-red-600" />
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+                <CardTitle className="text-xl text-gray-800">AI Mock Interview</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 mb-4">Experience realistic interview scenarios with our advanced AI interviewer.</p>
+                <Button className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white">
+                  <Trophy className="w-4 h-4 mr-2" />
+                  Start Interview
+                </Button>
+              </CardContent>
+            </Card>
 
-      {/* Main Content */}
-      <div className="relative z-10">
-        {/* Hero Section */}
-        <div className="max-w-5xl mx-auto px-6 pt-12 pb-8 text-center">
-          <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full text-gray-700 text-sm font-semibold mb-8 backdrop-blur-sm border border-blue-200/50 shadow-lg">
-            <Brain className="w-5 h-5 mr-2 text-blue-600" />
-            🤖 AI-Powered Professional Development Journey
-          </div>
-          
-          <h2 className="text-5xl md:text-6xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 bg-clip-text text-transparent">
-              Welcome to Your
-            </span>
-            <br />
-            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Learning Adventure
-            </span>
-          </h2>
-          
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-8">
-            🚀 Master interview skills through AI-guided training, real-time feedback, and personalized learning paths
-          </p>
-
-          {/* Enhanced feature highlights */}
-          <div className="flex justify-center flex-wrap gap-4 mb-8">
-            <div className="flex items-center space-x-2 text-gray-600 bg-white/70 px-4 py-2 rounded-full backdrop-blur-sm border border-white/50 shadow-md">
-              <Brain className="w-4 h-4 text-blue-500" />
-              <span className="text-sm font-medium">AI Mentor</span>
-            </div>
-            <div className="flex items-center space-x-2 text-gray-600 bg-white/70 px-4 py-2 rounded-full backdrop-blur-sm border border-white/50 shadow-md">
-              <Users className="w-4 h-4 text-indigo-500" />
-              <span className="text-sm font-medium">Mock Interviews</span>
-            </div>
-            <div className="flex items-center space-x-2 text-gray-600 bg-white/70 px-4 py-2 rounded-full backdrop-blur-sm border border-white/50 shadow-md">
-              <Sparkles className="w-4 h-4 text-cyan-500" />
-              <span className="text-sm font-medium">Smart Analytics</span>
-            </div>
-            <div className="flex items-center space-x-2 text-gray-600 bg-white/70 px-4 py-2 rounded-full backdrop-blur-sm border border-white/50 shadow-md">
-              <Star className="w-4 h-4 text-purple-500" />
-              <span className="text-sm font-medium">Skill Assessment</span>
-            </div>
-          </div>
-
-          {/* Progress Stats with Credits Display */}
-          <div className="flex items-center justify-center space-x-8 mb-8">
-            <div className="text-center">
-              <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-xl mb-3 mx-auto shadow-xl border-4 border-white/50">
-                {completedLevels.length}
-              </div>
-              <div className="text-sm text-gray-600 font-medium">Levels Complete</div>
-            </div>
-            <div className="text-center">
-              <div className="w-24 h-24 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl mb-3 mx-auto shadow-xl border-4 border-white/50">
-                {Math.round((completedLevels.length / 5) * 100)}%
-              </div>
-              <div className="text-sm text-gray-600 font-medium">Progress</div>
-            </div>
-            <div className="text-center">
-              <div className="w-24 h-24 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center text-white font-bold text-xl mb-3 mx-auto shadow-xl border-4 border-white/50">
-                <Trophy className="w-10 h-10" />
-              </div>
-              <div className="text-sm text-gray-600 font-medium">{getTotalCredits()} Credits</div>
-            </div>
-          </div>
-
-          {/* Credits Breakdown */}
-          {completedLevels.length > 0 && (
-            <div className="mt-8 bg-white/80 backdrop-blur-md rounded-3xl p-8 border border-white/50 shadow-xl max-w-2xl mx-auto">
-              <h3 className="text-gray-800 font-bold text-lg mb-6 flex items-center justify-center">
-                <Award className="w-6 h-6 mr-2 text-yellow-500" />
-                Credits Earned
-              </h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {completedLevels.map((level) => (
-                  <div key={level} className="flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl px-4 py-3 border border-blue-200/50">
-                    <span className="text-gray-600 text-sm font-medium">Level {level + 1}</span>
-                    <div className="flex items-center space-x-1">
-                      <Star className="w-4 h-4 text-yellow-500" />
-                      <span className="text-gray-800 font-bold">{levelCredits[level as keyof typeof levelCredits]}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Interactive Roadmap */}
-        <div className="max-w-7xl mx-auto px-6">
-          <InteractiveRoadmap
-            currentLevel={currentLevel}
-            completedLevels={completedLevels}
-            onStepClick={handleCardClick}
-            levelCredits={levelCredits}
-          />
-        </div>
-
-        {/* Enhanced bottom section */}
-        <div className="text-center mt-16 pb-12">
-          <div className="max-w-4xl mx-auto bg-white/80 backdrop-blur-md rounded-3xl p-8 border border-white/50 shadow-xl">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4">
-              🌟 Join Thousands of Successful Professionals
-            </h3>
-            <div className="flex justify-center space-x-8 text-sm text-gray-600">
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span>Trusted by Top Companies</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                <span>95% Success Rate</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                <span>AI-Powered Insights</span>
-              </div>
-            </div>
+            {/* Level 5 Card */}
+            <Card className="bg-white/90 backdrop-blur-md shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105 animate-fade-in border border-white/50" style={{ animationDelay: '1200ms' }} onClick={() => setCurrentView('level5')}>
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <Badge variant="secondary" className="bg-violet-100 text-violet-700">
+                    Level 5
+                  </Badge>
+                  <Zap className="w-6 h-6 text-violet-600" />
+                </div>
+                <CardTitle className="text-xl text-gray-800">Proctored Assessment</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 mb-4">Take supervised assessments with advanced proctoring and monitoring features.</p>
+                <Button className="w-full bg-gradient-to-r from-violet-500 to-violet-600 hover:from-violet-600 hover:to-violet-700 text-white">
+                  <Zap className="w-4 h-4 mr-2" />
+                  Begin Assessment
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
