@@ -116,17 +116,39 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
 
   return (
     <div className="py-12">
-      {/* Section Header */}
-      <div className="text-center mb-16">
-        <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-100 to-indigo-100 rounded-full text-gray-700 text-sm font-semibold mb-6 backdrop-blur-sm border border-purple-200/50 shadow-lg">
-          🎯 Learning Roadmap
+      {/* Overall Progress Summary - Moved to top */}
+      <div className="max-w-7xl mx-auto px-6 mb-16">
+        <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 border-2 border-white/50 shadow-2xl transform transition-all duration-500 hover:scale-105">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <Trophy className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h4 className="font-bold text-xl text-gray-800">Learning Progress</h4>
+                <p className="text-sm text-gray-600">Your journey to interview mastery</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="text-3xl font-bold text-gray-800">{completedLevels.length}/5</div>
+              <div className="text-sm text-gray-600 font-medium">Completed</div>
+            </div>
+          </div>
+          
+          <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden shadow-inner">
+            <div
+              className="bg-gradient-to-r from-purple-400 to-indigo-500 h-4 rounded-full transition-all duration-1000 relative overflow-hidden shadow-lg"
+              style={{ width: `${(completedLevels.length / roadmapSteps.length) * 100}%` }}
+            >
+              <div className="absolute inset-0 bg-white/30 animate-shimmer" />
+            </div>
+          </div>
+          
+          <div className="flex justify-between text-sm text-gray-600 mt-3 font-medium">
+            <span>Journey Progress</span>
+            <span>{Math.round((completedLevels.length / roadmapSteps.length) * 100)}% Complete</span>
+          </div>
         </div>
-        <h3 className="text-4xl md:text-5xl font-bold mb-4">
-          <span className="bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">Your Learning</span>
-          <br />
-          <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Journey</span>
-        </h3>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">Progress through each level to unlock advanced features and build your professional expertise</p>
       </div>
 
       {/* Single Line Roadmap */}
@@ -258,39 +280,6 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                 </div>
               );
             })}
-          </div>
-        </div>
-
-        {/* Overall Progress Summary */}
-        <div className="mt-16 bg-white/90 backdrop-blur-md rounded-3xl p-8 border-2 border-white/50 shadow-2xl transform transition-all duration-500 hover:scale-105">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
-                <Trophy className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h4 className="font-bold text-xl text-gray-800">Learning Progress</h4>
-                <p className="text-sm text-gray-600">Your journey to interview mastery</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-3xl font-bold text-gray-800">{completedLevels.length}/5</div>
-              <div className="text-sm text-gray-600 font-medium">Completed</div>
-            </div>
-          </div>
-          
-          <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden shadow-inner">
-            <div
-              className="bg-gradient-to-r from-purple-400 to-indigo-500 h-4 rounded-full transition-all duration-1000 relative overflow-hidden shadow-lg"
-              style={{ width: `${(completedLevels.length / roadmapSteps.length) * 100}%` }}
-            >
-              <div className="absolute inset-0 bg-white/30 animate-shimmer" />
-            </div>
-          </div>
-          
-          <div className="flex justify-between text-sm text-gray-600 mt-3 font-medium">
-            <span>Journey Progress</span>
-            <span>{Math.round((completedLevels.length / roadmapSteps.length) * 100)}% Complete</span>
           </div>
         </div>
       </div>
