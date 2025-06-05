@@ -6,6 +6,7 @@ import AssessmentFlow from '../components/AssessmentFlow';
 import ChatFlow from '../components/ChatFlow';
 import Level3Flow from '../components/Level3Flow';
 import Level4Flow from '../components/Level4Flow';
+import GamethonFlow from '../components/GamethonFlow';
 import InteractiveRoadmap from '../components/InteractiveRoadmap';
 
 const Index = () => {
@@ -15,6 +16,7 @@ const Index = () => {
   const [showChat, setShowChat] = useState(false);
   const [showLevel3, setShowLevel3] = useState(false);
   const [showLevel4, setShowLevel4] = useState(false);
+  const [showGamethon, setShowGamethon] = useState(false);
   const [assessmentScore] = useState(70);
 
   // Credits earned per level (updated for 5 levels)
@@ -54,7 +56,7 @@ const Index = () => {
     }
 
     if (index === 4) {
-      console.log('Gamethon feature coming soon!');
+      setShowGamethon(true);
       return;
     }
     
@@ -93,6 +95,12 @@ const Index = () => {
     if (!completedLevels.includes(3)) {
       setCompletedLevels(prev => [...prev, 3]);
       setCurrentLevel(4);
+    }
+  };
+
+  const handleGamethonCompleted = () => {
+    if (!completedLevels.includes(4)) {
+      setCompletedLevels(prev => [...prev, 4]);
     }
   };
 
@@ -136,6 +144,18 @@ const Index = () => {
         onBack={() => {
           setShowLevel4(false);
           handleLevel4Completed();
+        }}
+        userName="Revati"
+      />
+    );
+  }
+
+  if (showGamethon) {
+    return (
+      <GamethonFlow 
+        onBack={() => {
+          setShowGamethon(false);
+          handleGamethonCompleted();
         }}
         userName="Revati"
       />
