@@ -168,8 +168,7 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
         let updateQuery = supabase
           .from('ai_procto_user')
           .update({
-            [columnName]: reportUrl,
-            updated_at: new Date().toISOString()
+            [columnName]: reportUrl
           })
           .eq('email', email);
         
