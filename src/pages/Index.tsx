@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ArrowLeft, Trophy, Star, Award, Brain, Users, Sparkles, Target, Rocket, Code, Globe } from 'lucide-react';
 import ParticleBackground from '../components/ParticleBackground';
@@ -198,10 +199,10 @@ const Index = () => {
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
               </button>
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                   ProctoVerse
                 </h1>
-                <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full"></div>
+                <div className="w-20 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
               </div>
             </div>
             
