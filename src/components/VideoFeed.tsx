@@ -1,20 +1,35 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Video, VideoOff } from 'lucide-react';
 import Webcam from 'react-webcam';
+import * as tf from '@tensorflow/tfjs';
+import '@tensorflow/tfjs-backend-webgl';
+import * as blazeface from '@tensorflow-models/blazeface';
 
 interface VideoFeedProps {
   onStatusChange?: (isVideoOn: boolean) => void;
   videoRef?: React.RefObject<HTMLVideoElement>;
   faceDetectionVideoRef?: React.RefObject<HTMLVideoElement>;
+  onViolation?: (violation: { type: 'warning' | 'error'; message: string; timestamp: Date; id: number }) => void;
 }
 
-const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange, videoRef, faceDetectionVideoRef }) => {
+const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange, videoRef, faceDetectionVideoRef, onViolation }) => {
   const [isVideoOn, setIsVideoOn] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const webcamRef = useRef<Webcam>(null);
   const [key, setKey] = useState(0); // Used to force remount of webcam component
   const [rearCameraId, setRearCameraId] = useState<string | null>(null);
+  
+  // Face detection states
+  const [model, setModel] = useState<blazeface.BlazeFaceModel | null>(null);
+  const [isModelLoading, setIsModelLoading] = useState(false);
+  const [faceDetectionStatus, setFaceDetectionStatus] = useState<string>('');
+  const [faceCount, setFaceCount] = useState<number>(0);
+  const requestAnimationFrameRef = useRef<number | null>(null);
+  
+  // Violation tracking
+  const lastViolationRef = useRef<{ type: string; timestamp: number }>({ type: '', timestamp: 0 });
+  const violationCountRef = useRef<{ noFace: number; multipleFaces: number }>({ noFace: 0, multipleFaces: 0 });
 
   // Notify parent component when video status changes
   useEffect(() => {
@@ -187,6 +202,140 @@ const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange, videoRef, faceDet
     startCamera();
   }, [startCamera]);
 
+  // Load BlazeFace model
+  useEffect(() => {
+    const loadModel = async () => {
+      try {
+        setIsModelLoading(true);
+        // Make sure TensorFlow backend is initialized
+        await tf.ready();
+        console.log('TensorFlow backend ready:', tf.getBackend());
+        
+        // Load BlazeFace model
+        const loadedModel = await blazeface.load();
+        console.log('BlazeFace model loaded successfully');
+        setModel(loadedModel);
+        setIsModelLoading(false);
+      } catch (err) {
+        console.error('Error loading BlazeFace model:', err);
+        setIsModelLoading(false);
+      }
+    };
+    
+    loadModel();
+    
+    // Cleanup function
+    return () => {
+      if (requestAnimationFrameRef.current) {
+        cancelAnimationFrame(requestAnimationFrameRef.current);
+      }
+    };
+  }, []);
+
+  // Face detection function
+  const detectFaces = useCallback(async () => {
+    if (!model || !webcamRef.current || !webcamRef.current.video || !isVideoOn) {
+      // Skip if model not loaded or video not available
+      requestAnimationFrameRef.current = requestAnimationFrame(detectFaces);
+      return;
+    }
+    
+    try {
+      const video = webcamRef.current.video;
+      
+      // Only run detection if video is playing and ready
+      if (video.readyState === 4) {
+        // Get video properties
+        const videoWidth = video.videoWidth;
+        const videoHeight = video.videoHeight;
+        
+        // Set video width and height
+        video.width = videoWidth;
+        video.height = videoHeight;
+        
+        // Make detections
+        const predictions = await model.estimateFaces(video, false);
+        
+        // Update face count
+        setFaceCount(predictions.length);
+        
+        // Update face detection status
+        if (predictions.length === 0) {
+          setFaceDetectionStatus('No face detected');
+          // Report no face violation after a short delay to avoid false positives
+          violationCountRef.current.noFace++;
+          if (violationCountRef.current.noFace >= 15) { // About 0.5 seconds at 30fps
+            reportViolation('warning', 'No face detected in camera view');
+            violationCountRef.current.noFace = 0;
+          }
+        } else if (predictions.length === 1) {
+          setFaceDetectionStatus('Face detected');
+          // Reset violation counters when face is properly detected
+          violationCountRef.current.noFace = 0;
+          violationCountRef.current.multipleFaces = 0;
+        } else {
+          setFaceDetectionStatus('Multiple faces detected');
+          // Report multiple faces violation
+          violationCountRef.current.multipleFaces++;
+          if (violationCountRef.current.multipleFaces >= 15) { // About 0.5 seconds at 30fps
+            reportViolation('error', `Multiple faces detected (${predictions.length})`);
+            violationCountRef.current.multipleFaces = 0;
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Error in face detection:', err);
+    }
+    
+    // Continue detection loop
+    requestAnimationFrameRef.current = requestAnimationFrame(detectFaces);
+  }, [model, isVideoOn]);
+
+  // Function to report violations with debouncing
+  const reportViolation = useCallback((type: 'warning' | 'error', message: string) => {
+    const now = Date.now();
+    const violationType = type + message;
+    
+    // Debounce violations of the same type to avoid flooding logs
+    // Only report the same violation once every 5 seconds
+    if (
+      violationType !== lastViolationRef.current.type ||
+      now - lastViolationRef.current.timestamp > 5000
+    ) {
+      console.log(`Face detection violation: ${type} - ${message}`);
+      
+      // Update the last violation reference
+      lastViolationRef.current = {
+        type: violationType,
+        timestamp: now
+      };
+      
+      // Report to parent component if callback exists
+      if (onViolation) {
+        onViolation({
+          type,
+          message,
+          timestamp: new Date(),
+          id: now // Use timestamp as a unique ID
+        });
+      }
+    }
+  }, [onViolation]);
+
+  // Start face detection when video is on and model is loaded
+  useEffect(() => {
+    if (isVideoOn && model && !isModelLoading) {
+      console.log('Starting face detection');
+      detectFaces();
+    }
+    
+    return () => {
+      if (requestAnimationFrameRef.current) {
+        cancelAnimationFrame(requestAnimationFrameRef.current);
+      }
+    };
+  }, [isVideoOn, model, isModelLoading, detectFaces]);
+
   // Auto-start camera on component mount and cleanup on unmount
   useEffect(() => {
     startCamera();
@@ -200,6 +349,11 @@ const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange, videoRef, faceDet
           console.log('Stopping track on unmount:', track.kind);
           track.stop();
         });
+      }
+      
+      // Also cancel any ongoing face detection
+      if (requestAnimationFrameRef.current) {
+        cancelAnimationFrame(requestAnimationFrameRef.current);
       }
     };
   }, [startCamera]);
@@ -313,6 +467,24 @@ const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange, videoRef, faceDet
             >
               Start Camera
             </button>
+          </div>
+        )}
+        
+        {/* Face Detection Status Overlay */}
+        {isVideoOn && !error && (
+          <div className="absolute top-4 right-4 bg-black/70 text-white px-4 py-2 rounded-lg">
+            {isModelLoading ? (
+              <div className="flex items-center">
+                <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                <span>Loading face detection...</span>
+              </div>
+            ) : (
+              <div>
+                <span className={`font-medium ${faceCount === 0 ? 'text-red-400' : faceCount === 1 ? 'text-green-400' : 'text-yellow-400'}`}>
+                  {faceDetectionStatus}
+                </span>
+              </div>
+            )}
           </div>
         )}
       </div>
