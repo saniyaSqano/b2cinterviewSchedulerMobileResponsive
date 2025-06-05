@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { CheckCircle, Circle, Lock, Target, Zap, Star, Trophy, User, GraduationCap, Award } from 'lucide-react';
 
@@ -53,25 +52,17 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
     },
     {
       id: 3,
-      title: "Practice Hub",
+      title: "Proctored Interview",
       subtitle: "Level 4",
-      description: "Hands-on exercises and real-world scenario simulations",
+      description: "Hands-on exercises and real-world scenario simulations with AI monitoring",
       icon: "star",
       status: 'available'
     },
     {
       id: 4,
-      title: "Proctored Interview",
+      title: "Gamethon",
       subtitle: "Level 5",
-      description: "Simulated environment with comprehensive AI-powered analysis",
-      icon: "zap",
-      status: 'available'
-    },
-    {
-      id: 5,
-      title: "Leaderboard Challenge",
-      subtitle: "Level 6",
-      description: "Compete and rank up against other professionals",
+      description: "Compete and rank up against other professionals in exciting challenges",
       icon: "trophy",
       status: 'available'
     }
@@ -275,7 +266,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
               </div>
             </div>
             <div className="text-right">
-              <div className="text-3xl font-bold text-gray-800">{completedLevels.length}/6</div>
+              <div className="text-3xl font-bold text-gray-800">{completedLevels.length}/5</div>
               <div className="text-sm text-gray-600 font-medium">Completed</div>
             </div>
           </div>

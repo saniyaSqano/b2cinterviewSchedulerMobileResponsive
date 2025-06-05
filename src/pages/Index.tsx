@@ -5,7 +5,6 @@ import AssessmentFlow from '../components/AssessmentFlow';
 import ChatFlow from '../components/ChatFlow';
 import Level3Flow from '../components/Level3Flow';
 import Level4Flow from '../components/Level4Flow';
-import Level5Flow from '../components/Level5Flow';
 import InteractiveRoadmap from '../components/InteractiveRoadmap';
 
 const Index = () => {
@@ -15,17 +14,15 @@ const Index = () => {
   const [showChat, setShowChat] = useState(false);
   const [showLevel3, setShowLevel3] = useState(false);
   const [showLevel4, setShowLevel4] = useState(false);
-  const [showLevel5, setShowLevel5] = useState(false);
   const [assessmentScore] = useState(70);
 
-  // Credits earned per level
+  // Credits earned per level (updated for 5 levels)
   const levelCredits = {
     0: 100, // Skill Assessment
     1: 150, // AI Mentor Chat
     2: 200, // Pitch Builder
-    3: 250, // Practice Hub
-    4: 300, // Proctored Interview
-    5: 500  // Leaderboard Challenge
+    3: 250, // Proctored Interview
+    4: 500  // Gamethon
   };
 
   const getTotalCredits = () => {
@@ -56,19 +53,14 @@ const Index = () => {
     }
 
     if (index === 4) {
-      setShowLevel5(true);
-      return;
-    }
-
-    if (index === 5) {
-      console.log('GameOn feature coming soon!');
+      console.log('Gamethon feature coming soon!');
       return;
     }
     
     setTimeout(() => {
       if (!completedLevels.includes(index)) {
         setCompletedLevels(prev => [...prev, index]);
-        if (index === currentLevel && currentLevel < 5) {
+        if (index === currentLevel && currentLevel < 4) {
           setCurrentLevel(prev => prev + 1);
         }
       }
@@ -100,13 +92,6 @@ const Index = () => {
     if (!completedLevels.includes(3)) {
       setCompletedLevels(prev => [...prev, 3]);
       setCurrentLevel(4);
-    }
-  };
-
-  const handleLevel5Completed = () => {
-    if (!completedLevels.includes(4)) {
-      setCompletedLevels(prev => [...prev, 4]);
-      setCurrentLevel(5);
     }
   };
 
@@ -150,18 +135,6 @@ const Index = () => {
         onBack={() => {
           setShowLevel4(false);
           handleLevel4Completed();
-        }}
-        userName="Revati"
-      />
-    );
-  }
-
-  if (showLevel5) {
-    return (
-      <Level5Flow 
-        onBack={() => {
-          setShowLevel5(false);
-          handleLevel5Completed();
         }}
         userName="Revati"
       />
@@ -312,7 +285,7 @@ const Index = () => {
             </div>
             <div className="text-center">
               <div className="w-24 h-24 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl mb-3 mx-auto shadow-xl border-4 border-white/50">
-                {Math.round((completedLevels.length / 6) * 100)}%
+                {Math.round((completedLevels.length / 5) * 100)}%
               </div>
               <div className="text-sm text-gray-600 font-medium">Progress</div>
             </div>
