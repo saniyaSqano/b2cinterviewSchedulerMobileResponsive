@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAiProctoUser } from '../hooks/useAiProctoUser';
 import { ChevronLeft, ChevronRight, Calendar, Clock, FileText } from 'lucide-react';
@@ -32,7 +31,7 @@ const AssessmentFlow: React.FC<AssessmentFlowProps> = ({ onBack, onTestPassed })
   const [showReport, setShowReport] = useState(false);
   const [testResults, setTestResults] = useState<any>(null);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
-  const { createUser, updateUserReport, loading, error } = useAiProctoUser();
+  const { createUser, loading, error } = useAiProctoUser();
   const [formData, setFormData] = useState<FormData>({
     totalQuestions: 10,
     codingQuestions: 3,

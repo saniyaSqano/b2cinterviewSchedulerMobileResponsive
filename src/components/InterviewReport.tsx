@@ -103,7 +103,7 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
       
       // Check if the user exists by email
       const { data: existingUser, error: fetchError } = await supabase
-        .from('ai_procto_users')
+        .from('ai_procto_user')
         .select('*')
         .eq('email', email)
         .single();
@@ -133,19 +133,16 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
         
         const userData = {
           email: email,
-          first_name: fullName.split(' ')[0],
-          last_name: fullName.split(' ').slice(1).join(' '),
-          password_hash: 'placeholder',
+          full_name: fullName,
           policies_accepted: true,
           [columnName]: reportUrl,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          created_at: new Date().toISOString()
         };
         
         console.log('Full user data being inserted:', userData);
         
         const { data, error } = await supabase
-          .from('ai_procto_users')
+          .from('ai_procto_user')
           .insert(userData)
           .select()
           .single();
@@ -169,7 +166,7 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
         });
         
         let updateQuery = supabase
-          .from('ai_procto_users')
+          .from('ai_procto_user')
           .update({
             [columnName]: reportUrl,
             updated_at: new Date().toISOString()
