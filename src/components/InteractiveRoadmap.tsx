@@ -173,10 +173,11 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
               >
                 <div
                   onClick={() => handleCardClick(index)}
-                  className="relative p-6 rounded-3xl bg-white border-2 border-gray-100 shadow-xl hover:shadow-2xl hover:border-gray-200 hover:-translate-y-1 transition-all duration-300 cursor-pointer w-full h-full"
+                  className="relative p-6 rounded-3xl bg-white border-2 border-gray-100 shadow-xl hover:shadow-2xl hover:border-gray-200 hover:-translate-y-1 transition-all duration-300 cursor-pointer w-full"
+                  style={{ minHeight: '420px' }}
                 >
                   {/* Level Icon */}
-                  <div className="flex justify-center mb-4 relative">
+                  <div className="flex justify-center mb-6 relative">
                     <div className={`
                       w-16 h-16 rounded-full flex items-center justify-center text-white font-bold shadow-xl
                       ${getStatusStyles(status, isHovered)}
@@ -184,7 +185,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                       {getStepIcon(step, status)}
                     </div>
                     
-                    {/* Credits Badge - positioned absolutely to avoid layout shift */}
+                    {/* Credits Badge - positioned absolutely */}
                     <div className="absolute -top-2 -right-2">
                       <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-xl px-3 py-2 flex items-center space-x-1 shadow-lg border-2 border-white">
                         <Award className="w-4 h-4 text-white" />
@@ -203,20 +204,24 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                   )}
 
                   {/* Content */}
-                  <div className="text-center">
-                    <div className="text-xs font-bold text-purple-600 uppercase tracking-wider mb-3 bg-purple-50 px-3 py-1 rounded-full inline-block">
+                  <div className="text-center space-y-4">
+                    <div className="text-xs font-bold text-purple-600 uppercase tracking-wider bg-purple-50 px-3 py-1 rounded-full inline-block">
                       {step.subtitle}
                     </div>
-                    <h4 className="text-lg font-bold text-gray-900 mb-3 leading-tight min-h-[2.5rem] flex items-center justify-center">
+                    
+                    <h4 className="text-lg font-bold text-gray-900 leading-tight">
                       {step.title}
                     </h4>
-                    <p className="text-sm text-gray-600 leading-relaxed mb-4 min-h-[4rem] flex items-start justify-center">
-                      <span className="block">{step.description}</span>
-                    </p>
+                    
+                    <div style={{ minHeight: '72px' }} className="flex items-start justify-center">
+                      <p className="text-sm text-gray-600 leading-relaxed text-center">
+                        {step.description}
+                      </p>
+                    </div>
 
-                    {/* Progress Bar */}
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+                    {/* Progress Section */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between text-xs text-gray-500">
                         <span className="font-medium">Progress</span>
                         <span className="font-bold">{progress}%</span>
                       </div>
@@ -235,23 +240,25 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                     </div>
 
                     {/* Action Button */}
-                    <button
-                      className={`
-                        w-full py-3 px-4 rounded-2xl font-bold text-sm shadow-lg border-2 transition-all duration-300
-                        ${status === 'completed'
-                          ? 'bg-gradient-to-r from-green-100 to-green-200 text-green-700 hover:from-green-200 hover:to-green-300 border-green-300' 
-                          : status === 'current'
-                            ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 border-blue-400'
-                            : status === 'available'
-                              ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600 border-purple-400'
-                              : 'bg-gray-300 text-gray-500 cursor-not-allowed border-gray-400'
-                        }
-                      `}
-                    >
-                      {status === 'completed' ? '✅ Continue' : 
-                       status === 'current' && index === 0 ? '🚀 Continue' : 
-                       status === 'available' ? '▶️ Begin' : '🔒 Locked'}
-                    </button>
+                    <div className="pt-2">
+                      <button
+                        className={`
+                          w-full py-3 px-4 rounded-2xl font-bold text-sm shadow-lg border-2 transition-all duration-300
+                          ${status === 'completed'
+                            ? 'bg-gradient-to-r from-green-100 to-green-200 text-green-700 hover:from-green-200 hover:to-green-300 border-green-300' 
+                            : status === 'current'
+                              ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 border-blue-400'
+                              : status === 'available'
+                                ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600 border-purple-400'
+                                : 'bg-gray-300 text-gray-500 cursor-not-allowed border-gray-400'
+                          }
+                        `}
+                      >
+                        {status === 'completed' ? '✅ Continue' : 
+                         status === 'current' && index === 0 ? '🚀 Continue' : 
+                         status === 'available' ? '▶️ Begin' : '🔒 Locked'}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
