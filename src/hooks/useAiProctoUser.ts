@@ -48,15 +48,18 @@ export const useAiProctoUser = (email?: string) => {
         if (error.code === 'PGRST116') {
           // User not found, this is not necessarily an error
           setUser(null);
+          return null;
         } else {
           throw error;
         }
       } else {
         setUser(data);
+        return data;
       }
     } catch (err) {
       console.error('Error fetching user:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch user');
+      return null;
     } finally {
       setLoading(false);
     }
@@ -68,6 +71,14 @@ export const useAiProctoUser = (email?: string) => {
     
     try {
       console.log('Creating user with data:', userData);
+      
+      // First try to fetch existing user
+      const existingUser = await fetchUser(userData.email);
+      if (existingUser) {
+        console.log('User already exists:', existingUser);
+        setUser(existingUser);
+        return existingUser;
+      }
       
       const userDataForInsert = { 
         ...userData, 
@@ -83,6 +94,16 @@ export const useAiProctoUser = (email?: string) => {
         .single();
       
       if (error) {
+        // Handle duplicate key error gracefully
+        if (error.code === '23505') {
+          console.log('User already exists, fetching existing user');
+          const existingUser = await fetchUser(userData.email);
+          if (existingUser) {
+            setUser(existingUser);
+            return existingUser;
+          }
+        }
+        
         console.error('Supabase error details:', {
           code: error.code,
           message: error.message,

@@ -60,6 +60,31 @@ const UserInfoForm: React.FC = () => {
     } else {
       // Handle form submission and redirect to levels page
       try {
+        // Check if user already exists before creating
+        const { user: existingUser, fetchUser } = useAiProctoUser(formData.email);
+        
+        // Try to fetch existing user first
+        await fetchUser(formData.email);
+        
+        if (existingUser) {
+          // User already exists, just set them in context and proceed
+          setUser({
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            skills: formData.skills,
+            experience: formData.experience,
+            jobDescription: formData.jobDescription,
+            experienceLevel: formData.experienceLevel[0],
+            confidenceLevel: formData.confidenceLevel[0]
+          });
+          
+          toast.success('Welcome back! Proceeding to your journey! 🚀');
+          navigate('/levels');
+          return;
+        }
+
+        // User doesn't exist, create new user
         await createUser({
           email: formData.email,
           full_name: formData.name,
@@ -84,9 +109,27 @@ const UserInfoForm: React.FC = () => {
         
         toast.success('Profile created successfully! Welcome to ProctoVerse! 🚀');
         navigate('/levels');
-      } catch (error) {
-        toast.error('Failed to create profile. Please try again.');
-        console.error('Form submission error:', error);
+      } catch (error: any) {
+        // Handle duplicate email error specifically
+        if (error?.code === '23505' || error?.message?.includes('duplicate key')) {
+          // User already exists, just proceed with the form data
+          setUser({
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone,
+            skills: formData.skills,
+            experience: formData.experience,
+            jobDescription: formData.jobDescription,
+            experienceLevel: formData.experienceLevel[0],
+            confidenceLevel: formData.confidenceLevel[0]
+          });
+          
+          toast.success('Welcome back! Proceeding to your journey! 🚀');
+          navigate('/levels');
+        } else {
+          toast.error('Failed to create profile. Please try again.');
+          console.error('Form submission error:', error);
+        }
       }
     }
   };
