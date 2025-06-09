@@ -115,9 +115,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
     return 0;
   };
 
-  const handleCardClick = (index: number) => {
-    navigate('/user-info');
-  };
+  // Use the provided onStepClick function directly
 
   return (
     <div className="py-8">
@@ -156,7 +154,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
 
       {/* Roadmap Cards */}
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 justify-items-center">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
           {roadmapSteps.map((step, index) => {
             const status = getStepStatus(index);
             const isClickable = true;
@@ -167,13 +165,13 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
             return (
               <div
                 key={step.id}
-                className="w-full max-w-sm"
+                className="w-full max-w-sm h-full"
                 onMouseEnter={() => setHoveredStep(index)}
                 onMouseLeave={() => setHoveredStep(null)}
               >
                 <div
-                  onClick={() => handleCardClick(index)}
-                  className="relative p-8 rounded-3xl bg-white border-2 border-gray-100 shadow-xl hover:shadow-2xl hover:border-gray-200 hover:-translate-y-1 transition-all duration-300 cursor-pointer w-full min-h-[480px] flex flex-col justify-between"
+                  onClick={() => onStepClick(index)}
+                  className="relative p-6 rounded-3xl bg-white border-2 border-gray-100 shadow-xl hover:shadow-2xl hover:border-gray-200 hover:-translate-y-1 transition-all duration-300 cursor-pointer w-full h-full flex flex-col justify-between"
                 >
                   {/* Status Badge */}
                   {status === 'completed' && (
@@ -184,10 +182,10 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                     </div>
                   )}
 
-                  {/* Credits Badge - positioned absolutely */}
-                  <div className="absolute top-4 right-4">
-                    <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-xl px-3 py-2 flex items-center space-x-1 shadow-lg border-2 border-white">
-                      <Award className="w-4 h-4 text-white" />
+                  {/* Credits Badge - positioned as a standalone element above the card content */}
+                  <div className="absolute top-6 right-6">
+                    <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-xl px-3 py-1.5 flex items-center space-x-1 shadow-md border border-white">
+                      <Award className="w-3.5 h-3.5 text-white" />
                       <span className="text-white text-sm font-bold">{credits}</span>
                     </div>
                   </div>
@@ -195,7 +193,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                   {/* Top Content Section */}
                   <div className="flex-1 flex flex-col">
                     {/* Level Icon */}
-                    <div className="flex justify-center mb-8">
+                    <div className="flex justify-center mb-6 mt-4">
                       <div className={`
                         w-20 h-20 rounded-full flex items-center justify-center text-white font-bold shadow-xl
                         ${getStatusStyles(status, isHovered)}
@@ -205,7 +203,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                     </div>
 
                     {/* Content */}
-                    <div className="text-center space-y-4 flex-1 flex flex-col justify-center">
+                    <div className="text-center space-y-3 flex-1 flex flex-col justify-center">
                       <div className="text-xs font-bold text-purple-600 uppercase tracking-wider bg-purple-50 px-3 py-1 rounded-full inline-block mx-auto">
                         {step.subtitle}
                       </div>
@@ -214,7 +212,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                         {step.title}
                       </h4>
                       
-                      <div className="px-4 py-2">
+                      <div className="px-3 py-1">
                         <p className="text-sm text-gray-600 leading-relaxed text-center min-h-[60px] flex items-center justify-center">
                           {step.description}
                         </p>
@@ -223,7 +221,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                   </div>
 
                   {/* Bottom Section */}
-                  <div className="mt-6 space-y-4">
+                  <div className="mt-4 space-y-3">
                     {/* Progress Section */}
                     <div className="space-y-3">
                       <div className="flex items-center justify-between text-xs text-gray-500">
