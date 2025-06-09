@@ -8,8 +8,10 @@ import Level3Flow from '../components/Level3Flow';
 import Level4Flow from '../components/Level4Flow';
 import GamethonFlow from '../components/GamethonFlow';
 import InteractiveRoadmap from '../components/InteractiveRoadmap';
+import { useUser } from '../contexts/UserContext';
 
 const Index = () => {
+  const { user, setUser } = useUser();
   const [currentLevel, setCurrentLevel] = useState(0);
   const [completedLevels, setCompletedLevels] = useState<number[]>([]);
   const [showAssessment, setShowAssessment] = useState(false);
@@ -104,6 +106,17 @@ const Index = () => {
     }
   };
 
+  const handleLogout = () => {
+    setUser(null);
+  };
+
+  // Get user's first name
+  const getUserDisplayName = () => {
+    if (!user?.name) return 'User';
+    const firstName = user.name.split(' ')[0];
+    return firstName;
+  };
+
   if (showAssessment) {
     return (
       <AssessmentFlow 
@@ -120,7 +133,7 @@ const Index = () => {
           setShowChat(false);
           handleChatCompleted();
         }}
-        userName="Revati"
+        userName={getUserDisplayName()}
         assessmentScore={assessmentScore}
       />
     );
@@ -133,7 +146,7 @@ const Index = () => {
           setShowLevel3(false);
           handleLevel3Completed();
         }}
-        userName="Revati"
+        userName={getUserDisplayName()}
       />
     );
   }
@@ -145,7 +158,7 @@ const Index = () => {
           setShowLevel4(false);
           handleLevel4Completed();
         }}
-        userName="Revati"
+        userName={getUserDisplayName()}
       />
     );
   }
@@ -157,7 +170,7 @@ const Index = () => {
           setShowGamethon(false);
           handleGamethonCompleted();
         }}
-        userName="Revati"
+        userName={getUserDisplayName()}
       />
     );
   }
@@ -170,7 +183,6 @@ const Index = () => {
         <div className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-r from-purple-400/10 to-pink-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '10s' }}></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-r from-cyan-400/10 to-blue-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '12s' }}></div>
         
-        {/* Professional geometric patterns */}
         <div className="absolute top-1/4 right-1/4 w-2 h-2 bg-blue-400/30 rounded-full animate-pulse" style={{ animationDelay: '2s' }}></div>
         <div className="absolute bottom-1/3 left-1/4 w-1 h-1 bg-indigo-400/40 rounded-full animate-pulse" style={{ animationDelay: '4s' }}></div>
         <div className="absolute top-2/3 right-1/3 w-1.5 h-1.5 bg-purple-400/35 rounded-full animate-pulse" style={{ animationDelay: '6s' }}></div>
@@ -182,7 +194,7 @@ const Index = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <button 
-                onClick={() => window.history.back()}
+                onClick={handleLogout}
                 className="p-2.5 hover:bg-gray-100 rounded-lg transition-colors duration-200"
               >
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
@@ -210,10 +222,10 @@ const Index = () => {
               </div>
               <div className="flex items-center space-x-3 bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-200/70">
                 <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-semibold text-sm">R</span>
+                  <span className="text-white font-semibold text-sm">{getUserDisplayName().charAt(0)}</span>
                 </div>
                 <div>
-                  <span className="text-gray-900 font-semibold">Revati</span>
+                  <span className="text-gray-900 font-semibold">{getUserDisplayName()}</span>
                   <div className="text-xs text-gray-500">Level {currentLevel + 1}</div>
                 </div>
               </div>
@@ -242,7 +254,6 @@ const Index = () => {
             Master professional skills through AI-guided training, personalized feedback, and industry-standard assessments
           </p>
 
-          {/* Professional Trust Indicators */}
           <div className="flex justify-center flex-wrap gap-8 mb-12">
             <div className="flex items-center space-x-2 text-gray-600">
               <CheckCircle className="w-5 h-5 text-green-500" />
@@ -262,7 +273,6 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Professional Progress Overview */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 max-w-4xl mx-auto">
             <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 shadow-sm">
               <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center text-white font-bold text-2xl mb-4 mx-auto">
@@ -287,7 +297,6 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Professional Credits Breakdown */}
           {completedLevels.length > 0 && (
             <div className="mt-8 bg-white/90 backdrop-blur-sm rounded-2xl p-8 border border-gray-200/50 shadow-sm max-w-3xl mx-auto">
               <h3 className="text-gray-900 font-bold text-xl mb-6 flex items-center justify-center">
@@ -309,7 +318,6 @@ const Index = () => {
           )}
         </div>
 
-        {/* Professional Learning Path */}
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12">
             <h3 className="text-3xl font-bold text-gray-900 mb-4">Your Learning Journey</h3>
@@ -326,7 +334,6 @@ const Index = () => {
           />
         </div>
 
-        {/* Professional Bottom Section */}
         <div className="text-center mt-20 pb-16">
           <div className="max-w-5xl mx-auto bg-white/90 backdrop-blur-sm rounded-3xl p-12 border border-gray-200/50 shadow-sm">
             <div className="flex items-center justify-center mb-6">

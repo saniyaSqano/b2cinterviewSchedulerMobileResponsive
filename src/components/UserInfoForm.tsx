@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
 import { ArrowRight, Upload, Sparkles, Users, Brain, Target, Award, Zap, Star, Rocket, Code, Globe } from 'lucide-react';
 import { useAiProctoUser } from '@/hooks/useAiProctoUser';
+import { useUser } from '@/contexts/UserContext';
 import { toast } from 'sonner';
 
 interface FormData {
@@ -23,6 +24,7 @@ interface FormData {
 
 const UserInfoForm: React.FC = () => {
   const navigate = useNavigate();
+  const { setUser } = useUser();
   const [currentStep, setCurrentStep] = useState(1);
   const { createUser, loading } = useAiProctoUser();
   const [formData, setFormData] = useState<FormData>({
@@ -66,6 +68,18 @@ const UserInfoForm: React.FC = () => {
           cv_file_name: formData.cv?.name,
           job_description: formData.jobDescription,
           policies_accepted: true
+        });
+        
+        // Set user in context
+        setUser({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          skills: formData.skills,
+          experience: formData.experience,
+          jobDescription: formData.jobDescription,
+          experienceLevel: formData.experienceLevel[0],
+          confidenceLevel: formData.confidenceLevel[0]
         });
         
         toast.success('Profile created successfully! Welcome to ProctoVerse! 🚀');
