@@ -120,9 +120,9 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
   };
 
   return (
-    <div className="py-12">
+    <div className="py-8">
       {/* Overall Progress Summary */}
-      <div className="max-w-7xl mx-auto px-6 mb-16">
+      <div className="max-w-7xl mx-auto px-6 mb-12">
         <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 border-2 border-white/50 shadow-xl">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-4">
@@ -156,7 +156,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
 
       {/* Roadmap Cards */}
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 justify-items-center">
           {roadmapSteps.map((step, index) => {
             const status = getStepStatus(index);
             const isClickable = true; // All cards are clickable now
@@ -167,31 +167,29 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
             return (
               <div
                 key={step.id}
-                className="relative"
+                className="w-full max-w-sm"
                 onMouseEnter={() => setHoveredStep(index)}
                 onMouseLeave={() => setHoveredStep(null)}
               >
                 <div
                   onClick={() => handleCardClick(index)}
-                  className={`
-                    relative p-6 rounded-3xl transition-all duration-300 shadow-xl bg-white border-2 border-gray-100 backdrop-blur-sm cursor-pointer hover:shadow-2xl hover:border-gray-200 hover:-translate-y-1
-                  `}
+                  className="relative p-6 rounded-3xl bg-white border-2 border-gray-100 shadow-xl hover:shadow-2xl hover:border-gray-200 hover:-translate-y-1 transition-all duration-300 cursor-pointer w-full h-full"
                 >
                   {/* Level Icon */}
-                  <div className="flex justify-center mb-4">
+                  <div className="flex justify-center mb-4 relative">
                     <div className={`
-                      w-16 h-16 rounded-full flex items-center justify-center text-white font-bold shadow-xl transition-all duration-300
+                      w-16 h-16 rounded-full flex items-center justify-center text-white font-bold shadow-xl
                       ${getStatusStyles(status, isHovered)}
                     `}>
                       {getStepIcon(step, status)}
                     </div>
-                  </div>
-
-                  {/* Credits Badge */}
-                  <div className="absolute top-4 right-4">
-                    <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-xl px-3 py-2 flex items-center space-x-1 shadow-lg border-2 border-white">
-                      <Award className="w-4 h-4 text-white" />
-                      <span className="text-white text-sm font-bold">{credits}</span>
+                    
+                    {/* Credits Badge - positioned absolutely to avoid layout shift */}
+                    <div className="absolute -top-2 -right-2">
+                      <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-xl px-3 py-2 flex items-center space-x-1 shadow-lg border-2 border-white">
+                        <Award className="w-4 h-4 text-white" />
+                        <span className="text-white text-sm font-bold">{credits}</span>
+                      </div>
                     </div>
                   </div>
 
@@ -209,11 +207,11 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                     <div className="text-xs font-bold text-purple-600 uppercase tracking-wider mb-3 bg-purple-50 px-3 py-1 rounded-full inline-block">
                       {step.subtitle}
                     </div>
-                    <h4 className="text-lg font-bold text-gray-900 mb-3 leading-tight">
+                    <h4 className="text-lg font-bold text-gray-900 mb-3 leading-tight min-h-[2.5rem] flex items-center justify-center">
                       {step.title}
                     </h4>
-                    <p className="text-sm text-gray-600 leading-relaxed mb-4 min-h-[3rem]">
-                      {step.description}
+                    <p className="text-sm text-gray-600 leading-relaxed mb-4 min-h-[4rem] flex items-start justify-center">
+                      <span className="block">{step.description}</span>
                     </p>
 
                     {/* Progress Bar */}
@@ -239,7 +237,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                     {/* Action Button */}
                     <button
                       className={`
-                        w-full py-3 px-4 rounded-2xl font-bold text-sm transition-all duration-300 shadow-lg border-2
+                        w-full py-3 px-4 rounded-2xl font-bold text-sm shadow-lg border-2 transition-all duration-300
                         ${status === 'completed'
                           ? 'bg-gradient-to-r from-green-100 to-green-200 text-green-700 hover:from-green-200 hover:to-green-300 border-green-300' 
                           : status === 'current'
@@ -248,7 +246,6 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                               ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600 border-purple-400'
                               : 'bg-gray-300 text-gray-500 cursor-not-allowed border-gray-400'
                         }
-                        ${isHovered ? 'transform scale-105' : ''}
                       `}
                     >
                       {status === 'completed' ? '✅ Continue' : 
