@@ -92,15 +92,15 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
   };
 
   const getStatusStyles = (status: string, isHovered: boolean) => {
-    const baseClasses = 'transition-all duration-500 border-2 shadow-xl';
+    const baseClasses = 'transition-all duration-300 border-2 shadow-lg';
     
     switch (status) {
       case 'completed':
-        return `${baseClasses} bg-gradient-to-br from-green-500 to-emerald-600 border-green-400 shadow-green-200`;
+        return `${baseClasses} bg-gradient-to-br from-green-500 to-emerald-600 border-green-400`;
       case 'current':
-        return `${baseClasses} bg-gradient-to-br from-blue-500 to-indigo-600 border-blue-400 ring-4 ring-blue-200 animate-pulse`;
+        return `${baseClasses} bg-gradient-to-br from-blue-500 to-indigo-600 border-blue-400 ring-2 ring-blue-200`;
       case 'available':
-        return `${baseClasses} bg-gradient-to-br from-purple-400 to-indigo-500 border-purple-300 ${isHovered ? 'bg-gradient-to-br from-purple-500 to-indigo-600 shadow-purple-200' : 'shadow-purple-100'}`;
+        return `${baseClasses} bg-gradient-to-br from-purple-400 to-indigo-500 border-purple-300 ${isHovered ? 'bg-gradient-to-br from-purple-500 to-indigo-600' : ''}`;
       default:
         return `${baseClasses} bg-gradient-to-br from-gray-300 to-gray-400 border-gray-200`;
     }
@@ -116,9 +116,9 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
 
   return (
     <div className="py-12">
-      {/* Overall Progress Summary - Moved to top */}
+      {/* Overall Progress Summary */}
       <div className="max-w-7xl mx-auto px-6 mb-16">
-        <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 border-2 border-white/50 shadow-2xl transform transition-all duration-500 hover:scale-105">
+        <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 border-2 border-white/50 shadow-xl">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-4">
               <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
@@ -137,11 +137,9 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
           
           <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden shadow-inner">
             <div
-              className="bg-gradient-to-r from-purple-400 to-indigo-500 h-4 rounded-full transition-all duration-1000 relative overflow-hidden shadow-lg"
+              className="bg-gradient-to-r from-purple-400 to-indigo-500 h-4 rounded-full transition-all duration-500"
               style={{ width: `${(completedLevels.length / roadmapSteps.length) * 100}%` }}
-            >
-              <div className="absolute inset-0 bg-white/30 animate-shimmer" />
-            </div>
+            />
           </div>
           
           <div className="flex justify-between text-sm text-gray-600 mt-3 font-medium">
@@ -156,10 +154,10 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
         {/* Roadmap Container */}
         <div className="relative">
           {/* Connecting Line */}
-          <div className="absolute top-16 left-0 right-0 h-1 bg-gradient-to-r from-purple-200 via-blue-200 to-indigo-200 rounded-full mx-16"></div>
+          <div className="absolute top-20 left-0 right-0 h-1 bg-gradient-to-r from-purple-200 via-blue-200 to-indigo-200 rounded-full mx-20"></div>
           
           {/* Cards in Single Row */}
-          <div className="flex justify-between items-start space-x-4 relative z-10">
+          <div className="flex justify-between items-start space-x-8 relative z-10">
             {roadmapSteps.map((step, index) => {
               const status = getStepStatus(index);
               const isClickable = status === 'current' || status === 'available' || status === 'completed';
@@ -177,35 +175,22 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                   <div
                     onClick={() => isClickable && onStepClick(index)}
                     className={`
-                      relative p-6 rounded-3xl cursor-pointer transform transition-all duration-500
-                      ${isClickable ? 'hover:scale-105 hover:-translate-y-3' : 'cursor-not-allowed opacity-75'}
-                      ${isHovered ? 'shadow-2xl' : 'shadow-xl'}
-                      bg-white/90 border-2 border-white/50 backdrop-blur-sm
-                      hover:bg-white/95 hover:border-white/70
+                      relative p-6 rounded-3xl transition-all duration-300 shadow-xl bg-white/90 border-2 border-white/50 backdrop-blur-sm
+                      ${isClickable ? 'cursor-pointer hover:shadow-2xl hover:bg-white/95 hover:border-white/70 hover:-translate-y-1' : 'cursor-not-allowed opacity-75'}
                     `}
                   >
-                    {/* Floating particles for completed levels */}
-                    {status === 'completed' && (
-                      <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-3xl">
-                        <div className="absolute top-4 left-4 w-2 h-2 bg-green-400 rounded-full animate-floating-particle-1"></div>
-                        <div className="absolute top-6 right-5 w-1.5 h-1.5 bg-emerald-400 rounded-full animate-floating-particle-2"></div>
-                        <div className="absolute bottom-5 left-6 w-1.5 h-1.5 bg-green-500 rounded-full animate-floating-particle-3"></div>
-                      </div>
-                    )}
-
                     {/* Level Badge */}
-                    <div className="absolute -top-4 -left-4 z-10">
+                    <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-10">
                       <div className={`
-                        w-16 h-16 rounded-full flex items-center justify-center text-white font-bold shadow-xl transform transition-all duration-300
+                        w-16 h-16 rounded-full flex items-center justify-center text-white font-bold shadow-xl transition-all duration-300
                         ${getStatusStyles(status, isHovered)}
-                        ${isHovered ? 'scale-110' : ''}
                       `}>
                         {getStepIcon(step, status)}
                       </div>
                     </div>
 
                     {/* Credits Badge */}
-                    <div className="absolute -top-3 -right-3 z-10">
+                    <div className="absolute -top-4 -right-4 z-10">
                       <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-xl px-3 py-2 flex items-center space-x-1 shadow-lg border-2 border-white">
                         <Award className="w-4 h-4 text-white" />
                         <span className="text-white text-sm font-bold">{credits}</span>
@@ -214,7 +199,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
 
                     {/* Status Badge */}
                     {status === 'completed' && (
-                      <div className="absolute top-2 right-2 z-10">
+                      <div className="absolute top-4 right-4 z-10">
                         <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
                           <CheckCircle className="w-5 h-5 text-white" />
                         </div>
@@ -222,18 +207,18 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                     )}
 
                     {/* Content */}
-                    <div className="pt-8">
+                    <div className="pt-10 pb-2">
                       <div className="text-xs font-bold text-purple-600 uppercase tracking-wider mb-3 bg-purple-50 px-3 py-1 rounded-full inline-block">
                         {step.subtitle}
                       </div>
                       <h4 className="text-lg font-bold text-gray-900 mb-3 leading-tight">
                         {step.title}
                       </h4>
-                      <p className="text-xs text-gray-600 leading-relaxed mb-4 min-h-[2.5rem]">
+                      <p className="text-xs text-gray-600 leading-relaxed mb-4 min-h-[3rem]">
                         {step.description}
                       </p>
 
-                      {/* Enhanced Progress Bar */}
+                      {/* Progress Bar */}
                       <div className="mb-4">
                         <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
                           <span className="font-medium">Progress</span>
@@ -241,7 +226,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden shadow-inner">
                           <div
-                            className={`h-2 rounded-full transition-all duration-1000 relative overflow-hidden ${
+                            className={`h-2 rounded-full transition-all duration-500 ${
                               status === 'completed' 
                                 ? 'bg-gradient-to-r from-green-400 to-emerald-500' 
                                 : status === 'current'
@@ -249,25 +234,23 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
                                   : 'bg-gray-300'
                             }`}
                             style={{ width: `${progress}%` }}
-                          >
-                            <div className="absolute inset-0 bg-white/20 animate-shimmer" />
-                          </div>
+                          />
                         </div>
                       </div>
 
-                      {/* Enhanced Action Button */}
+                      {/* Action Button */}
                       <button
                         className={`
-                          w-full py-3 px-4 rounded-2xl font-bold text-xs transition-all duration-300 transform shadow-lg
+                          w-full py-3 px-4 rounded-2xl font-bold text-xs transition-all duration-300 shadow-lg border-2
                           ${status === 'completed'
-                            ? 'bg-gradient-to-r from-green-100 to-green-200 text-green-700 hover:from-green-200 hover:to-green-300 border-2 border-green-300' 
+                            ? 'bg-gradient-to-r from-green-100 to-green-200 text-green-700 hover:from-green-200 hover:to-green-300 border-green-300' 
                             : status === 'current'
-                              ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 shadow-blue-200 border-2 border-blue-400'
+                              ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 border-blue-400'
                               : status === 'available'
-                                ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600 shadow-purple-200 border-2 border-purple-400'
-                                : 'bg-gray-300 text-gray-500 cursor-not-allowed border-2 border-gray-400'
+                                ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600 border-purple-400'
+                                : 'bg-gray-300 text-gray-500 cursor-not-allowed border-gray-400'
                           }
-                          ${isHovered && isClickable ? 'scale-105 shadow-xl' : ''}
+                          ${isHovered && isClickable ? 'transform scale-105' : ''}
                         `}
                         disabled={!isClickable}
                       >
