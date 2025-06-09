@@ -26,7 +26,7 @@ const UserInfoForm: React.FC = () => {
   const navigate = useNavigate();
   const { setUser } = useUser();
   const [currentStep, setCurrentStep] = useState(1);
-  const { createUser, loading } = useAiProctoUser();
+  const { createUser, fetchUser, loading } = useAiProctoUser();
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -60,11 +60,8 @@ const UserInfoForm: React.FC = () => {
     } else {
       // Handle form submission and redirect to levels page
       try {
-        // Check if user already exists before creating
-        const { user: existingUser, fetchUser } = useAiProctoUser(formData.email);
-        
-        // Try to fetch existing user first
-        await fetchUser(formData.email);
+        // First try to fetch existing user
+        const existingUser = await fetchUser(formData.email);
         
         if (existingUser) {
           // User already exists, just set them in context and proceed
