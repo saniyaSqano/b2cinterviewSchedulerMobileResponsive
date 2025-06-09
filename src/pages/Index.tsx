@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ArrowLeft, Trophy, Star, Award, Brain, Users, Sparkles, Target, Rocket, Code, Globe } from 'lucide-react';
+import { ArrowLeft, Trophy, Star, Award, Brain, Users, Sparkles, Target, Rocket, Code, Globe, CheckCircle, Clock, TrendingUp } from 'lucide-react';
 import ParticleBackground from '../components/ParticleBackground';
 import AssessmentFlow from '../components/AssessmentFlow';
 import ChatFlow from '../components/ChatFlow';
@@ -164,87 +164,56 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative overflow-hidden">
-      {/* Enhanced Animated Background Elements */}
+      {/* Professional Background with Subtle Animations */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* Floating geometric shapes with better animations */}
-        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-indigo-200/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-cyan-200/20 rounded-full blur-3xl animate-pulse delay-500"></div>
+        <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-blue-400/10 to-indigo-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }}></div>
+        <div className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-r from-purple-400/10 to-pink-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '10s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-r from-cyan-400/10 to-blue-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '12s' }}></div>
         
-        {/* Moving gradient orbs */}
-        <div className="absolute top-1/4 right-1/3 w-64 h-64 bg-gradient-to-r from-blue-300/30 to-cyan-300/30 rounded-full blur-2xl animate-bounce" style={{ animationDuration: '8s' }}></div>
-        <div className="absolute bottom-1/3 left-1/4 w-48 h-48 bg-gradient-to-r from-indigo-300/30 to-purple-300/30 rounded-full blur-2xl animate-bounce delay-2000" style={{ animationDuration: '6s' }}></div>
-        
-        {/* Enhanced floating icons with motion */}
-        <div className="absolute top-16 right-1/4 animate-bounce" style={{ animationDelay: '1s', animationDuration: '4s' }}>
-          <Target className="w-10 h-10 text-blue-400/50" />
-        </div>
-        <div className="absolute bottom-1/4 left-1/5 animate-bounce" style={{ animationDelay: '2s', animationDuration: '5s' }}>
-          <Award className="w-8 h-8 text-indigo-400/50" />
-        </div>
-        <div className="absolute top-1/3 right-1/6 animate-bounce" style={{ animationDelay: '3s', animationDuration: '3.5s' }}>
-          <Rocket className="w-9 h-9 text-cyan-400/50" />
-        </div>
-        <div className="absolute top-3/4 left-1/3 animate-bounce" style={{ animationDelay: '4s', animationDuration: '4.5s' }}>
-          <Code className="w-7 h-7 text-purple-400/50" />
-        </div>
-        <div className="absolute bottom-1/2 right-1/5 animate-bounce" style={{ animationDelay: '5s', animationDuration: '6s' }}>
-          <Globe className="w-8 h-8 text-blue-500/50" />
-        </div>
-        
-        {/* Enhanced floating particles */}
-        {Array.from({ length: 20 }).map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-2 h-2 bg-gradient-to-r from-blue-400/30 to-cyan-400/30 rounded-full animate-float"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animation: `float ${4 + Math.random() * 6}s ease-in-out infinite`,
-              animationDelay: `${Math.random() * 8}s`
-            }}
-          ></div>
-        ))}
+        {/* Professional geometric patterns */}
+        <div className="absolute top-1/4 right-1/4 w-2 h-2 bg-blue-400/30 rounded-full animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute bottom-1/3 left-1/4 w-1 h-1 bg-indigo-400/40 rounded-full animate-pulse" style={{ animationDelay: '4s' }}></div>
+        <div className="absolute top-2/3 right-1/3 w-1.5 h-1.5 bg-purple-400/35 rounded-full animate-pulse" style={{ animationDelay: '6s' }}></div>
       </div>
 
-      {/* Top Navigation Bar */}
-      <div className="relative z-20 bg-white/90 backdrop-blur-md border-b border-white/30 shadow-lg">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+      {/* Professional Header */}
+      <div className="relative z-20 bg-white/95 backdrop-blur-md border-b border-gray-200/50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <button 
                 onClick={() => window.history.back()}
-                className="p-3 hover:bg-gradient-to-r hover:from-purple-100 hover:to-indigo-100 rounded-xl transition-all duration-300 hover:scale-105 shadow-md"
+                className="p-2.5 hover:bg-gray-100 rounded-lg transition-colors duration-200"
               >
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
               </button>
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                <h1 className="text-2xl font-bold text-gray-900">
                   ProctoVerse
                 </h1>
-                <div className="w-20 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></div>
+                <p className="text-sm text-gray-600 font-medium">Professional Development Platform</p>
               </div>
             </div>
             
-            {/* User Profile & Credits */}
+            {/* Professional User Profile Section */}
             <div className="flex items-center space-x-6">
-              <div className="flex items-center space-x-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl px-6 py-3 border border-blue-200/50 shadow-lg backdrop-blur-sm">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center animate-pulse">
+              <div className="flex items-center space-x-4 bg-white rounded-xl px-5 py-3 border border-gray-200/70 shadow-sm">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
                     <Trophy className="w-4 h-4 text-white" />
                   </div>
                   <div>
-                    <span className="text-gray-700 font-bold text-lg">{getTotalCredits()}</span>
+                    <span className="text-gray-900 font-bold text-lg">{getTotalCredits()}</span>
                     <span className="text-gray-600 text-sm ml-1">Credits</span>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center space-x-3 bg-white/80 rounded-2xl px-4 py-3 shadow-lg backdrop-blur-sm border border-white/50">
-                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full flex items-center justify-center shadow-lg">
-                  <span className="text-white font-bold text-lg">R</span>
+              <div className="flex items-center space-x-3 bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-200/70">
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-semibold text-sm">R</span>
                 </div>
                 <div>
-                  <span className="text-gray-800 font-semibold">Revati</span>
+                  <span className="text-gray-900 font-semibold">Revati</span>
                   <div className="text-xs text-gray-500">Level {currentLevel + 1}</div>
                 </div>
               </div>
@@ -253,85 +222,85 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Main Content */}
+      {/* Professional Hero Section */}
       <div className="relative z-10">
-        {/* Hero Section */}
-        <div className="max-w-5xl mx-auto px-6 pt-12 pb-8 text-center">
-          <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full text-gray-700 text-sm font-semibold mb-8 backdrop-blur-sm border border-blue-200/50 shadow-lg">
-            <Brain className="w-5 h-5 mr-2 text-blue-600" />
-            🤖 AI-Powered Professional Development Journey
+        <div className="max-w-6xl mx-auto px-6 pt-16 pb-12 text-center">
+          <div className="inline-flex items-center px-6 py-3 bg-white/90 backdrop-blur-sm rounded-full text-gray-700 text-sm font-medium mb-8 border border-gray-200/50 shadow-sm">
+            <Brain className="w-4 h-4 mr-2 text-blue-600" />
+            AI-Powered Professional Development
           </div>
           
-          <h2 className="text-5xl md:text-6xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 bg-clip-text text-transparent">
-              Welcome to Your
-            </span>
+          <h2 className="text-5xl md:text-6xl font-bold mb-6 text-gray-900 leading-tight">
+            Accelerate Your
             <br />
-            <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Learning Adventure
+            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              Career Growth
             </span>
           </h2>
           
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-8">
-            🚀 Master interview skills through AI-guided training, real-time feedback, and personalized learning paths
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-10">
+            Master professional skills through AI-guided training, personalized feedback, and industry-standard assessments
           </p>
 
-          {/* Enhanced feature highlights */}
-          <div className="flex justify-center flex-wrap gap-4 mb-8">
-            <div className="flex items-center space-x-2 text-gray-600 bg-white/70 px-4 py-2 rounded-full backdrop-blur-sm border border-white/50 shadow-md">
-              <Brain className="w-4 h-4 text-blue-500" />
-              <span className="text-sm font-medium">AI Mentor</span>
+          {/* Professional Trust Indicators */}
+          <div className="flex justify-center flex-wrap gap-8 mb-12">
+            <div className="flex items-center space-x-2 text-gray-600">
+              <CheckCircle className="w-5 h-5 text-green-500" />
+              <span className="text-sm font-medium">Industry Certified</span>
             </div>
-            <div className="flex items-center space-x-2 text-gray-600 bg-white/70 px-4 py-2 rounded-full backdrop-blur-sm border border-white/50 shadow-md">
-              <Users className="w-4 h-4 text-indigo-500" />
-              <span className="text-sm font-medium">Mock Interviews</span>
+            <div className="flex items-center space-x-2 text-gray-600">
+              <Users className="w-5 h-5 text-blue-500" />
+              <span className="text-sm font-medium">10,000+ Professionals</span>
             </div>
-            <div className="flex items-center space-x-2 text-gray-600 bg-white/70 px-4 py-2 rounded-full backdrop-blur-sm border border-white/50 shadow-md">
-              <Sparkles className="w-4 h-4 text-cyan-500" />
-              <span className="text-sm font-medium">Smart Analytics</span>
+            <div className="flex items-center space-x-2 text-gray-600">
+              <TrendingUp className="w-5 h-5 text-indigo-500" />
+              <span className="text-sm font-medium">95% Success Rate</span>
             </div>
-            <div className="flex items-center space-x-2 text-gray-600 bg-white/70 px-4 py-2 rounded-full backdrop-blur-sm border border-white/50 shadow-md">
-              <Star className="w-4 h-4 text-purple-500" />
-              <span className="text-sm font-medium">Skill Assessment</span>
+            <div className="flex items-center space-x-2 text-gray-600">
+              <Clock className="w-5 h-5 text-purple-500" />
+              <span className="text-sm font-medium">24/7 AI Support</span>
             </div>
           </div>
 
-          {/* Progress Stats with Credits Display */}
-          <div className="flex items-center justify-center space-x-8 mb-8">
-            <div className="text-center">
-              <div className="w-24 h-24 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-xl mb-3 mx-auto shadow-xl border-4 border-white/50">
+          {/* Professional Progress Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 max-w-4xl mx-auto">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 shadow-sm">
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center text-white font-bold text-2xl mb-4 mx-auto">
                 {completedLevels.length}
               </div>
-              <div className="text-sm text-gray-600 font-medium">Levels Complete</div>
+              <div className="text-sm font-medium text-gray-600 mb-1">Modules Completed</div>
+              <div className="text-lg font-bold text-gray-900">{completedLevels.length} of 5</div>
             </div>
-            <div className="text-center">
-              <div className="w-24 h-24 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xl mb-3 mx-auto shadow-xl border-4 border-white/50">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 shadow-sm">
+              <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center text-white font-bold text-2xl mb-4 mx-auto">
                 {Math.round((completedLevels.length / 5) * 100)}%
               </div>
-              <div className="text-sm text-gray-600 font-medium">Progress</div>
+              <div className="text-sm font-medium text-gray-600 mb-1">Overall Progress</div>
+              <div className="text-lg font-bold text-gray-900">Course Completion</div>
             </div>
-            <div className="text-center">
-              <div className="w-24 h-24 bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full flex items-center justify-center text-white font-bold text-xl mb-3 mx-auto shadow-xl border-4 border-white/50">
-                <Trophy className="w-10 h-10" />
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 shadow-sm">
+              <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-white mb-4 mx-auto">
+                <Trophy className="w-8 h-8" />
               </div>
-              <div className="text-sm text-gray-600 font-medium">{getTotalCredits()} Credits</div>
+              <div className="text-sm font-medium text-gray-600 mb-1">Credits Earned</div>
+              <div className="text-lg font-bold text-gray-900">{getTotalCredits()} Points</div>
             </div>
           </div>
 
-          {/* Credits Breakdown */}
+          {/* Professional Credits Breakdown */}
           {completedLevels.length > 0 && (
-            <div className="mt-8 bg-white/80 backdrop-blur-md rounded-3xl p-8 border border-white/50 shadow-xl max-w-2xl mx-auto">
-              <h3 className="text-gray-800 font-bold text-lg mb-6 flex items-center justify-center">
-                <Award className="w-6 h-6 mr-2 text-yellow-500" />
-                Credits Earned
+            <div className="mt-8 bg-white/90 backdrop-blur-sm rounded-2xl p-8 border border-gray-200/50 shadow-sm max-w-3xl mx-auto">
+              <h3 className="text-gray-900 font-bold text-xl mb-6 flex items-center justify-center">
+                <Award className="w-6 h-6 mr-2 text-blue-500" />
+                Achievement Overview
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {completedLevels.map((level) => (
-                  <div key={level} className="flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl px-4 py-3 border border-blue-200/50">
-                    <span className="text-gray-600 text-sm font-medium">Level {level + 1}</span>
+                  <div key={level} className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3 border border-gray-200/50">
+                    <span className="text-gray-700 text-sm font-medium">Module {level + 1}</span>
                     <div className="flex items-center space-x-1">
-                      <Star className="w-4 h-4 text-yellow-500" />
-                      <span className="text-gray-800 font-bold">{levelCredits[level as keyof typeof levelCredits]}</span>
+                      <Star className="w-4 h-4 text-blue-500" />
+                      <span className="text-gray-900 font-bold">{levelCredits[level as keyof typeof levelCredits]}</span>
                     </div>
                   </div>
                 ))}
@@ -340,8 +309,15 @@ const Index = () => {
           )}
         </div>
 
-        {/* Interactive Roadmap */}
+        {/* Professional Learning Path */}
         <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold text-gray-900 mb-4">Your Learning Journey</h3>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Follow our structured path to master professional skills and advance your career
+            </p>
+          </div>
+          
           <InteractiveRoadmap
             currentLevel={currentLevel}
             completedLevels={completedLevels}
@@ -350,24 +326,40 @@ const Index = () => {
           />
         </div>
 
-        {/* Enhanced bottom section */}
-        <div className="text-center mt-16 pb-12">
-          <div className="max-w-4xl mx-auto bg-white/80 backdrop-blur-md rounded-3xl p-8 border border-white/50 shadow-xl">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4">
-              🌟 Join Thousands of Successful Professionals
-            </h3>
-            <div className="flex justify-center space-x-8 text-sm text-gray-600">
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span>Trusted by Top Companies</span>
+        {/* Professional Bottom Section */}
+        <div className="text-center mt-20 pb-16">
+          <div className="max-w-5xl mx-auto bg-white/90 backdrop-blur-sm rounded-3xl p-12 border border-gray-200/50 shadow-sm">
+            <div className="flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mr-4">
+                <Sparkles className="w-8 h-8 text-white" />
               </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                <span>95% Success Rate</span>
+              <div className="text-left">
+                <h3 className="text-2xl font-bold text-gray-900">Ready to Transform Your Career?</h3>
+                <p className="text-gray-600">Join thousands of professionals who've accelerated their growth</p>
               </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                <span>AI-Powered Insights</span>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+              <div className="text-center">
+                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <CheckCircle className="w-6 h-6 text-green-600" />
+                </div>
+                <div className="font-semibold text-gray-900 mb-1">Certified Training</div>
+                <div className="text-sm text-gray-600">Industry-recognized certifications</div>
+              </div>
+              <div className="text-center">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <Brain className="w-6 h-6 text-blue-600" />
+                </div>
+                <div className="font-semibold text-gray-900 mb-1">AI-Powered Learning</div>
+                <div className="text-sm text-gray-600">Personalized feedback and guidance</div>
+              </div>
+              <div className="text-center">
+                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <TrendingUp className="w-6 h-6 text-purple-600" />
+                </div>
+                <div className="font-semibold text-gray-900 mb-1">Career Growth</div>
+                <div className="text-sm text-gray-600">Proven results and outcomes</div>
               </div>
             </div>
           </div>
