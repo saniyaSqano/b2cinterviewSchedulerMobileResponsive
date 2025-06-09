@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { CheckCircle, Circle, Lock, Target, Zap, Star, Trophy, User, GraduationCap, Award } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface RoadmapStep {
   id: number;
@@ -25,6 +26,7 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
   levelCredits
 }) => {
   const [hoveredStep, setHoveredStep] = useState<number | null>(null);
+  const navigate = useNavigate();
 
   const roadmapSteps: RoadmapStep[] = [
     {
@@ -106,12 +108,15 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
     }
   };
 
-  const getProgressPercentage = (status: string) => {
-    switch (status) {
-      case 'completed': return 100;
-      case 'current': return 75;
-      default: return 0;
-    }
+  const getProgressPercentage = (status: string, index: number) => {
+    if (status === 'completed') return 100;
+    if (index === 0 && status === 'current') return 75; // Special case for level 1
+    if (status === 'current') return 0;
+    return 0;
+  };
+
+  const handleCardClick = (index: number) => {
+    navigate('/user-info');
   };
 
   return (
@@ -149,121 +154,112 @@ const InteractiveRoadmap: React.FC<InteractiveRoadmapProps> = ({
         </div>
       </div>
 
-      {/* Single Line Roadmap */}
+      {/* Roadmap Cards */}
       <div className="max-w-7xl mx-auto px-6">
-        {/* Roadmap Container */}
-        <div className="relative">
-          {/* Connecting Line */}
-          <div className="absolute top-20 left-0 right-0 h-1 bg-gradient-to-r from-purple-200 via-blue-200 to-indigo-200 rounded-full mx-20"></div>
-          
-          {/* Cards in Single Row */}
-          <div className="flex justify-between items-start space-x-8 relative z-10">
-            {roadmapSteps.map((step, index) => {
-              const status = getStepStatus(index);
-              const isClickable = status === 'current' || status === 'available' || status === 'completed';
-              const isHovered = hoveredStep === index;
-              const progress = getProgressPercentage(status);
-              const credits = levelCredits[index] || 0;
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+          {roadmapSteps.map((step, index) => {
+            const status = getStepStatus(index);
+            const isClickable = true; // All cards are clickable now
+            const isHovered = hoveredStep === index;
+            const progress = getProgressPercentage(status, index);
+            const credits = levelCredits[index] || 0;
 
-              return (
+            return (
+              <div
+                key={step.id}
+                className="relative"
+                onMouseEnter={() => setHoveredStep(index)}
+                onMouseLeave={() => setHoveredStep(null)}
+              >
                 <div
-                  key={step.id}
-                  className="flex-1 relative max-w-xs"
-                  onMouseEnter={() => setHoveredStep(index)}
-                  onMouseLeave={() => setHoveredStep(null)}
+                  onClick={() => handleCardClick(index)}
+                  className={`
+                    relative p-6 rounded-3xl transition-all duration-300 shadow-xl bg-white border-2 border-gray-100 backdrop-blur-sm cursor-pointer hover:shadow-2xl hover:border-gray-200 hover:-translate-y-1
+                  `}
                 >
-                  <div
-                    onClick={() => isClickable && onStepClick(index)}
-                    className={`
-                      relative p-6 rounded-3xl transition-all duration-300 shadow-xl bg-white/90 border-2 border-white/50 backdrop-blur-sm
-                      ${isClickable ? 'cursor-pointer hover:shadow-2xl hover:bg-white/95 hover:border-white/70 hover:-translate-y-1' : 'cursor-not-allowed opacity-75'}
-                    `}
-                  >
-                    {/* Level Badge */}
-                    <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-10">
-                      <div className={`
-                        w-16 h-16 rounded-full flex items-center justify-center text-white font-bold shadow-xl transition-all duration-300
-                        ${getStatusStyles(status, isHovered)}
-                      `}>
-                        {getStepIcon(step, status)}
-                      </div>
-                    </div>
-
-                    {/* Credits Badge */}
-                    <div className="absolute -top-4 -right-4 z-10">
-                      <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-xl px-3 py-2 flex items-center space-x-1 shadow-lg border-2 border-white">
-                        <Award className="w-4 h-4 text-white" />
-                        <span className="text-white text-sm font-bold">{credits}</span>
-                      </div>
-                    </div>
-
-                    {/* Status Badge */}
-                    {status === 'completed' && (
-                      <div className="absolute top-4 right-4 z-10">
-                        <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
-                          <CheckCircle className="w-5 h-5 text-white" />
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Content */}
-                    <div className="pt-10 pb-2">
-                      <div className="text-xs font-bold text-purple-600 uppercase tracking-wider mb-3 bg-purple-50 px-3 py-1 rounded-full inline-block">
-                        {step.subtitle}
-                      </div>
-                      <h4 className="text-lg font-bold text-gray-900 mb-3 leading-tight">
-                        {step.title}
-                      </h4>
-                      <p className="text-xs text-gray-600 leading-relaxed mb-4 min-h-[3rem]">
-                        {step.description}
-                      </p>
-
-                      {/* Progress Bar */}
-                      <div className="mb-4">
-                        <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
-                          <span className="font-medium">Progress</span>
-                          <span className="font-bold">{progress}%</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden shadow-inner">
-                          <div
-                            className={`h-2 rounded-full transition-all duration-500 ${
-                              status === 'completed' 
-                                ? 'bg-gradient-to-r from-green-400 to-emerald-500' 
-                                : status === 'current'
-                                  ? 'bg-gradient-to-r from-blue-400 to-indigo-500'
-                                  : 'bg-gray-300'
-                            }`}
-                            style={{ width: `${progress}%` }}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Action Button */}
-                      <button
-                        className={`
-                          w-full py-3 px-4 rounded-2xl font-bold text-xs transition-all duration-300 shadow-lg border-2
-                          ${status === 'completed'
-                            ? 'bg-gradient-to-r from-green-100 to-green-200 text-green-700 hover:from-green-200 hover:to-green-300 border-green-300' 
-                            : status === 'current'
-                              ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 border-blue-400'
-                              : status === 'available'
-                                ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600 border-purple-400'
-                                : 'bg-gray-300 text-gray-500 cursor-not-allowed border-gray-400'
-                          }
-                          ${isHovered && isClickable ? 'transform scale-105' : ''}
-                        `}
-                        disabled={!isClickable}
-                      >
-                        {status === 'completed' ? '✅ Review' : 
-                         status === 'current' ? '🚀 Continue' : 
-                         status === 'available' ? '▶️ Begin' : '🔒 Locked'}
-                      </button>
+                  {/* Level Icon */}
+                  <div className="flex justify-center mb-4">
+                    <div className={`
+                      w-16 h-16 rounded-full flex items-center justify-center text-white font-bold shadow-xl transition-all duration-300
+                      ${getStatusStyles(status, isHovered)}
+                    `}>
+                      {getStepIcon(step, status)}
                     </div>
                   </div>
+
+                  {/* Credits Badge */}
+                  <div className="absolute top-4 right-4">
+                    <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-xl px-3 py-2 flex items-center space-x-1 shadow-lg border-2 border-white">
+                      <Award className="w-4 h-4 text-white" />
+                      <span className="text-white text-sm font-bold">{credits}</span>
+                    </div>
+                  </div>
+
+                  {/* Status Badge */}
+                  {status === 'completed' && (
+                    <div className="absolute top-4 left-4">
+                      <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                        <CheckCircle className="w-5 h-5 text-white" />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Content */}
+                  <div className="text-center">
+                    <div className="text-xs font-bold text-purple-600 uppercase tracking-wider mb-3 bg-purple-50 px-3 py-1 rounded-full inline-block">
+                      {step.subtitle}
+                    </div>
+                    <h4 className="text-lg font-bold text-gray-900 mb-3 leading-tight">
+                      {step.title}
+                    </h4>
+                    <p className="text-sm text-gray-600 leading-relaxed mb-4 min-h-[3rem]">
+                      {step.description}
+                    </p>
+
+                    {/* Progress Bar */}
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+                        <span className="font-medium">Progress</span>
+                        <span className="font-bold">{progress}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden shadow-inner">
+                        <div
+                          className={`h-2 rounded-full transition-all duration-500 ${
+                            status === 'completed' 
+                              ? 'bg-gradient-to-r from-green-400 to-emerald-500' 
+                              : status === 'current' && index === 0
+                                ? 'bg-gradient-to-r from-blue-400 to-indigo-500'
+                                : 'bg-gray-300'
+                          }`}
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Action Button */}
+                    <button
+                      className={`
+                        w-full py-3 px-4 rounded-2xl font-bold text-sm transition-all duration-300 shadow-lg border-2
+                        ${status === 'completed'
+                          ? 'bg-gradient-to-r from-green-100 to-green-200 text-green-700 hover:from-green-200 hover:to-green-300 border-green-300' 
+                          : status === 'current'
+                            ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:from-blue-600 hover:to-indigo-700 border-blue-400'
+                            : status === 'available'
+                              ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600 border-purple-400'
+                              : 'bg-gray-300 text-gray-500 cursor-not-allowed border-gray-400'
+                        }
+                        ${isHovered ? 'transform scale-105' : ''}
+                      `}
+                    >
+                      {status === 'completed' ? '✅ Continue' : 
+                       status === 'current' && index === 0 ? '🚀 Continue' : 
+                       status === 'available' ? '▶️ Begin' : '🔒 Locked'}
+                    </button>
+                  </div>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
