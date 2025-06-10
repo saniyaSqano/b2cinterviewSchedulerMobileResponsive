@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ArrowLeft, Trophy, Star, Award, Brain, Users, Sparkles, Target, Rocket, Code, Globe, CheckCircle, Clock, TrendingUp } from 'lucide-react';
 import ParticleBackground from '../components/ParticleBackground';
@@ -8,9 +7,18 @@ import Level3Flow from '../components/Level3Flow';
 import Level4Flow from '../components/Level4Flow';
 import GamethonFlow from '../components/GamethonFlow';
 import InteractiveRoadmap from '../components/InteractiveRoadmap';
+import ProtectedRoute from '../components/ProtectedRoute';
 import { useUser } from '../contexts/UserContext';
 
 const Index = () => {
+  return (
+    <ProtectedRoute>
+      <LevelsContent />
+    </ProtectedRoute>
+  );
+};
+
+const LevelsContent = () => {
   const { user, setUser } = useUser();
   const [currentLevel, setCurrentLevel] = useState(0);
   const [completedLevels, setCompletedLevels] = useState<number[]>([]);

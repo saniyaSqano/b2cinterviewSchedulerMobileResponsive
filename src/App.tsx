@@ -9,7 +9,6 @@ import { UserProvider } from "./contexts/UserContext";
 import Index from "./pages/Index";
 import UserInfo from "./pages/UserInfo";
 import NotFound from "./pages/NotFound";
-import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -22,22 +21,8 @@ const App: React.FC = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/user-info" element={<UserInfo />} />
-            <Route 
-              path="/levels" 
-              element={
-                <ProtectedRoute>
-                  <Index />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/" 
-              element={
-                <ProtectedRoute>
-                  <Index />
-                </ProtectedRoute>
-              } 
-            />
+            <Route path="/levels" element={<Index />} />
+            <Route path="/" element={<Index />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
