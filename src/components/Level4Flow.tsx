@@ -408,6 +408,28 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
     }
   };
 
+  const downloadRecordingFromBlob = () => {
+    if (!recordingBlobUrl) {
+      console.error('No recording blob URL available');
+      alert('No recording available to download');
+      return;
+    }
+
+    try {
+      const a = document.createElement('a');
+      a.href = recordingBlobUrl;
+      a.download = `proctored-interview-${userName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.webm`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      
+      console.log('Download initiated from blob URL');
+    } catch (error) {
+      console.error('Error downloading recording from blob:', error);
+      alert('Error downloading recording: ' + error.message);
+    }
+  };
+
   const uploadRecordingToS3 = async () => {
     if (recordedChunks.length === 0) {
       console.error('No recording available');
@@ -457,17 +479,6 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
         playerRef.current.play();
       }
       setIsPlaying(!isPlaying);
-    }
-  };
-
-  const downloadFromPlayer = () => {
-    if (recordingBlobUrl) {
-      const a = document.createElement('a');
-      a.href = recordingBlobUrl;
-      a.download = `proctored-interview-${userName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.webm`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
     }
   };
 
@@ -547,6 +558,17 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
               >
                 <Square className="w-4 h-4" />
                 <span>Stop Interview</span>
+              </button>
+            )}
+            
+            {/* Download button in header when recording is available */}
+            {hasRecording && (
+              <button
+                onClick={downloadRecording}
+                className="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium shadow-md"
+              >
+                <Download className="w-4 h-4" />
+                <span>Download Video</span>
               </button>
             )}
             
@@ -734,7 +756,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
                 </button>
                 
                 <button
-                  onClick={downloadFromPlayer}
+                  onClick={downloadRecordingFromBlob}
                   className="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
                 >
                   <Download className="w-4 h-4" />
