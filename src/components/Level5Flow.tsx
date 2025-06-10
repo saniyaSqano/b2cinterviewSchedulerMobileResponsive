@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import Level5CongratulationsScreen from './Level5CongratulationsScreen';
-import InterviewReport from './InterviewReport';
+import ProctoredInterviewReport from './ProctoredInterviewReport';
 import Level5Header from './Level5Header';
 import Level5ProctoredCamera from './Level5ProctoredCamera';
 import Level5ViolationLogs from './Level5ViolationLogs';
@@ -38,8 +38,11 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [isStartingCamera, setIsStartingCamera] = useState(false);
   const [violationLogs, setViolationLogs] = useState<ViolationLog[]>([]);
+  const [interviewStartTime, setInterviewStartTime] = useState<Date>(new Date());
+  const [interviewDuration, setInterviewDuration] = useState<number>(0);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const startTimeRef = useRef<Date | null>(null);
 
   const interviewQuestions = [
     "Welcome to your AI Proctored Interview! This is your final assessment. Let's begin with a professional introduction. Please tell me about yourself and your career aspirations.",
@@ -56,6 +59,19 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
       stopCamera();
     };
   }, []);
+
+  // Calculate interview duration
+  useEffect(() => {
+    if (!showCongratulations && !showReport && startTimeRef.current) {
+      const interval = setInterval(() => {
+        const now = new Date();
+        const duration = Math.floor((now.getTime() - startTimeRef.current!.getTime()) / (1000 * 60));
+        setInterviewDuration(duration);
+      }, 60000); // Update every minute
+
+      return () => clearInterval(interval);
+    }
+  }, [showCongratulations, showReport]);
 
   // Enhanced violation detection for proctored interview
   useEffect(() => {
@@ -151,6 +167,9 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
   const handleProceedToInterview = async () => {
     console.log('Proceeding to proctored interview...');
     setShowCongratulations(false);
+    const startTime = new Date();
+    setInterviewStartTime(startTime);
+    startTimeRef.current = startTime;
     
     setTimeout(async () => {
       console.log('Starting camera for proctored interview...');
@@ -236,18 +255,16 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
     }
   }, [userName]);
 
-  const skillAssessment = {
-    programming: 85,
-    framework: 78,
-    testing: 72,
-    confidence: 88,
-    leadership: 75,
-    communication: 92,
-    adaptability: 80
-  };
-
   const handleEndInterview = () => {
     console.log('Ending AI proctored interview and generating report...');
+    
+    // Calculate final duration
+    if (startTimeRef.current) {
+      const endTime = new Date();
+      const finalDuration = Math.floor((endTime.getTime() - startTimeRef.current.getTime()) / (1000 * 60));
+      setInterviewDuration(finalDuration);
+    }
+    
     stopCamera();
     setShowReport(true);
   };
@@ -259,12 +276,14 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
 
   if (showReport) {
     return (
-      <InterviewReport
+      <ProctoredInterviewReport
         candidateDetails={candidateDetails}
-        skillAssessment={skillAssessment}
         violationLogs={violationLogs}
         onBack={handleBackFromReport}
-        reportType="ai_proctor"
+        duration={interviewDuration}
+        interviewStartTime={interviewStartTime}
+        totalQuestions={interviewQuestions.length}
+        answeredQuestions={currentQuestionIndex + 1}
       />
     );
   }
