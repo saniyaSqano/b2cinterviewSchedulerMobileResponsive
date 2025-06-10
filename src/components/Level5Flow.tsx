@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import Level5CongratulationsScreen from './Level5CongratulationsScreen';
 import ProctoredInterviewReport from './ProctoredInterviewReport';
@@ -28,7 +27,7 @@ interface Message {
 
 const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
   const [showCongratulations, setShowCongratulations] = useState(true);
-  const [showReport, setShowReport] = useState(false);
+  const [showProctoredReport, setShowProctoredReport] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [currentInput, setCurrentInput] = useState('');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -62,7 +61,7 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
 
   // Calculate interview duration
   useEffect(() => {
-    if (!showCongratulations && !showReport && startTimeRef.current) {
+    if (!showCongratulations && !showProctoredReport && startTimeRef.current) {
       const interval = setInterval(() => {
         const now = new Date();
         const duration = Math.floor((now.getTime() - startTimeRef.current!.getTime()) / (1000 * 60));
@@ -71,7 +70,7 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
 
       return () => clearInterval(interval);
     }
-  }, [showCongratulations, showReport]);
+  }, [showCongratulations, showProctoredReport]);
 
   // Enhanced violation detection for proctored interview
   useEffect(() => {
@@ -266,15 +265,15 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
     }
     
     stopCamera();
-    setShowReport(true);
+    setShowProctoredReport(true);
   };
 
   const handleBackFromReport = () => {
-    setShowReport(false);
+    setShowProctoredReport(false);
     onBack();
   };
 
-  if (showReport) {
+  if (showProctoredReport) {
     return (
       <ProctoredInterviewReport
         candidateDetails={candidateDetails}
