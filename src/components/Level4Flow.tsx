@@ -525,7 +525,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50">
       {/* Header */}
-      <div className="bg-white/95 backdrop-blur-sm border-b border-gray-200 p-4 shadow-sm">
+      <div className="bg-white/95 backdrop-blur-sm border-b border-gray-200 p-3 shadow-sm">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center space-x-4">
             <button
@@ -535,7 +535,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
               <ArrowLeft className="w-5 h-5 text-gray-700" />
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-800">AI Proctored Interview</h1>
+              <h1 className="text-xl font-bold text-gray-800">AI Proctored Interview</h1>
               <p className="text-sm text-gray-600">Level 4 - Final Assessment</p>
             </div>
           </div>
@@ -582,11 +582,11 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
         </div>
       </div>
 
-      <div className="flex h-screen pt-20">
+      <div className="flex h-screen pt-16">
         {/* Left Side - Video Feed */}
-        <div className="w-3/5 p-6">
-          <div className="bg-white rounded-2xl shadow-lg p-6 h-full">
-            <div className="flex items-center justify-between mb-4">
+        <div className="w-3/5 p-4">
+          <div className="bg-white rounded-2xl shadow-lg p-4 h-full">
+            <div className="flex items-center justify-between mb-3">
               <h3 className="text-lg font-semibold text-gray-800">Proctored Camera</h3>
               <div className="flex items-center space-x-2">
                 {isRecording && (
@@ -602,7 +602,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
               </div>
             </div>
             
-            <div className="relative h-[calc(100%-4rem)] bg-gray-900 rounded-xl overflow-hidden">
+            <div className="relative h-[calc(100%-3.5rem)] bg-gray-900 rounded-xl overflow-hidden">
               <VideoFeed
                 onStatusChange={handleVideoStatusChange}
                 videoRef={videoRef}
@@ -615,18 +615,18 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
         </div>
 
         {/* Right Side - AI Interview & Violations */}
-        <div className="w-2/5 p-6 flex flex-col">
+        <div className="w-2/5 p-4 flex flex-col">
           {/* Current Question Display */}
-          <div className="bg-purple-50 p-4 rounded-lg mb-4">
+          <div className="bg-purple-50 p-3 rounded-lg mb-3">
             <h3 className="text-sm font-medium text-purple-800 mb-1">Interview Question ({currentQuestionIndex + 1}/{questions.length})</h3>
-            <p className="text-gray-800">{questions[currentQuestionIndex]}</p>
+            <p className="text-gray-800 text-sm">{questions[currentQuestionIndex]}</p>
           </div>
 
           {/* AI Proctoring System */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-lg">AI</span>
+          <div className="bg-white rounded-2xl shadow-lg p-4 mb-4">
+            <div className="flex items-center space-x-3 mb-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center">
+                <span className="text-white font-bold">AI</span>
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-800">AI Proctoring System</h3>
@@ -639,12 +639,12 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
             </div>
 
             {/* Current Question */}
-            <div className="bg-gray-50 rounded-xl p-4">
+            <div className="bg-gray-50 rounded-xl p-3">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-purple-600">Question {currentQuestionIndex + 1} of {questions.length}</span>
                 <span className="text-sm text-gray-500">{new Date().toLocaleTimeString()}</span>
               </div>
-              <p className="text-gray-800 leading-relaxed">{questions[currentQuestionIndex]}</p>
+              <p className="text-gray-800 leading-relaxed text-sm">{questions[currentQuestionIndex]}</p>
               {isRecording && (
                 <div className="mt-3 flex items-center space-x-2">
                   <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
@@ -655,9 +655,9 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
           </div>
 
           {/* Response Status */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-            <h4 className="text-lg font-semibold text-gray-800 mb-4">Response Status</h4>
-            <div className="space-y-3">
+          <div className="bg-white rounded-2xl shadow-lg p-4 mb-4">
+            <h4 className="text-lg font-semibold text-gray-800 mb-3">Response Status</h4>
+            <div className="space-y-2">
               <div className="flex items-center space-x-3">
                 <div className="flex items-center space-x-2">
                   <Mic className={`w-4 h-4 ${isMicOn ? 'text-green-500' : 'text-red-500'}`} />
@@ -676,8 +676,8 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
               </div>
             </div>
             
-            <div className="mt-6 p-4 bg-gray-50 rounded-xl">
-              <p className="text-gray-600 text-center">
+            <div className="mt-4 p-3 bg-gray-50 rounded-xl">
+              <p className="text-gray-600 text-center text-sm">
                 {isRecording 
                   ? "Recording your responses. Please maintain eye contact and speak clearly."
                   : "Click 'Start Interview' to begin the proctored assessment."
@@ -687,8 +687,8 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
           </div>
 
           {/* Violation Logs */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 flex-1">
-            <h4 className="text-lg font-semibold text-gray-800 mb-4">Security Monitoring</h4>
+          <div className="bg-white rounded-2xl shadow-lg p-4 flex-1">
+            <h4 className="text-lg font-semibold text-gray-800 mb-3">Security Monitoring</h4>
             {violationLogs.length === 0 ? (
               <div className="flex items-center space-x-2 text-green-600">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
@@ -840,3 +840,5 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
 };
 
 export default Level4Flow;
+
+</edits_to_apply>
