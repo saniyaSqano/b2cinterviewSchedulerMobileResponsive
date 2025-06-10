@@ -1,13 +1,15 @@
 
-import React, { useState } from 'react';
-import { ArrowLeft, Download, User, Clock, Eye, Mic, AlertTriangle, CheckCircle, Star, TrendingUp, FileText, Award, Shield } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowLeft, Download, User, Clock, Eye, Mic, AlertTriangle, CheckCircle, Star, TrendingUp, FileText, Award, Shield, Info } from 'lucide-react';
 import jsPDF from 'jspdf';
+import { generateFaceDetectionSummary, FaceDetectionSummaryTable, generateTextSummaryFromTable } from '../utils/rule_based_logic';
 
 interface ViolationLog {
   id: number;
   type: 'warning' | 'error';
   message: string;
   timestamp: Date;
+  details?: string;
 }
 
 interface CandidateDetails {
@@ -39,6 +41,24 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState('overview');
 
+  // State for face detection summary
+  const [faceDetectionSummary, setFaceDetectionSummary] = useState<FaceDetectionSummaryTable | null>(null);
+
+  // Generate face detection summary when component mounts
+  useEffect(() => {
+    // Convert violation logs to the format expected by rule_based_logic
+    const violations = violationLogs.map(log => ({
+      type: log.type,
+      message: log.message,
+      details: log.details,
+      timestamp: log.timestamp
+    }));
+
+    // Generate summary using the rule-based logic
+    const summaryTable = generateFaceDetectionSummary(violations, candidateDetails.fullName);
+    setFaceDetectionSummary(summaryTable);
+  }, [violationLogs, candidateDetails.fullName]);
+
   // Calculate AI-based hire recommendation
   const calculateHireRecommendation = () => {
     let score = 100;
@@ -56,6 +76,15 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
     }
     if (warningViolations > 0) {
       factors.push(`${warningViolations} minor violation(s) detected`);
+    }
+    
+    // Check for multiple faces violations specifically
+    const multipleFacesViolations = violationLogs.filter(log => 
+      log.type === 'error' && log.message.includes('Multiple faces detected')
+    ).length;
+    
+    if (multipleFacesViolations > 0) {
+      factors.push(`${candidateDetails.fullName} was present with more than one people`);
     }
 
     // Consider completion rate
@@ -127,14 +156,49 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
     doc.text(`Score: ${score}/100`, 20, 185);
     doc.text(`Recommendation: ${recommendation}`, 20, 195);
     
+    // Face Detection Analysis
+    doc.setFontSize(16);
+    doc.text('Face Detection Analysis', 20, 220);
+    doc.setFontSize(12);
+    
+    if (faceDetectionSummary) {
+      // Add summary text
+      const textSummary = generateTextSummaryFromTable(faceDetectionSummary);
+      doc.text(textSummary, 20, 235);
+      
+      // Add table headers
+      let y = 260;
+      doc.setFillColor(240, 240, 250);
+      doc.rect(20, y, 170, 10, 'F');
+      doc.setTextColor(50, 50, 100);
+      doc.setFontSize(10);
+      doc.text('Issue', 22, y + 7);
+      doc.text('Occurrences', 70, y + 7);
+      doc.text('Impact', 100, y + 7);
+      doc.text('Recommendation', 130, y + 7);
+      
+      // Add table rows
+      y += 12;
+      doc.setTextColor(0, 0, 0);
+      faceDetectionSummary.rows.forEach((row, index) => {
+        doc.text(row.issue, 22, y);
+        doc.text(row.occurrences.toString(), 70, y);
+        doc.text(row.impact, 100, y);
+        doc.text(row.recommendation, 130, y);
+        y += 10;
+      });
+    } else {
+      doc.text('No face detection data available', 20, 235);
+    }
+    
     // Violations
     doc.setFontSize(16);
-    doc.text('Security Violations', 20, 220);
+    doc.text('Security Violations', 20, 300);
     doc.setFontSize(12);
     if (violationLogs.length === 0) {
-      doc.text('No violations detected', 20, 235);
+      doc.text('No violations detected', 20, 315);
     } else {
-      let y = 235;
+      let y = 315;
       violationLogs.slice(0, 10).forEach((log, index) => {
         doc.text(`${index + 1}. ${log.message}`, 20, y);
         y += 10;
@@ -358,6 +422,72 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
               <div className="space-y-6">
                 <div className="bg-gray-50 rounded-xl p-4">
                   <h3 className="font-semibold text-gray-800 mb-3">Security Monitoring Status</h3>
+                  
+                  {/* Face Detection Summary Table */}
+                  {faceDetectionSummary && (
+                    <div className="mb-6">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-medium text-gray-800 flex items-center">
+                          <Eye className="w-5 h-5 mr-2 text-blue-600" />
+                          Face Detection Analysis
+                        </h4>
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${faceDetectionSummary.overallStatus === 'Excellent' ? 'bg-green-100 text-green-700' : faceDetectionSummary.overallStatus === 'Fair' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>
+                          {faceDetectionSummary.overallStatus}
+                        </span>
+                      </div>
+                      
+                      <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
+                        <table className="min-w-full divide-y divide-gray-200">
+                          <thead className="bg-gray-50">
+                            <tr>
+                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Issue
+                              </th>
+                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Occurrences
+                              </th>
+                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Impact
+                              </th>
+                              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Recommendation
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-200">
+                            {faceDetectionSummary.rows.map((row, index) => (
+                              <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                <td className="px-4 py-3 text-sm text-gray-900">
+                                  <div className="flex items-center">
+                                    {row.issue === 'No issues detected' ? (
+                                      <CheckCircle className="w-4 h-4 mr-2 text-green-500" />
+                                    ) : row.issue === 'Multiple people detected' ? (
+                                      <AlertTriangle className="w-4 h-4 mr-2 text-red-500" />
+                                    ) : (
+                                      <Info className="w-4 h-4 mr-2 text-yellow-500" />
+                                    )}
+                                    {row.issue}
+                                  </div>
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900">
+                                  {row.occurrences}
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900">
+                                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${row.impact.includes('High') ? 'bg-red-100 text-red-700' : row.impact.includes('Medium') ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}`}>
+                                    {row.impact}
+                                  </span>
+                                </td>
+                                <td className="px-4 py-3 text-sm text-gray-900">
+                                  {row.recommendation}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+                  
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="flex items-center space-x-2">
                       <CheckCircle className="w-5 h-5 text-green-500" />
@@ -405,6 +535,7 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
                             }`}>
                               {log.message}
                             </p>
+                            {log.details && <p className="text-sm text-gray-600 mt-1">{log.details}</p>}
                             <p className="text-sm text-gray-500 mt-1">
                               {log.timestamp.toLocaleString()}
                             </p>

@@ -19,6 +19,7 @@ interface ViolationLog {
   type: 'warning' | 'error';
   message: string;
   timestamp: Date;
+  details?: string;
 }
 
 const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
@@ -545,6 +546,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
                 videoRef={videoRef}
                 faceDetectionVideoRef={faceDetectionVideoRef}
                 onViolation={handleViolation}
+                candidateName={userDetails.fullName}
               />
             </div>
           </div>

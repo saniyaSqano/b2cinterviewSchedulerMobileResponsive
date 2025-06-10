@@ -4,15 +4,17 @@ import Webcam from 'react-webcam';
 import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-backend-webgl';
 import * as blazeface from '@tensorflow-models/blazeface';
+import { analyzeFaceDetection, FaceDetectionResult } from '../utils/rule_based_logic';
 
 interface VideoFeedProps {
   onStatusChange?: (isVideoOn: boolean) => void;
   videoRef?: React.RefObject<HTMLVideoElement>;
   faceDetectionVideoRef?: React.RefObject<HTMLVideoElement>;
-  onViolation?: (violation: { type: 'warning' | 'error'; message: string; timestamp: Date; id: number }) => void;
+  onViolation?: (violation: { type: 'warning' | 'error'; message: string; timestamp: Date; id: number; details?: string }) => void;
+  candidateName?: string;
 }
 
-const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange, videoRef, faceDetectionVideoRef, onViolation }) => {
+const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange, videoRef, faceDetectionVideoRef, onViolation, candidateName = 'Candidate' }) => {
   const [isVideoOn, setIsVideoOn] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -259,16 +261,31 @@ const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange, videoRef, faceDet
         // Update face count
         setFaceCount(predictions.length);
         
-        // Update face detection status
-        if (predictions.length === 0) {
+        // Create face detection result object
+        const faceDetectionResult: FaceDetectionResult = {
+          faceCount: predictions.length,
+          noFaceDetected: predictions.length === 0,
+          multipleFacesDetected: predictions.length > 1,
+          predictions: predictions
+        };
+        
+        // Use rule-based logic to analyze the face detection result
+        const violationReport = analyzeFaceDetection(faceDetectionResult, candidateName);
+        
+        // Update face detection status based on the result
+        if (faceDetectionResult.noFaceDetected) {
           setFaceDetectionStatus('No face detected');
           // Report no face violation after a short delay to avoid false positives
           violationCountRef.current.noFace++;
           if (violationCountRef.current.noFace >= 15) { // About 0.5 seconds at 30fps
-            reportViolation('warning', 'No face detected in camera view');
+            if (violationReport) {
+              reportViolation('warning', violationReport.message, violationReport.details);
+            } else {
+              reportViolation('warning', 'No face detected in camera view');
+            }
             violationCountRef.current.noFace = 0;
           }
-        } else if (predictions.length === 1) {
+        } else if (!faceDetectionResult.multipleFacesDetected) {
           setFaceDetectionStatus('Face detected');
           // Reset violation counters when face is properly detected
           violationCountRef.current.noFace = 0;
@@ -278,7 +295,11 @@ const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange, videoRef, faceDet
           // Report multiple faces violation
           violationCountRef.current.multipleFaces++;
           if (violationCountRef.current.multipleFaces >= 15) { // About 0.5 seconds at 30fps
-            reportViolation('error', `Multiple faces detected (${predictions.length})`);
+            if (violationReport) {
+              reportViolation('error', violationReport.message, violationReport.details);
+            } else {
+              reportViolation('error', `Multiple faces detected (${predictions.length})`);
+            }
             violationCountRef.current.multipleFaces = 0;
           }
         }
@@ -292,7 +313,7 @@ const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange, videoRef, faceDet
   }, [model, isVideoOn]);
 
   // Function to report violations with debouncing
-  const reportViolation = useCallback((type: 'warning' | 'error', message: string) => {
+  const reportViolation = useCallback((type: 'warning' | 'error', message: string, details?: string) => {
     const now = Date.now();
     const violationType = type + message;
     
@@ -303,6 +324,9 @@ const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange, videoRef, faceDet
       now - lastViolationRef.current.timestamp > 5000
     ) {
       console.log(`Face detection violation: ${type} - ${message}`);
+      if (details) {
+        console.log(`Details: ${details}`);
+      }
       
       // Update the last violation reference
       lastViolationRef.current = {
@@ -316,7 +340,8 @@ const VideoFeed: React.FC<VideoFeedProps> = ({ onStatusChange, videoRef, faceDet
           type,
           message,
           timestamp: new Date(),
-          id: now // Use timestamp as a unique ID
+          id: now, // Use timestamp as a unique ID
+          details // Include details for the report
         });
       }
     }
