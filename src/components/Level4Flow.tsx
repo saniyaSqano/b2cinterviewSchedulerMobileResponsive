@@ -302,6 +302,11 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
               setUploadSuccess(true);
               setIsUploading(false);
               
+              // Create blob URL for the player
+              const url = URL.createObjectURL(blob);
+              setRecordingBlobUrl(url);
+              setShowVideoPlayer(true);
+              
               console.log('Automatic upload successful, download URL:', downloadUrl);
               alert('Your proctored interview recording has been successfully uploaded to S3 and is available for viewing.');
             } catch (error) {
@@ -342,16 +347,6 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
             }
           });
         }
-        
-        // Create blob URL for the player
-        setTimeout(() => {
-          if (recordedChunks.length > 0) {
-            const blob = new Blob(recordedChunks, { type: 'video/webm' });
-            const url = URL.createObjectURL(blob);
-            setRecordingBlobUrl(url);
-            setShowVideoPlayer(true);
-          }
-        }, 1000);
         
         // Show a notification that recording has stopped
         alert('Proctored interview recording has been stopped. Video player will open automatically.');
@@ -823,5 +818,3 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
 };
 
 export default Level4Flow;
-
-</edits_to_apply>
