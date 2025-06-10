@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Video, VideoOff, Mic, MicOff, Download, Square, Circle, Upload, Check, User, Mail, Phone, Award, Star, TrendingUp, Clock } from 'lucide-react';
+import { ArrowLeft, Video, VideoOff, Mic, MicOff, Download, Square, Circle, Upload, Check, User, Mail, Phone, Award, Star, TrendingUp, Clock, Play, Pause, X } from 'lucide-react';
 import Level4CongratulationsScreen from './Level4CongratulationsScreen';
 import VideoFeed from './VideoFeed';
 import SelfPracticeReport from './SelfPracticeReport';
@@ -40,6 +40,9 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
   const [showProctoredReport, setShowProctoredReport] = useState(false);
   const [interviewStartTime, setInterviewStartTime] = useState<Date>(new Date());
   const [interviewDuration, setInterviewDuration] = useState<number>(0);
+  const [showVideoPlayer, setShowVideoPlayer] = useState(false);
+  const [recordingBlobUrl, setRecordingBlobUrl] = useState<string>('');
+  const [isPlaying, setIsPlaying] = useState(false);
   
   // Store user details from localStorage
   const [userDetails, setUserDetails] = useState({
@@ -74,6 +77,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const startTimeRef = useRef<Date | null>(null);
+  const playerRef = useRef<HTMLVideoElement>(null);
 
   const questions = [
     "Welcome to your proctored interview! This is your final assessment. Let's begin with a professional introduction. Please tell me about yourself and your career aspirations.",
@@ -339,8 +343,18 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
           });
         }
         
+        // Create blob URL for the player
+        setTimeout(() => {
+          if (recordedChunks.length > 0) {
+            const blob = new Blob(recordedChunks, { type: 'video/webm' });
+            const url = URL.createObjectURL(blob);
+            setRecordingBlobUrl(url);
+            setShowVideoPlayer(true);
+          }
+        }, 1000);
+        
         // Show a notification that recording has stopped
-        alert('Proctored interview recording has been stopped. It will be automatically uploaded to S3.');
+        alert('Proctored interview recording has been stopped. Video player will open automatically.');
       } catch (error) {
         console.error('Error stopping recording:', error);
       }
@@ -438,6 +452,37 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
       alert('Error uploading recording: ' + error.message);
       setIsUploading(false);
     }
+  };
+
+  const togglePlayPause = () => {
+    if (playerRef.current) {
+      if (isPlaying) {
+        playerRef.current.pause();
+      } else {
+        playerRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const downloadFromPlayer = () => {
+    if (recordingBlobUrl) {
+      const a = document.createElement('a');
+      a.href = recordingBlobUrl;
+      a.download = `proctored-interview-${userName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.webm`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  };
+
+  const closeVideoPlayer = () => {
+    setShowVideoPlayer(false);
+    if (recordingBlobUrl) {
+      URL.revokeObjectURL(recordingBlobUrl);
+      setRecordingBlobUrl('');
+    }
+    setIsPlaying(false);
   };
 
   // Show proctored interview report
@@ -657,6 +702,72 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
         </div>
       </div>
 
+      {/* Video Player Modal */}
+      {showVideoPlayer && recordingBlobUrl && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-6 max-w-4xl mx-4 w-full max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-2xl font-bold text-gray-800">Proctored Interview Recording</h3>
+              <button
+                onClick={closeVideoPlayer}
+                className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-700" />
+              </button>
+            </div>
+            
+            <div className="relative bg-black rounded-xl overflow-hidden mb-4">
+              <video
+                ref={playerRef}
+                src={recordingBlobUrl}
+                className="w-full h-auto max-h-[60vh]"
+                controls
+                onPlay={() => setIsPlaying(true)}
+                onPause={() => setIsPlaying(false)}
+                onEnded={() => setIsPlaying(false)}
+              />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={togglePlayPause}
+                  className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                  <span>{isPlaying ? 'Pause' : 'Play'}</span>
+                </button>
+                
+                <button
+                  onClick={downloadFromPlayer}
+                  className="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Download Video</span>
+                </button>
+              </div>
+              
+              <button
+                onClick={handleEndInterview}
+                className="px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-lg hover:from-purple-600 hover:to-indigo-600 transition-colors"
+              >
+                <Award className="w-4 h-4 mr-2 inline" />
+                View Report
+              </button>
+            </div>
+            
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              <p className="text-sm text-gray-600">
+                <strong>Recording Details:</strong> Interview completed on {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}
+              </p>
+              <p className="text-sm text-gray-600 mt-1">
+                <strong>Duration:</strong> {interviewDuration} minutes | <strong>Questions:</strong> {currentQuestionIndex + 1}/{questions.length}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Completion Modal */}
       {isComplete && !showProctoredReport && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -712,3 +823,5 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
 };
 
 export default Level4Flow;
+
+</edits_to_apply>
