@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ArrowLeft, Download, Clock, User, Mail, Phone, Award, AlertTriangle, CheckCircle } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
@@ -108,14 +107,14 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
       const doc = new jsPDF();
       
       // Set colors for PDF
-      const primaryColor = [102, 51, 153]; // Purple
-      const secondaryColor = [79, 70, 229]; // Indigo
-      const errorColor = [239, 68, 68]; // Red
-      const warningColor = [245, 158, 11]; // Yellow
-      const successColor = [34, 197, 94]; // Green
+      const primaryColor = [102, 51, 153] as const; // Purple
+      const secondaryColor = [79, 70, 229] as const; // Indigo
+      const errorColor = [239, 68, 68] as const; // Red
+      const warningColor = [245, 158, 11] as const; // Yellow
+      const successColor = [34, 197, 94] as const; // Green
       
       // Header with color
-      doc.setTextColor(...primaryColor);
+      doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
       doc.setFontSize(24);
       doc.setFont('helvetica', 'bold');
       doc.text('AI Proctored Interview Report', 20, 25);
@@ -124,7 +123,7 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
       doc.setTextColor(0, 0, 0);
       
       // Candidate Information Section
-      doc.setTextColor(...secondaryColor);
+      doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
       doc.setFontSize(18);
       doc.setFont('helvetica', 'bold');
       doc.text('Candidate Information', 20, 45);
@@ -139,7 +138,7 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
       doc.text('Experience: ' + candidateDetails.experience, 20, 95);
       
       // Interview Details Section
-      doc.setTextColor(...secondaryColor);
+      doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
       doc.setFontSize(18);
       doc.setFont('helvetica', 'bold');
       doc.text('Interview Details', 20, 115);
@@ -152,7 +151,7 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
       doc.text('Questions Answered: ' + answeredQuestions + '/' + totalQuestions, 20, 145);
       
       // AI Recommendation Section with colored background
-      doc.setTextColor(...secondaryColor);
+      doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
       doc.setFontSize(18);
       doc.setFont('helvetica', 'bold');
       doc.text('AI Recommendation', 20, 165);
@@ -161,19 +160,19 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
       doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
       if (score >= 85) {
-        doc.setTextColor(...successColor);
+        doc.setTextColor(successColor[0], successColor[1], successColor[2]);
       } else if (score >= 70) {
-        doc.setTextColor(...secondaryColor);
+        doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
       } else if (score >= 50) {
-        doc.setTextColor(...warningColor);
+        doc.setTextColor(warningColor[0], warningColor[1], warningColor[2]);
       } else {
-        doc.setTextColor(...errorColor);
+        doc.setTextColor(errorColor[0], errorColor[1], errorColor[2]);
       }
       doc.text('Overall Score: ' + score + '/100', 20, 175);
       doc.text('Recommendation: ' + recommendation, 20, 185);
       
       // Security Violations Table
-      doc.setTextColor(...secondaryColor);
+      doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
       doc.setFontSize(18);
       doc.setFont('helvetica', 'bold');
       doc.text('Security Violations Summary', 20, 205);
@@ -210,9 +209,9 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
           
           // Color code the violation type
           if (violation.type === 'error') {
-            doc.setTextColor(...errorColor);
+            doc.setTextColor(errorColor[0], errorColor[1], errorColor[2]);
           } else {
-            doc.setTextColor(...warningColor);
+            doc.setTextColor(warningColor[0], warningColor[1], warningColor[2]);
           }
           
           const violationType = violation.fullName.length > 25 
@@ -232,7 +231,7 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
           yPos += 12;
         });
       } else {
-        doc.setTextColor(...successColor);
+        doc.setTextColor(successColor[0], successColor[1], successColor[2]);
         doc.setFontSize(12);
         doc.setFont('helvetica', 'normal');
         doc.text('No security violations detected - Excellent compliance!', 20, 225);
