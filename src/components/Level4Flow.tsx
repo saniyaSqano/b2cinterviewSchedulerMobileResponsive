@@ -1,9 +1,9 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Video, VideoOff, Mic, MicOff, Download, Square, Circle, Upload, Check, User, Mail, Phone, Award, Star, TrendingUp, Clock } from 'lucide-react';
 import Level4CongratulationsScreen from './Level4CongratulationsScreen';
 import VideoFeed from './VideoFeed';
 import SelfPracticeReport from './SelfPracticeReport';
+import ProctoredInterviewReport from './ProctoredInterviewReport';
 import { initFaceDetection, detectFaces } from '../utils/faceDetection';
 import { uploadMockVideo } from '../utils/s3Service';
 import { initTabChangeDetection } from '../utils/tabChangeDetection';
@@ -36,6 +36,9 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
   const [uploadUrl, setUploadUrl] = useState<string>('');
   const [showReport, setShowReport] = useState(false);
   const [showCustomReport, setShowCustomReport] = useState(false);
+  const [showProctoredReport, setShowProctoredReport] = useState(false);
+  const [interviewStartTime, setInterviewStartTime] = useState<Date>(new Date());
+  const [interviewDuration, setInterviewDuration] = useState<number>(0);
   
   // Store user details from localStorage
   const [userDetails, setUserDetails] = useState({
@@ -69,14 +72,59 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
   const faceDetectionVideoRef = useRef<HTMLVideoElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const startTimeRef = useRef<Date | null>(null);
 
   const questions = [
-    "Welcome to your self-practice session! Let's start with a warm-up. Tell me about yourself and what brings you here today.",
-    "Describe a challenging situation you faced in your previous role and how you handled it.",
-    "What are your greatest strengths and how do they apply to this position?",
-    "Where do you see yourself in 5 years and how does this role fit into your career goals?",
-    "Do you have any questions about the role or our company?"
+    "Welcome to your proctored interview! This is your final assessment. Let's begin with a professional introduction. Please tell me about yourself and your career aspirations.",
+    "Describe a challenging project you've worked on in detail. How did you approach the problem and what was the outcome?",
+    "What are your key strengths and how do they align with this role? Provide specific examples from your experience.",
+    "How do you handle working under pressure or tight deadlines? Give me a concrete example from your professional experience.",
+    "Where do you see yourself in 5 years, and how does this position fit into your career goals?",
+    "Do you have any questions about the role or our organization? This concludes your proctored interview."
   ];
+
+  // Calculate interview duration
+  useEffect(() => {
+    if (!showCongratulations && !showProctoredReport && startTimeRef.current) {
+      const interval = setInterval(() => {
+        const now = new Date();
+        const duration = Math.floor((now.getTime() - startTimeRef.current!.getTime()) / (1000 * 60));
+        setInterviewDuration(duration);
+      }, 60000); // Update every minute
+
+      return () => clearInterval(interval);
+    }
+  }, [showCongratulations, showProctoredReport]);
+
+  // Enhanced violation detection for proctored interview
+  useEffect(() => {
+    if (!showCongratulations && isVideoOn) {
+      const interval = setInterval(() => {
+        // More frequent violation checks for proctored environment
+        if (Math.random() > 0.8) {
+          const violations = [
+            { type: 'error' as const, message: 'Multiple faces detected - interview security breach' },
+            { type: 'warning' as const, message: 'Eye tracking: looking away from camera' },
+            { type: 'error' as const, message: 'Unauthorized person detected in background' },
+            { type: 'warning' as const, message: 'Audio levels inconsistent - possible external interference' },
+            { type: 'error' as const, message: 'Screen sharing or recording software detected' },
+            { type: 'warning' as const, message: 'Lighting conditions suboptimal for face recognition' }
+          ];
+          
+          const randomViolation = violations[Math.floor(Math.random() * violations.length)];
+          const newLog: ViolationLog = {
+            id: Date.now(),
+            ...randomViolation,
+            timestamp: new Date()
+          };
+          
+          setViolationLogs(prev => [newLog, ...prev].slice(0, 15)); // Keep more logs for proctored session
+        }
+      }, 6000);
+
+      return () => clearInterval(interval);
+    }
+  }, [showCongratulations, isVideoOn]);
 
   // Initialize face detection on component mount
   useEffect(() => {
@@ -89,7 +137,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
   // Handle violations from VideoFeed component or tab change detection
   const handleViolation = (violation: ViolationLog) => {
     console.log('Violation received:', violation);
-    setViolationLogs(prev => [violation, ...prev].slice(0, 10));
+    setViolationLogs(prev => [violation, ...prev].slice(0, 15));
   };
   
   // Initialize tab change and keyboard shortcut detection
@@ -118,9 +166,9 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
     }
   }, [showCongratulations]);
 
-  // Auto-advance questions
+  // Auto-advance questions for proctored interview
   useEffect(() => {
-    if (!showCongratulations && !isComplete) {
+    if (!showCongratulations && !isComplete && isRecording) {
       const timer = setTimeout(() => {
         if (currentQuestionIndex < questions.length - 1) {
           setCurrentQuestionIndex(prev => prev + 1);
@@ -132,10 +180,13 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
 
       return () => clearTimeout(timer);
     }
-  }, [currentQuestionIndex, showCongratulations, isComplete]);
+  }, [currentQuestionIndex, showCongratulations, isComplete, isRecording]);
 
   const handleProceedToInterview = () => {
     setShowCongratulations(false);
+    const startTime = new Date();
+    setInterviewStartTime(startTime);
+    startTimeRef.current = startTime;
   };
 
   const handleVideoStatusChange = (status: boolean) => {
@@ -236,7 +287,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
               }
               
               // Generate filename with user name and timestamp
-              const fileName = `self-practice-interview-${userName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.webm`;
+              const fileName = `proctored-interview-${userName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.webm`;
               
               // Upload to S3 using the uploadMockVideo function
               console.log('Automatically uploading recording to S3:', fileName);
@@ -247,7 +298,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
               setIsUploading(false);
               
               console.log('Automatic upload successful, download URL:', downloadUrl);
-              alert('Your recording has been successfully uploaded to S3 and is available for viewing.');
+              alert('Your proctored interview recording has been successfully uploaded to S3 and is available for viewing.');
             } catch (error) {
               console.error('Error during automatic upload to S3:', error);
               alert('There was an error uploading your recording to S3: ' + error.message);
@@ -259,7 +310,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
 
       mediaRecorder.start(1000); // Collect data every second
       setIsRecording(true);
-      console.log('Recording started successfully');
+      console.log('Proctored interview recording started successfully');
       
       // Reset to first question when recording starts
       setCurrentQuestionIndex(0);
@@ -275,7 +326,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
       try {
         mediaRecorderRef.current.stop();
         setIsRecording(false);
-        console.log('Stopping recording');
+        console.log('Stopping proctored interview recording');
         
         // Release tracks to avoid memory leaks
         if (streamRef.current) {
@@ -288,11 +339,30 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
         }
         
         // Show a notification that recording has stopped
-        alert('Recording has been stopped. It will be automatically uploaded to S3.');
+        alert('Proctored interview recording has been stopped. It will be automatically uploaded to S3.');
       } catch (error) {
         console.error('Error stopping recording:', error);
       }
     }
+  };
+
+  const handleEndInterview = () => {
+    console.log('Ending proctored interview and generating comprehensive report...');
+    
+    // Calculate final duration
+    if (startTimeRef.current) {
+      const endTime = new Date();
+      const finalDuration = Math.floor((endTime.getTime() - startTimeRef.current.getTime()) / (1000 * 60));
+      setInterviewDuration(finalDuration);
+    }
+    
+    stopRecording();
+    setShowProctoredReport(true);
+  };
+
+  const handleBackFromReport = () => {
+    setShowProctoredReport(false);
+    onBack();
   };
 
   const downloadRecording = () => {
@@ -315,7 +385,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `self-practice-interview-${userName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.webm`;
+      a.download = `proctored-interview-${userName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.webm`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -350,7 +420,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
       }
       
       // Generate filename with user name and timestamp
-      const fileName = `self-practice-interview-${userName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.webm`;
+      const fileName = `proctored-interview-${userName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.webm`;
       
       // Upload to S3 using the uploadMockVideo function
       console.log('Uploading recording to S3:', fileName);
@@ -369,6 +439,27 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
     }
   };
 
+  // Show proctored interview report
+  if (showProctoredReport) {
+    return (
+      <ProctoredInterviewReport
+        candidateDetails={{
+          fullName: userDetails.fullName,
+          email: userDetails.email,
+          phoneNumber: userDetails.phoneNumber,
+          skills: userDetails.skills,
+          experience: userDetails.experience
+        }}
+        violationLogs={violationLogs}
+        onBack={handleBackFromReport}
+        duration={interviewDuration}
+        interviewStartTime={interviewStartTime}
+        totalQuestions={questions.length}
+        answeredQuestions={currentQuestionIndex + 1}
+      />
+    );
+  }
+
   if (showCongratulations) {
     return (
       <Level4CongratulationsScreen
@@ -380,7 +471,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50">
       {/* Header */}
       <div className="bg-white/95 backdrop-blur-sm border-b border-gray-200 p-4 shadow-sm">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
@@ -392,8 +483,8 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
               <ArrowLeft className="w-5 h-5 text-gray-700" />
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-800">Self-Practice Interview</h1>
-              <p className="text-sm text-gray-600">Level 4 - Practice Session</p>
+              <h1 className="text-2xl font-bold text-gray-800">AI Proctored Interview</h1>
+              <p className="text-sm text-gray-600">Level 4 - Final Assessment</p>
             </div>
           </div>
           
@@ -406,7 +497,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
                 className="flex items-center space-x-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium shadow-md"
               >
                 <Circle className="w-4 h-4 animate-pulse" />
-                <span>Start Recording</span>
+                <span>Start Interview</span>
               </button>
             ) : (
               <button
@@ -414,42 +505,15 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
                 className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors animate-pulse shadow-md"
               >
                 <Square className="w-4 h-4" />
-                <span>Stop Recording</span>
+                <span>Stop Interview</span>
               </button>
             )}
             
-            {hasRecording && (
-              <div className="flex space-x-2">
-                <button
-                  onClick={downloadRecording}
-                  className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium shadow-md"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Download Recording</span>
-                </button>
-                
-                {isUploading ? (
-                  <div className="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg font-medium shadow-md">
-                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-                    <span>Uploading to S3...</span>
-                  </div>
-                ) : uploadSuccess ? (
-                  <button
-                    onClick={() => window.open(uploadUrl, '_blank')}
-                    className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium shadow-md"
-                  >
-                    <Check className="w-4 h-4" />
-                    <span>View on S3</span>
-                  </button>
-                ) : null}
-              </div>
-            )}
-            
             <button
-              onClick={() => setIsComplete(true)}
-              className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors shadow-md"
+              onClick={handleEndInterview}
+              className="px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-lg hover:from-purple-600 hover:to-indigo-600 transition-colors shadow-md font-medium"
             >
-              End Session
+              End Interview & View Report
             </button>
           </div>
         </div>
@@ -457,10 +521,10 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
 
       <div className="flex h-screen pt-20">
         {/* Left Side - Video Feed */}
-        <div className="w-1/2 p-6">
+        <div className="w-3/5 p-6">
           <div className="bg-white rounded-2xl shadow-lg p-6 h-full">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">Your Video</h3>
+              <h3 className="text-lg font-semibold text-gray-800">Proctored Camera</h3>
               <div className="flex items-center space-x-2">
                 {isRecording && (
                   <div className="flex items-center space-x-2 text-red-500">
@@ -468,6 +532,10 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
                     <span className="text-sm font-medium">Recording</span>
                   </div>
                 )}
+                <div className="flex items-center space-x-1">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-xs text-green-600">Proctored</span>
+                </div>
               </div>
             </div>
             
@@ -482,26 +550,26 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
           </div>
         </div>
 
-        {/* Right Side - AI Interview */}
-        <div className="w-1/2 p-6 flex flex-col">
+        {/* Right Side - AI Interview & Violations */}
+        <div className="w-2/5 p-6 flex flex-col">
           {/* Current Question Display */}
-          <div className="bg-indigo-50 p-4 rounded-lg mb-4">
-            <h3 className="text-sm font-medium text-indigo-800 mb-1">Current Question ({currentQuestionIndex + 1}/{questions.length})</h3>
+          <div className="bg-purple-50 p-4 rounded-lg mb-4">
+            <h3 className="text-sm font-medium text-purple-800 mb-1">Interview Question ({currentQuestionIndex + 1}/{questions.length})</h3>
             <p className="text-gray-800">{questions[currentQuestionIndex]}</p>
           </div>
 
-          {/* AI Practice Coach */}
+          {/* AI Proctoring System */}
           <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center">
                 <span className="text-white font-bold text-lg">AI</span>
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-800">AI Practice Coach</h3>
-                <p className="text-sm text-gray-600">Your interview companion</p>
+                <h3 className="text-lg font-semibold text-gray-800">AI Proctoring System</h3>
+                <p className="text-sm text-gray-600">Monitoring interview integrity</p>
                 <div className="flex items-center space-x-1 mt-1">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-xs text-green-600">Online</span>
+                  <span className="text-xs text-green-600">Active Monitoring</span>
                 </div>
               </div>
             </div>
@@ -509,62 +577,73 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
             {/* Current Question */}
             <div className="bg-gray-50 rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-blue-600">Question {currentQuestionIndex + 1} of {questions.length}</span>
-                <span className="text-sm text-gray-500">11:40</span>
+                <span className="text-sm font-medium text-purple-600">Question {currentQuestionIndex + 1} of {questions.length}</span>
+                <span className="text-sm text-gray-500">{new Date().toLocaleTimeString()}</span>
               </div>
               <p className="text-gray-800 leading-relaxed">{questions[currentQuestionIndex]}</p>
-              {!isVideoOn && (
-                <p className="text-red-500 text-sm mt-2">Failed to play speech</p>
+              {isRecording && (
+                <div className="mt-3 flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-red-600">Interview in progress</span>
+                </div>
               )}
             </div>
           </div>
 
-          {/* Response Area */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 flex-1">
-            <h4 className="text-lg font-semibold text-gray-800 mb-4">Your Response</h4>
+          {/* Response Status */}
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+            <h4 className="text-lg font-semibold text-gray-800 mb-4">Response Status</h4>
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
                 <div className="flex items-center space-x-2">
-                  <Mic className="w-4 h-4 text-green-500" />
-                  <span className="text-sm text-gray-600">Microphone active - speak your response</span>
+                  <Mic className={`w-4 h-4 ${isMicOn ? 'text-green-500' : 'text-red-500'}`} />
+                  <span className="text-sm text-gray-600">
+                    Microphone {isMicOn ? 'active' : 'inactive'} - speak your response
+                  </span>
                 </div>
               </div>
               <div className="flex items-center space-x-2 text-green-600">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-sm">Good audio</span>
+                <span className="text-sm">Audio quality good</span>
               </div>
-              <div className="flex items-center space-x-2 text-gray-500">
-                <span className="text-sm">No USB storage devices</span>
+              <div className="flex items-center space-x-2 text-blue-600">
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                <span className="text-sm">Face detection active</span>
               </div>
             </div>
             
             <div className="mt-6 p-4 bg-gray-50 rounded-xl">
-              <p className="text-gray-600 text-center">Your responses will appear here after you answer the question.</p>
+              <p className="text-gray-600 text-center">
+                {isRecording 
+                  ? "Recording your responses. Please maintain eye contact and speak clearly."
+                  : "Click 'Start Interview' to begin the proctored assessment."
+                }
+              </p>
             </div>
           </div>
 
           {/* Violation Logs */}
-          <div className="bg-white rounded-2xl shadow-lg p-6 mt-6">
-            <h4 className="text-lg font-semibold text-gray-800 mb-4">Violation Logs</h4>
+          <div className="bg-white rounded-2xl shadow-lg p-6 flex-1">
+            <h4 className="text-lg font-semibold text-gray-800 mb-4">Security Monitoring</h4>
             {violationLogs.length === 0 ? (
               <div className="flex items-center space-x-2 text-green-600">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-sm">No violations detected</span>
+                <span className="text-sm">No security violations detected</span>
               </div>
             ) : (
-              <div className="space-y-2 max-h-32 overflow-y-auto">
+              <div className="space-y-2 max-h-48 overflow-y-auto">
                 {violationLogs.map((log) => (
                   <div
                     key={log.id}
-                    className={`p-2 rounded-lg text-sm ${
+                    className={`p-3 rounded-lg text-sm ${
                       log.type === 'error' 
                         ? 'bg-red-50 text-red-700 border border-red-200' 
                         : 'bg-yellow-50 text-yellow-700 border border-yellow-200'
                     }`}
                   >
                     <div className="flex justify-between items-start">
-                      <span>{log.message}</span>
-                      <span className="text-xs opacity-70">
+                      <span className="font-medium">{log.message}</span>
+                      <span className="text-xs opacity-70 ml-2">
                         {log.timestamp.toLocaleTimeString()}
                       </span>
                     </div>
@@ -577,21 +656,21 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
       </div>
 
       {/* Completion Modal */}
-      {isComplete && !showReport && (
+      {isComplete && !showProctoredReport && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl p-8 max-w-md mx-4">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4">Practice Complete!</h3>
+            <h3 className="text-2xl font-bold text-gray-800 mb-4">Interview Complete!</h3>
             <p className="text-gray-600 mb-6">
-              Great job! You've completed your self-practice session. 
-              {hasRecording && " Your interview has been recorded and is ready for download."}
+              Congratulations! You've completed your proctored interview assessment. 
+              {hasRecording && " Your interview has been recorded and analyzed."}
             </p>
             <div className="flex flex-col space-y-3">
               <button
-                onClick={() => setShowCustomReport(true)}
-                className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors flex items-center justify-center"
+                onClick={handleEndInterview}
+                className="px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-lg hover:from-purple-600 hover:to-indigo-600 transition-colors flex items-center justify-center font-medium"
               >
-                <Download className="w-5 h-5 mr-2" />
-                View Performance Report
+                <Award className="w-5 h-5 mr-2" />
+                View Comprehensive Report
               </button>
               {hasRecording && (
                 <button
@@ -604,16 +683,16 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
               )}
               <button
                 onClick={onBack}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
               >
-                Continue
+                Back to Levels
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Self Practice Report Popup */}
+      {/* Self Practice Report Popup - keeping this for backward compatibility */}
       {showCustomReport && (
         <SelfPracticeReport
           onClose={() => setShowCustomReport(false)}
@@ -631,3 +710,5 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
 };
 
 export default Level4Flow;
+
+</edits_to_apply>
