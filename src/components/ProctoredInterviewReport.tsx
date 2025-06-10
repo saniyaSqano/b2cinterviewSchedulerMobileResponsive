@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ArrowLeft, Download, Clock, User, Mail, Phone, Award, AlertTriangle, CheckCircle } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
@@ -131,11 +132,11 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(12);
       doc.setFont('helvetica', 'normal');
-      doc.text(`Name: ${candidateDetails.fullName}`, 20, 55);
-      doc.text(`Email: ${candidateDetails.email}`, 20, 65);
-      doc.text(`Phone: ${candidateDetails.phoneNumber}`, 20, 75);
-      doc.text(`Skills: ${candidateDetails.skills}`, 20, 85);
-      doc.text(`Experience: ${candidateDetails.experience}`, 20, 95);
+      doc.text('Name: ' + candidateDetails.fullName, 20, 55);
+      doc.text('Email: ' + candidateDetails.email, 20, 65);
+      doc.text('Phone: ' + candidateDetails.phoneNumber, 20, 75);
+      doc.text('Skills: ' + candidateDetails.skills, 20, 85);
+      doc.text('Experience: ' + candidateDetails.experience, 20, 95);
       
       // Interview Details Section
       doc.setTextColor(...secondaryColor);
@@ -146,9 +147,9 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
       doc.setTextColor(0, 0, 0);
       doc.setFontSize(12);
       doc.setFont('helvetica', 'normal');
-      doc.text(`Date: ${interviewStartTime.toLocaleDateString()}`, 20, 125);
-      doc.text(`Duration: ${duration} minutes`, 20, 135);
-      doc.text(`Questions Answered: ${answeredQuestions}/${totalQuestions}`, 20, 145);
+      doc.text('Date: ' + interviewStartTime.toLocaleDateString(), 20, 125);
+      doc.text('Duration: ' + duration + ' minutes', 20, 135);
+      doc.text('Questions Answered: ' + answeredQuestions + '/' + totalQuestions, 20, 145);
       
       // AI Recommendation Section with colored background
       doc.setTextColor(...secondaryColor);
@@ -168,8 +169,8 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
       } else {
         doc.setTextColor(...errorColor);
       }
-      doc.text(`Overall Score: ${score}/100`, 20, 175);
-      doc.text(`Recommendation: ${recommendation}`, 20, 185);
+      doc.text('Overall Score: ' + score + '/100', 20, 175);
+      doc.text('Recommendation: ' + recommendation, 20, 185);
       
       // Security Violations Table
       doc.setTextColor(...secondaryColor);
@@ -240,11 +241,11 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
       // Add footer with timestamp
       doc.setTextColor(128, 128, 128);
       doc.setFontSize(8);
-      doc.text(`Report generated on: ${new Date().toLocaleString()}`, 20, 285);
+      doc.text('Report generated on: ' + new Date().toLocaleString(), 20, 285);
       
       // Generate filename with timestamp
       const timestamp = new Date().toISOString().split('T')[0];
-      const filename = `proctored-interview-report-${candidateDetails.fullName.replace(/\s+/g, '-')}-${timestamp}.pdf`;
+      const filename = 'proctored-interview-report-' + candidateDetails.fullName.replace(/\s+/g, '-') + '-' + timestamp + '.pdf';
       
       console.log('Saving colored PDF with filename:', filename);
       doc.save(filename);
@@ -546,5 +547,3 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
 };
 
 export default ProctoredInterviewReport;
-
-```
