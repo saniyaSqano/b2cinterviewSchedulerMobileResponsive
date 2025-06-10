@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Download, User, Clock, Eye, Mic, AlertTriangle, CheckCircle, Star, TrendingUp, FileText, Award, Shield, Info } from 'lucide-react';
 import jsPDF from 'jspdf';
@@ -99,16 +98,16 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
 
   const violationChartData = getViolationChartData();
 
-  // Colors for different violation types
+  // Updated colors for different violation types - more vibrant and distinct
   const VIOLATION_COLORS = [
-    '#ef4444', // red for errors
-    '#f97316', // orange
-    '#eab308', // yellow
-    '#22c55e', // green
-    '#3b82f6', // blue
-    '#8b5cf6', // purple
-    '#ec4899', // pink
-    '#06b6d4'  // cyan
+    '#FF6B6B', // Coral red
+    '#4ECDC4', // Teal
+    '#45B7D1', // Sky blue
+    '#96CEB4', // Mint green
+    '#FFEAA7', // Light yellow
+    '#DDA0DD', // Plum
+    '#98D8C8', // Mint
+    '#F7DC6F'  // Light gold
   ];
 
   const chartConfig = {

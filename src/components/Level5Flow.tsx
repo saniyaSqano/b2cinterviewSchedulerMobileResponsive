@@ -42,6 +42,7 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const startTimeRef = useRef<Date | null>(null);
+  const violationIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const interviewQuestions = [
     "Welcome to your AI Proctored Interview! This is your final assessment. Let's begin with a professional introduction. Please tell me about yourself and your career aspirations.",
@@ -56,6 +57,7 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
     return () => {
       console.log('Cleaning up camera stream...');
       stopCamera();
+      stopViolationDetection();
     };
   }, []);
 
@@ -74,33 +76,50 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
 
   // Enhanced violation detection for proctored interview
   useEffect(() => {
-    if (!showCongratulations && isVideoOn) {
-      const interval = setInterval(() => {
-        // More frequent violation checks for proctored environment
-        if (Math.random() > 0.8) {
-          const violations = [
-            { type: 'error' as const, message: 'Multiple faces detected - interview security breach' },
-            { type: 'warning' as const, message: 'Eye tracking: looking away from camera' },
-            { type: 'error' as const, message: 'Unauthorized person detected in background' },
-            { type: 'warning' as const, message: 'Audio levels inconsistent - possible external interference' },
-            { type: 'error' as const, message: 'Screen sharing or recording software detected' },
-            { type: 'warning' as const, message: 'Lighting conditions suboptimal for face recognition' }
-          ];
-          
-          const randomViolation = violations[Math.floor(Math.random() * violations.length)];
-          const newLog: ViolationLog = {
-            id: Date.now(),
-            ...randomViolation,
-            timestamp: new Date()
-          };
-          
-          setViolationLogs(prev => [newLog, ...prev].slice(0, 15)); // Keep more logs for proctored session
-        }
-      }, 6000);
-
-      return () => clearInterval(interval);
+    if (!showCongratulations && isVideoOn && !showProctoredReport) {
+      startViolationDetection();
+    } else {
+      stopViolationDetection();
     }
-  }, [showCongratulations, isVideoOn]);
+
+    return () => stopViolationDetection();
+  }, [showCongratulations, isVideoOn, showProctoredReport]);
+
+  const startViolationDetection = () => {
+    // Clear any existing interval
+    stopViolationDetection();
+    
+    violationIntervalRef.current = setInterval(() => {
+      // More frequent violation checks for proctored environment
+      if (Math.random() > 0.8) {
+        const violations = [
+          { type: 'error' as const, message: 'Multiple faces detected - interview security breach' },
+          { type: 'warning' as const, message: 'Eye tracking: looking away from camera' },
+          { type: 'error' as const, message: 'Unauthorized person detected in background' },
+          { type: 'warning' as const, message: 'Audio levels inconsistent - possible external interference' },
+          { type: 'error' as const, message: 'Screen sharing or recording software detected' },
+          { type: 'warning' as const, message: 'Lighting conditions suboptimal for face recognition' }
+        ];
+        
+        const randomViolation = violations[Math.floor(Math.random() * violations.length)];
+        const newLog: ViolationLog = {
+          id: Date.now(),
+          ...randomViolation,
+          timestamp: new Date()
+        };
+        
+        setViolationLogs(prev => [newLog, ...prev].slice(0, 15)); // Keep more logs for proctored session
+      }
+    }, 6000);
+  };
+
+  const stopViolationDetection = () => {
+    if (violationIntervalRef.current) {
+      clearInterval(violationIntervalRef.current);
+      violationIntervalRef.current = null;
+      console.log('Violation detection stopped');
+    }
+  };
 
   const startCamera = async () => {
     try {
@@ -264,6 +283,8 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
       setInterviewDuration(finalDuration);
     }
     
+    // Stop all monitoring and camera
+    stopViolationDetection();
     stopCamera();
     setShowProctoredReport(true);
   };
