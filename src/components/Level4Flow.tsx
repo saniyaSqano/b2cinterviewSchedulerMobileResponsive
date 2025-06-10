@@ -546,7 +546,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
                     className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center space-x-2 ${
                       isRecording
                         ? 'bg-red-500 hover:bg-red-600 text-white'
-                        : 'bg-blue-500 hover:bg-blue-600 text-white disabled:bg-gray-300 disabled:cursor-not-allowed'
+                        : 'bg-blue-500 hover:bg-blue-600 text-white'
                     }`}
                   >
                     {isRecording ? (
@@ -760,5 +760,3 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
 };
 
 export default Level4Flow;
-
-}
