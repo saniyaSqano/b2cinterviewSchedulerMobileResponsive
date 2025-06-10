@@ -86,31 +86,27 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
     "Do you have any questions about the role or our organization? This concludes your proctored interview."
   ];
 
-  // Initialize component with start time
   useEffect(() => {
     const startTime = new Date();
     setInterviewStartTime(startTime);
     startTimeRef.current = startTime;
   }, []);
 
-  // Calculate interview duration
   useEffect(() => {
     if (!showProctoredReport && startTimeRef.current) {
       const interval = setInterval(() => {
         const now = new Date();
         const duration = Math.floor((now.getTime() - startTimeRef.current!.getTime()) / (1000 * 60));
         setInterviewDuration(duration);
-      }, 60000); // Update every minute
+      }, 60000);
 
       return () => clearInterval(interval);
     }
   }, [showProctoredReport]);
 
-  // Enhanced violation detection for proctored interview
   useEffect(() => {
     if (isVideoOn) {
       const interval = setInterval(() => {
-        // More frequent violation checks for proctored environment
         if (Math.random() > 0.8) {
           const violations = [
             { type: 'error' as const, message: 'Multiple faces detected - interview security breach' },
@@ -128,7 +124,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
             timestamp: new Date()
           };
           
-          setViolationLogs(prev => [newLog, ...prev].slice(0, 15)); // Keep more logs for proctored session
+          setViolationLogs(prev => [newLog, ...prev].slice(0, 15));
         }
       }, 6000);
 
@@ -136,7 +132,6 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
     }
   }, [isVideoOn]);
 
-  // Initialize face detection on component mount
   useEffect(() => {
     console.log('Level4Flow mounted, initializing face detection...');
     initFaceDetection().catch(error => {
@@ -144,20 +139,16 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
     });
   }, []);
 
-  // Handle violations from VideoFeed component or tab change detection
   const handleViolation = (violation: ViolationLog) => {
     console.log('Violation received:', violation);
     setViolationLogs(prev => [violation, ...prev].slice(0, 15));
   };
   
-  // Initialize tab change and keyboard shortcut detection
   useEffect(() => {
     console.log('Initializing tab change and keyboard shortcut detection');
     
-    // Initialize tab change detection with our violation handler
     const cleanup = initTabChangeDetection({
       onViolation: (type, message) => {
-        // Convert to our ViolationLog format
         handleViolation({
           id: Date.now(),
           type: type as 'warning' | 'error',
@@ -167,14 +158,12 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
       },
       detectTabChange: true,
       detectKeyboardShortcuts: true,
-      preventDefaultActions: true // Block the shortcuts from actually working
+      preventDefaultActions: true
     });
     
-    // Clean up when component unmounts
     return cleanup;
   }, []);
 
-  // Auto-advance questions for proctored interview
   useEffect(() => {
     if (!isComplete && isRecording) {
       const timer = setTimeout(() => {
@@ -184,7 +173,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
           setIsComplete(true);
           stopRecording();
         }
-      }, 45000); // 45 seconds per question
+      }, 45000);
 
       return () => clearTimeout(timer);
     }
@@ -206,11 +195,9 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
     }
 
     try {
-      // Get both video and audio streams
       let combinedStream;
       
       if (streamRef.current) {
-        // If we already have the video stream from VideoFeed
         const videoTracks = streamRef.current.getVideoTracks();
         
         if (videoTracks.length === 0) {
@@ -219,7 +206,6 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
           return;
         }
         
-        // Get audio stream separately if needed
         let audioStream;
         try {
           audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -229,7 +215,6 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
           alert('Could not access microphone. Recording will proceed without audio.');
         }
         
-        // Combine video and audio tracks
         const tracks = [...videoTracks];
         if (audioStream) {
           tracks.push(...audioStream.getAudioTracks());
@@ -237,7 +222,6 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
         
         combinedStream = new MediaStream(tracks);
       } else {
-        // If we don't have a stream yet, get both video and audio
         combinedStream = await navigator.mediaDevices.getUserMedia({
           video: true,
           audio: true
@@ -249,7 +233,6 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
 
       console.log('Combined stream created with tracks:', combinedStream.getTracks().map(t => t.kind));
       
-      // Create media recorder with the combined stream
       const mediaRecorder = new MediaRecorder(combinedStream, {
         mimeType: 'video/webm;codecs=vp8,opus'
       });
@@ -268,7 +251,6 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
         setHasRecording(true);
         console.log('Recording stopped, total chunks:', recordedChunks.length);
         
-        // Wait a short time to ensure all chunks are collected
         setTimeout(async () => {
           console.log('Preparing to upload recording, chunks:', recordedChunks.length);
           
@@ -277,7 +259,6 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
               setIsUploading(true);
               setUploadSuccess(false);
               
-              // Create blob from recorded chunks
               const blob = new Blob(recordedChunks, { type: 'video/webm' });
               console.log('Blob size for upload:', blob.size, 'bytes');
               
@@ -287,10 +268,8 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
                 return;
               }
               
-              // Generate filename with user name and timestamp
               const fileName = `proctored-interview-${userName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.webm`;
               
-              // Upload to S3 using the uploadMockVideo function
               console.log('Automatically uploading recording to S3:', fileName);
               const downloadUrl = await uploadMockVideo(blob, fileName);
               
@@ -298,7 +277,6 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
               setUploadSuccess(true);
               setIsUploading(false);
               
-              // Create blob URL for the player
               const url = URL.createObjectURL(blob);
               setRecordingBlobUrl(url);
               setShowVideoPlayer(true);
@@ -314,11 +292,10 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
         }, 1500);
       };
 
-      mediaRecorder.start(1000); // Collect data every second
+      mediaRecorder.start(1000);
       setIsRecording(true);
       console.log('Proctored interview recording started successfully');
       
-      // Reset to first question when recording starts
       setCurrentQuestionIndex(0);
       
     } catch (error) {
@@ -334,17 +311,14 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
         setIsRecording(false);
         console.log('Stopping proctored interview recording');
         
-        // Release tracks to avoid memory leaks
         if (streamRef.current) {
           streamRef.current.getTracks().forEach(track => {
-            // Only stop audio tracks, keep video running for the UI
             if (track.kind === 'audio') {
               track.stop();
             }
           });
         }
         
-        // Show a notification that recording has stopped
         alert('Proctored interview recording has been stopped. Video player will open automatically.');
       } catch (error) {
         console.error('Error stopping recording:', error);
@@ -355,7 +329,6 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
   const handleEndInterview = () => {
     console.log('Ending proctored interview and generating comprehensive report...');
     
-    // Calculate final duration
     if (startTimeRef.current) {
       const endTime = new Date();
       const finalDuration = Math.floor((endTime.getTime() - startTimeRef.current.getTime()) / (1000 * 60));
@@ -447,10 +420,8 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
         return;
       }
       
-      // Generate filename with user name and timestamp
       const fileName = `proctored-interview-${userName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.webm`;
       
-      // Upload to S3 using the uploadMockVideo function
       console.log('Uploading recording to S3:', fileName);
       const downloadUrl = await uploadMockVideo(blob, fileName);
       
@@ -500,7 +471,6 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
         }}
         violationLogs={violationLogs}
         onBack={handleBackFromReport}
-        uploadUrl={uploadUrl}
         userName={userName}
       />
     );
@@ -548,13 +518,12 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
               {/* Camera Feed */}
               <div className="rounded-2xl overflow-hidden shadow-lg">
                 <VideoFeed
-                  onVideoStatusChange={handleVideoStatusChange}
+                  onStatusChange={handleVideoStatusChange}
                   onViolation={handleViolation}
                   isActive={true}
                 />
               </div>
 
-              {/* Recording Controls */}
               <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">Recording Controls</h3>
@@ -642,7 +611,6 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
                 )}
               </div>
 
-              {/* Video Player */}
               {showVideoPlayer && recordingBlobUrl && (
                 <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50">
                   <div className="flex items-center justify-between mb-4">
@@ -695,7 +663,6 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
                 </div>
               )}
 
-              {/* Interview Question */}
               <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">Current Question</h3>
