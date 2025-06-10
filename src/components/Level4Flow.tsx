@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Video, VideoOff, Mic, MicOff, Download, Square, Circle, Upload, Check, User, Mail, Phone, Award, Star, TrendingUp, Clock, Play, Pause, X } from 'lucide-react';
-import Level4CongratulationsScreen from './Level4CongratulationsScreen';
 import VideoFeed from './VideoFeed';
 import SelfPracticeReport from './SelfPracticeReport';
 import ProctoredInterviewReport from './ProctoredInterviewReport';
@@ -23,7 +22,6 @@ interface ViolationLog {
 }
 
 const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
-  const [showCongratulations, setShowCongratulations] = useState(true);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
   const [isVideoOn, setIsVideoOn] = useState(false);
@@ -88,9 +86,16 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
     "Do you have any questions about the role or our organization? This concludes your proctored interview."
   ];
 
+  // Initialize component with start time
+  useEffect(() => {
+    const startTime = new Date();
+    setInterviewStartTime(startTime);
+    startTimeRef.current = startTime;
+  }, []);
+
   // Calculate interview duration
   useEffect(() => {
-    if (!showCongratulations && !showProctoredReport && startTimeRef.current) {
+    if (!showProctoredReport && startTimeRef.current) {
       const interval = setInterval(() => {
         const now = new Date();
         const duration = Math.floor((now.getTime() - startTimeRef.current!.getTime()) / (1000 * 60));
@@ -99,11 +104,11 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
 
       return () => clearInterval(interval);
     }
-  }, [showCongratulations, showProctoredReport]);
+  }, [showProctoredReport]);
 
   // Enhanced violation detection for proctored interview
   useEffect(() => {
-    if (!showCongratulations && isVideoOn) {
+    if (isVideoOn) {
       const interval = setInterval(() => {
         // More frequent violation checks for proctored environment
         if (Math.random() > 0.8) {
@@ -129,7 +134,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
 
       return () => clearInterval(interval);
     }
-  }, [showCongratulations, isVideoOn]);
+  }, [isVideoOn]);
 
   // Initialize face detection on component mount
   useEffect(() => {
@@ -147,33 +152,31 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
   
   // Initialize tab change and keyboard shortcut detection
   useEffect(() => {
-    if (!showCongratulations) {
-      console.log('Initializing tab change and keyboard shortcut detection');
-      
-      // Initialize tab change detection with our violation handler
-      const cleanup = initTabChangeDetection({
-        onViolation: (type, message) => {
-          // Convert to our ViolationLog format
-          handleViolation({
-            id: Date.now(),
-            type: type as 'warning' | 'error',
-            message,
-            timestamp: new Date()
-          });
-        },
-        detectTabChange: true,
-        detectKeyboardShortcuts: true,
-        preventDefaultActions: true // Block the shortcuts from actually working
-      });
-      
-      // Clean up when component unmounts or congratulations screen shows
-      return cleanup;
-    }
-  }, [showCongratulations]);
+    console.log('Initializing tab change and keyboard shortcut detection');
+    
+    // Initialize tab change detection with our violation handler
+    const cleanup = initTabChangeDetection({
+      onViolation: (type, message) => {
+        // Convert to our ViolationLog format
+        handleViolation({
+          id: Date.now(),
+          type: type as 'warning' | 'error',
+          message,
+          timestamp: new Date()
+        });
+      },
+      detectTabChange: true,
+      detectKeyboardShortcuts: true,
+      preventDefaultActions: true // Block the shortcuts from actually working
+    });
+    
+    // Clean up when component unmounts
+    return cleanup;
+  }, []);
 
   // Auto-advance questions for proctored interview
   useEffect(() => {
-    if (!showCongratulations && !isComplete && isRecording) {
+    if (!isComplete && isRecording) {
       const timer = setTimeout(() => {
         if (currentQuestionIndex < questions.length - 1) {
           setCurrentQuestionIndex(prev => prev + 1);
@@ -185,14 +188,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
 
       return () => clearTimeout(timer);
     }
-  }, [currentQuestionIndex, showCongratulations, isComplete, isRecording]);
-
-  const handleProceedToInterview = () => {
-    setShowCongratulations(false);
-    const startTime = new Date();
-    setInterviewStartTime(startTime);
-    startTimeRef.current = startTime;
-  };
+  }, [currentQuestionIndex, isComplete, isRecording]);
 
   const handleVideoStatusChange = (status: boolean) => {
     setIsVideoOn(status);
@@ -503,338 +499,295 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
           experience: userDetails.experience
         }}
         violationLogs={violationLogs}
+        interviewDuration={interviewDuration}
         onBack={handleBackFromReport}
-        duration={interviewDuration}
-        interviewStartTime={interviewStartTime}
-        totalQuestions={questions.length}
-        answeredQuestions={currentQuestionIndex + 1}
-      />
-    );
-  }
-
-  if (showCongratulations) {
-    return (
-      <Level4CongratulationsScreen
-        onBack={onBack}
-        onProceed={handleProceedToInterview}
+        uploadUrl={uploadUrl}
         userName={userName}
       />
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative">
       {/* Header */}
-      <div className="bg-white/95 backdrop-blur-sm border-b border-gray-200 p-2 shadow-sm">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={onBack}
-              className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 text-gray-700" />
-            </button>
-            <div>
-              <h1 className="text-xl font-bold text-gray-800">AI Proctored Interview</h1>
-              <p className="text-sm text-gray-600">Level 4 - Final Assessment</p>
-            </div>
-          </div>
-          
-          {/* Recording Controls */}
-          <div className="flex items-center space-x-3">
-            {!isRecording ? (
-              <button
-                onClick={startRecording}
-                disabled={!isVideoOn}
-                className="flex items-center space-x-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium shadow-md"
-              >
-                <Circle className="w-4 h-4 animate-pulse" />
-                <span>Start Interview</span>
-              </button>
-            ) : (
-              <button
-                onClick={stopRecording}
-                className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors animate-pulse shadow-md"
-              >
-                <Square className="w-4 h-4" />
-                <span>Stop Interview</span>
-              </button>
-            )}
-            
-            {/* Download button in header when recording is available */}
-            {hasRecording && (
-              <button
-                onClick={downloadRecording}
-                className="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium shadow-md"
-              >
-                <Download className="w-4 h-4" />
-                <span>Download Video</span>
-              </button>
-            )}
-            
-            <button
-              onClick={handleEndInterview}
-              className="px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-lg hover:from-purple-600 hover:to-indigo-600 transition-colors shadow-md font-medium"
-            >
-              End Interview & View Report
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex h-screen pt-8">
-        {/* Left Side - Video Feed */}
-        <div className="w-3/5 p-1">
-          <div className="h-full">
-            <div className="flex items-center justify-between mb-1 px-2">
-              <h3 className="text-lg font-semibold text-gray-800">Proctored Camera</h3>
-              <div className="flex items-center space-x-2">
-                {isRecording && (
-                  <div className="flex items-center space-x-2 text-red-500">
-                    <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
-                    <span className="text-sm font-medium">Recording</span>
-                  </div>
-                )}
-                <div className="flex items-center space-x-1">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-xs text-green-600">Proctored</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="relative h-[calc(100%-2rem)] bg-gray-900 rounded-xl overflow-hidden">
-              <VideoFeed
-                onStatusChange={handleVideoStatusChange}
-                videoRef={videoRef}
-                faceDetectionVideoRef={faceDetectionVideoRef}
-                onViolation={handleViolation}
-                candidateName={userDetails.fullName}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Right Side - AI Interview & Violations */}
-        <div className="w-2/5 p-1 flex flex-col">
-          {/* Current Question Display */}
-          <div className="bg-purple-50 p-2 rounded-lg mb-2">
-            <h3 className="text-sm font-medium text-purple-800 mb-1">Interview Question ({currentQuestionIndex + 1}/{questions.length})</h3>
-            <p className="text-gray-800 text-sm">{questions[currentQuestionIndex]}</p>
-          </div>
-
-          {/* AI Proctoring System */}
-          <div className="bg-white rounded-2xl shadow-lg p-3 mb-3">
-            <div className="flex items-center space-x-3 mb-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold">AI</span>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800">AI Proctoring System</h3>
-                <p className="text-sm text-gray-600">Monitoring interview integrity</p>
-                <div className="flex items-center space-x-1 mt-1">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-xs text-green-600">Active Monitoring</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Current Question */}
-            <div className="bg-gray-50 rounded-xl p-2">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-medium text-purple-600">Question {currentQuestionIndex + 1} of {questions.length}</span>
-                <span className="text-sm text-gray-500">{new Date().toLocaleTimeString()}</span>
-              </div>
-              <p className="text-gray-800 leading-relaxed text-sm">{questions[currentQuestionIndex]}</p>
-              {isRecording && (
-                <div className="mt-2 flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm text-red-600">Interview in progress</span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Response Status */}
-          <div className="bg-white rounded-2xl shadow-lg p-3 mb-3">
-            <h4 className="text-lg font-semibold text-gray-800 mb-2">Response Status</h4>
-            <div className="space-y-1">
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-2">
-                  <Mic className={`w-4 h-4 ${isMicOn ? 'text-green-500' : 'text-red-500'}`} />
-                  <span className="text-sm text-gray-600">
-                    Microphone {isMicOn ? 'active' : 'inactive'} - speak your response
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2 text-green-600">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-sm">Audio quality good</span>
-              </div>
-              <div className="flex items-center space-x-2 text-blue-600">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                <span className="text-sm">Face detection active</span>
-              </div>
-            </div>
-            
-            <div className="mt-3 p-2 bg-gray-50 rounded-xl">
-              <p className="text-gray-600 text-center text-sm">
-                {isRecording 
-                  ? "Recording your responses. Please maintain eye contact and speak clearly."
-                  : "Click 'Start Interview' to begin the proctored assessment."
-                }
-              </p>
-            </div>
-          </div>
-
-          {/* Violation Logs */}
-          <div className="bg-white rounded-2xl shadow-lg p-3 flex-1">
-            <h4 className="text-lg font-semibold text-gray-800 mb-2">Security Monitoring</h4>
-            {violationLogs.length === 0 ? (
-              <div className="flex items-center space-x-2 text-green-600">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-sm">No security violations detected</span>
-              </div>
-            ) : (
-              <div className="space-y-2 max-h-48 overflow-y-auto">
-                {violationLogs.map((log) => (
-                  <div
-                    key={log.id}
-                    className={`p-2 rounded-lg text-sm ${
-                      log.type === 'error' 
-                        ? 'bg-red-50 text-red-700 border border-red-200' 
-                        : 'bg-yellow-50 text-yellow-700 border border-yellow-200'
-                    }`}
-                  >
-                    <div className="flex justify-between items-start">
-                      <span className="font-medium">{log.message}</span>
-                      <span className="text-xs opacity-70 ml-2">
-                        {log.timestamp.toLocaleTimeString()}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Video Player Modal */}
-      {showVideoPlayer && recordingBlobUrl && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 max-w-4xl mx-4 w-full max-h-[90vh] overflow-hidden">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-2xl font-bold text-gray-800">Proctored Interview Recording</h3>
-              <button
-                onClick={closeVideoPlayer}
-                className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-              >
-                <X className="w-5 h-5 text-gray-700" />
-              </button>
-            </div>
-            
-            <div className="relative bg-black rounded-xl overflow-hidden mb-4">
-              <video
-                ref={playerRef}
-                src={recordingBlobUrl}
-                className="w-full h-auto max-h-[60vh]"
-                controls
-                onPlay={() => setIsPlaying(true)}
-                onPause={() => setIsPlaying(false)}
-                onEnded={() => setIsPlaying(false)}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <button
-                  onClick={togglePlayPause}
-                  className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                >
-                  {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                  <span>{isPlaying ? 'Pause' : 'Play'}</span>
-                </button>
-                
-                <button
-                  onClick={downloadRecordingFromBlob}
-                  className="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Download Video</span>
-                </button>
-              </div>
-              
-              <button
-                onClick={handleEndInterview}
-                className="px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-lg hover:from-purple-600 hover:to-indigo-600 transition-colors"
-              >
-                <Award className="w-4 h-4 mr-2 inline" />
-                View Report
-              </button>
-            </div>
-            
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-600">
-                <strong>Recording Details:</strong> Interview completed on {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}
-              </p>
-              <p className="text-sm text-gray-600 mt-1">
-                <strong>Duration:</strong> {interviewDuration} minutes | <strong>Questions:</strong> {currentQuestionIndex + 1}/{questions.length}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Completion Modal */}
-      {isComplete && !showProctoredReport && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-8 max-w-md mx-4">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4">Interview Complete!</h3>
-            <p className="text-gray-600 mb-6">
-              Congratulations! You've completed your proctored interview assessment. 
-              {hasRecording && " Your interview has been recorded and analyzed."}
-            </p>
-            <div className="flex flex-col space-y-3">
-              <button
-                onClick={handleEndInterview}
-                className="px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-lg hover:from-purple-600 hover:to-indigo-600 transition-colors flex items-center justify-center font-medium"
-              >
-                <Award className="w-5 h-5 mr-2" />
-                View Comprehensive Report
-              </button>
-              {hasRecording && (
-                <button
-                  onClick={downloadRecording}
-                  className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center"
-                >
-                  <Download className="w-5 h-5 mr-2" />
-                  Download Recording
-                </button>
-              )}
+      <div className="bg-white/95 backdrop-blur-md border-b border-gray-200/50 shadow-sm relative z-20">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
               <button
                 onClick={onBack}
-                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                className="p-2.5 hover:bg-gray-100 rounded-lg transition-colors duration-200"
               >
-                Back to Levels
+                <ArrowLeft className="w-5 h-5 text-gray-600" />
               </button>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Level 4 - Self Practice</h1>
+                <p className="text-sm text-gray-600">AI-Monitored Practice Session</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <div className="text-right">
+                <div className="text-sm text-gray-600">Duration</div>
+                <div className="text-lg font-semibold text-gray-900">{interviewDuration} min</div>
+              </div>
+              
+              <div className="text-right">
+                <div className="text-sm text-gray-600">Question</div>
+                <div className="text-lg font-semibold text-gray-900">{currentQuestionIndex + 1} of {questions.length}</div>
+              </div>
             </div>
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Self Practice Report Popup - keeping this for backward compatibility */}
-      {showCustomReport && (
-        <SelfPracticeReport
-          onClose={() => setShowCustomReport(false)}
-          userDetails={{
-            fullName: userDetails.fullName,
-            email: userDetails.email,
-            phoneNumber: userDetails.phoneNumber,
-            skills: userDetails.skills,
-            experience: userDetails.experience
-          }}
-        />
-      )}
+      <div className="relative z-10">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Column - Video Feed */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Camera Feed */}
+              <div className="rounded-2xl overflow-hidden shadow-lg">
+                <VideoFeed
+                  ref={videoRef}
+                  onVideoStatusChange={handleVideoStatusChange}
+                  onViolation={handleViolation}
+                  isActive={true}
+                />
+              </div>
+
+              {/* Recording Controls */}
+              <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">Recording Controls</h3>
+                  <div className="flex items-center space-x-2">
+                    {isRecording && (
+                      <div className="flex items-center space-x-2 text-red-600">
+                        <Circle className="w-3 h-3 fill-current animate-pulse" />
+                        <span className="text-sm font-medium">Recording</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-4">
+                  <button
+                    onClick={isRecording ? stopRecording : startRecording}
+                    disabled={!isVideoOn}
+                    className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center space-x-2 ${
+                      isRecording
+                        ? 'bg-red-500 hover:bg-red-600 text-white'
+                        : 'bg-blue-500 hover:bg-blue-600 text-white disabled:bg-gray-300 disabled:cursor-not-allowed'
+                    }`}
+                  >
+                    {isRecording ? (
+                      <>
+                        <Square className="w-4 h-4" />
+                        <span>Stop Recording</span>
+                      </>
+                    ) : (
+                      <>
+                        <Circle className="w-4 h-4" />
+                        <span>Start Recording</span>
+                      </>
+                    )}
+                  </button>
+
+                  {hasRecording && (
+                    <>
+                      <button
+                        onClick={downloadRecording}
+                        className="px-4 py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-medium transition-all flex items-center space-x-2"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span>Download</span>
+                      </button>
+
+                      <button
+                        onClick={uploadRecordingToS3}
+                        disabled={isUploading}
+                        className="px-4 py-3 bg-purple-500 hover:bg-purple-600 text-white rounded-xl font-medium transition-all flex items-center space-x-2 disabled:bg-gray-400"
+                      >
+                        {isUploading ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            <span>Uploading...</span>
+                          </>
+                        ) : uploadSuccess ? (
+                          <>
+                            <Check className="w-4 h-4" />
+                            <span>Uploaded</span>
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-4 h-4" />
+                            <span>Upload to S3</span>
+                          </>
+                        )}
+                      </button>
+                    </>
+                  )}
+                </div>
+
+                {uploadSuccess && uploadUrl && (
+                  <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm text-green-800 mb-2">Upload successful! Access your recording:</p>
+                    <a 
+                      href={uploadUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 text-sm break-all"
+                    >
+                      {uploadUrl}
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              {/* Video Player */}
+              {showVideoPlayer && recordingBlobUrl && (
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Recording Playback</h3>
+                    <button
+                      onClick={closeVideoPlayer}
+                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                      <X className="w-5 h-5 text-gray-600" />
+                    </button>
+                  </div>
+                  
+                  <div className="relative">
+                    <video
+                      ref={playerRef}
+                      src={recordingBlobUrl}
+                      className="w-full rounded-lg"
+                      controls
+                      onPlay={() => setIsPlaying(true)}
+                      onPause={() => setIsPlaying(false)}
+                    />
+                    
+                    <div className="mt-4 flex items-center space-x-4">
+                      <button
+                        onClick={togglePlayPause}
+                        className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-all flex items-center space-x-2"
+                      >
+                        {isPlaying ? (
+                          <>
+                            <Pause className="w-4 h-4" />
+                            <span>Pause</span>
+                          </>
+                        ) : (
+                          <>
+                            <Play className="w-4 h-4" />
+                            <span>Play</span>
+                          </>
+                        )}
+                      </button>
+                      
+                      <button
+                        onClick={downloadRecordingFromBlob}
+                        className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-all flex items-center space-x-2"
+                      >
+                        <Download className="w-4 h-4" />
+                        <span>Download</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Interview Question */}
+              <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">Current Question</h3>
+                  <div className="text-sm text-gray-600">
+                    Question {currentQuestionIndex + 1} of {questions.length}
+                  </div>
+                </div>
+                
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-4">
+                  <p className="text-gray-800 leading-relaxed">{questions[currentQuestionIndex]}</p>
+                </div>
+                
+                <div className="flex justify-between items-center">
+                  <button
+                    onClick={() => setCurrentQuestionIndex(Math.max(0, currentQuestionIndex - 1))}
+                    disabled={currentQuestionIndex === 0}
+                    className="px-4 py-2 bg-gray-500 hover:bg-gray-600 disabled:bg-gray-300 text-white rounded-lg font-medium transition-all disabled:cursor-not-allowed"
+                  >
+                    Previous
+                  </button>
+                  
+                  {currentQuestionIndex === questions.length - 1 ? (
+                    <button
+                      onClick={handleEndInterview}
+                      className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-all"
+                    >
+                      End Interview
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setCurrentQuestionIndex(Math.min(questions.length - 1, currentQuestionIndex + 1))}
+                      className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-all"
+                    >
+                      Next
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column - Violation Logs */}
+            <div className="space-y-6">
+              <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50 h-fit">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Violation Monitoring</h3>
+                
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {violationLogs.length === 0 ? (
+                    <div className="text-center py-8">
+                      <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <Check className="w-8 h-8 text-green-600" />
+                      </div>
+                      <p className="text-gray-600">No violations detected</p>
+                      <p className="text-sm text-gray-500 mt-1">Keep up the good work!</p>
+                    </div>
+                  ) : (
+                    violationLogs.map((log) => (
+                      <div
+                        key={log.id}
+                        className={`p-3 rounded-lg border-l-4 ${
+                          log.type === 'error'
+                            ? 'bg-red-50 border-red-400 text-red-800'
+                            : 'bg-yellow-50 border-yellow-400 text-yellow-800'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <p className="text-sm font-medium">{log.message}</p>
+                            <p className="text-xs opacity-75 mt-1">
+                              {log.timestamp.toLocaleTimeString()}
+                            </p>
+                          </div>
+                          <div
+                            className={`px-2 py-1 rounded text-xs font-medium ${
+                              log.type === 'error'
+                                ? 'bg-red-200 text-red-800'
+                                : 'bg-yellow-200 text-yellow-800'
+                            }`}
+                          >
+                            {log.type.toUpperCase()}
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
