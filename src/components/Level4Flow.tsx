@@ -471,6 +471,10 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
         }}
         violationLogs={violationLogs}
         onBack={handleBackFromReport}
+        duration={interviewDuration}
+        interviewStartTime={interviewStartTime}
+        totalQuestions={questions.length}
+        answeredQuestions={currentQuestionIndex + 1}
       />
     );
   }
@@ -756,3 +760,5 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
 };
 
 export default Level4Flow;
+
+</edits_to_apply>
