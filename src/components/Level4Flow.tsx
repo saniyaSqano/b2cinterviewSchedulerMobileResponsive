@@ -582,11 +582,11 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
         </div>
       </div>
 
-      <div className="flex h-screen pt-12">
+      <div className="flex h-screen pt-8">
         {/* Left Side - Video Feed */}
-        <div className="w-3/5 p-2">
-          <div className="bg-white rounded-2xl shadow-lg p-3 h-full">
-            <div className="flex items-center justify-between mb-2">
+        <div className="w-3/5 p-1">
+          <div className="h-full">
+            <div className="flex items-center justify-between mb-1 px-2">
               <h3 className="text-lg font-semibold text-gray-800">Proctored Camera</h3>
               <div className="flex items-center space-x-2">
                 {isRecording && (
@@ -602,7 +602,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
               </div>
             </div>
             
-            <div className="relative h-[calc(100%-3rem)] bg-gray-900 rounded-xl overflow-hidden">
+            <div className="relative h-[calc(100%-2rem)] bg-gray-900 rounded-xl overflow-hidden">
               <VideoFeed
                 onStatusChange={handleVideoStatusChange}
                 videoRef={videoRef}
@@ -615,7 +615,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
         </div>
 
         {/* Right Side - AI Interview & Violations */}
-        <div className="w-2/5 p-2 flex flex-col">
+        <div className="w-2/5 p-1 flex flex-col">
           {/* Current Question Display */}
           <div className="bg-purple-50 p-2 rounded-lg mb-2">
             <h3 className="text-sm font-medium text-purple-800 mb-1">Interview Question ({currentQuestionIndex + 1}/{questions.length})</h3>
@@ -840,3 +840,5 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
 };
 
 export default Level4Flow;
+
+</edits_to_apply>
