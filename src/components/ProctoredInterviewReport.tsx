@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Download, User, Clock, Eye, Mic, AlertTriangle, CheckCircle, Star, TrendingUp, FileText, Award, Shield, Info } from 'lucide-react';
 import jsPDF from 'jspdf';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from './ui/chart';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
 import { generateFaceDetectionSummary, FaceDetectionSummaryTable, generateTextSummaryFromTable } from '../utils/rule_based_logic';
 
 interface ViolationLog {
@@ -58,6 +60,62 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
     const summaryTable = generateFaceDetectionSummary(violations, candidateDetails.fullName);
     setFaceDetectionSummary(summaryTable);
   }, [violationLogs, candidateDetails.fullName]);
+
+  // Process violation data for pie chart
+  const getViolationChartData = () => {
+    const violationCounts: { [key: string]: number } = {};
+    
+    violationLogs.forEach(log => {
+      // Simplify violation messages for better chart readability
+      let violationType = log.message;
+      
+      if (log.message.includes('Multiple faces detected') || log.message.includes('Multiple people detected')) {
+        violationType = 'Multiple faces detected';
+      } else if (log.message.includes('No face detected')) {
+        violationType = 'No face detected';
+      } else if (log.message.includes('Eye tracking') || log.message.includes('looking away')) {
+        violationType = 'Looking away from camera';
+      } else if (log.message.includes('Unauthorized person')) {
+        violationType = 'Unauthorized person detected';
+      } else if (log.message.includes('Audio levels') || log.message.includes('interference')) {
+        violationType = 'Audio interference';
+      } else if (log.message.includes('Screen sharing') || log.message.includes('recording software')) {
+        violationType = 'Recording software detected';
+      } else if (log.message.includes('Lighting conditions')) {
+        violationType = 'Poor lighting conditions';
+      } else if (log.message.includes('Tab change') || log.message.includes('Keyboard shortcuts')) {
+        violationType = 'Tab/keyboard violations';
+      }
+      
+      violationCounts[violationType] = (violationCounts[violationType] || 0) + 1;
+    });
+
+    return Object.entries(violationCounts).map(([name, value]) => ({
+      name,
+      value,
+      percentage: ((value / violationLogs.length) * 100).toFixed(1)
+    }));
+  };
+
+  const violationChartData = getViolationChartData();
+
+  // Colors for different violation types
+  const VIOLATION_COLORS = [
+    '#ef4444', // red for errors
+    '#f97316', // orange
+    '#eab308', // yellow
+    '#22c55e', // green
+    '#3b82f6', // blue
+    '#8b5cf6', // purple
+    '#ec4899', // pink
+    '#06b6d4'  // cyan
+  ];
+
+  const chartConfig = {
+    violations: {
+      label: "Violations"
+    }
+  };
 
   // Calculate AI-based hire recommendation
   const calculateHireRecommendation = () => {
@@ -509,46 +567,78 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
                 </div>
 
                 <div className="bg-gray-50 rounded-xl p-4">
-                  <h3 className="font-semibold text-gray-800 mb-3">Violation Logs</h3>
+                  <h3 className="font-semibold text-gray-800 mb-3">Violation Analysis</h3>
                   {violationLogs.length === 0 ? (
                     <div className="flex items-center justify-center py-8 text-green-600">
                       <CheckCircle className="w-8 h-8 mr-3" />
                       <span className="text-lg font-medium">No violations detected - Excellent conduct!</span>
                     </div>
                   ) : (
-                    <div className="space-y-3 max-h-64 overflow-y-auto">
-                      {violationLogs.map((log) => (
-                        <div
-                          key={log.id}
-                          className={`flex items-start space-x-3 p-3 rounded-lg ${
-                            log.type === 'error' 
-                              ? 'bg-red-50 border border-red-200' 
-                              : 'bg-yellow-50 border border-yellow-200'
-                          }`}
-                        >
-                          <AlertTriangle className={`w-5 h-5 mt-0.5 ${
-                            log.type === 'error' ? 'text-red-500' : 'text-yellow-500'
-                          }`} />
-                          <div className="flex-1">
-                            <p className={`font-medium ${
-                              log.type === 'error' ? 'text-red-800' : 'text-yellow-800'
-                            }`}>
-                              {log.message}
-                            </p>
-                            {log.details && <p className="text-sm text-gray-600 mt-1">{log.details}</p>}
-                            <p className="text-sm text-gray-500 mt-1">
-                              {log.timestamp.toLocaleString()}
-                            </p>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Pie Chart */}
+                      <div>
+                        <h4 className="font-medium text-gray-700 mb-3">Violation Distribution</h4>
+                        <ChartContainer config={chartConfig} className="h-64">
+                          <PieChart>
+                            <Pie
+                              data={violationChartData}
+                              cx="50%"
+                              cy="50%"
+                              outerRadius={80}
+                              dataKey="value"
+                              nameKey="name"
+                            >
+                              {violationChartData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={VIOLATION_COLORS[index % VIOLATION_COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <ChartTooltip content={<ChartTooltipContent />} />
+                            <Legend />
+                          </PieChart>
+                        </ChartContainer>
+                      </div>
+                      
+                      {/* Statistics */}
+                      <div>
+                        <h4 className="font-medium text-gray-700 mb-3">Violation Statistics</h4>
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center p-3 bg-white rounded-lg">
+                            <span className="text-sm font-medium">Total Violations</span>
+                            <span className="text-lg font-bold text-red-600">{violationLogs.length}</span>
                           </div>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            log.type === 'error' 
-                              ? 'bg-red-100 text-red-700' 
-                              : 'bg-yellow-100 text-yellow-700'
-                          }`}>
-                            {log.type.toUpperCase()}
-                          </span>
+                          <div className="flex justify-between items-center p-3 bg-white rounded-lg">
+                            <span className="text-sm font-medium">Error Level</span>
+                            <span className="text-lg font-bold text-red-600">
+                              {violationLogs.filter(log => log.type === 'error').length}
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center p-3 bg-white rounded-lg">
+                            <span className="text-sm font-medium">Warning Level</span>
+                            <span className="text-lg font-bold text-yellow-600">
+                              {violationLogs.filter(log => log.type === 'warning').length}
+                            </span>
+                          </div>
+                          
+                          {/* Top violations */}
+                          <div className="mt-4">
+                            <h5 className="font-medium text-gray-700 mb-2">Most Frequent Violations</h5>
+                            <div className="space-y-2">
+                              {violationChartData.slice(0, 3).map((violation, index) => (
+                                <div key={index} className="flex items-center justify-between p-2 bg-white rounded">
+                                  <div className="flex items-center space-x-2">
+                                    <div 
+                                      className="w-3 h-3 rounded-full"
+                                      style={{ backgroundColor: VIOLATION_COLORS[index] }}
+                                    />
+                                    <span className="text-xs font-medium">{violation.name}</span>
+                                  </div>
+                                  <span className="text-xs text-gray-600">{violation.value} times ({violation.percentage}%)</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
                         </div>
-                      ))}
+                      </div>
                     </div>
                   )}
                 </div>
