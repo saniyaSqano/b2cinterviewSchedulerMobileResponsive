@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import Level5CongratulationsScreen from './Level5CongratulationsScreen';
 import ProctoredInterviewReport from './ProctoredInterviewReport';
@@ -5,6 +6,7 @@ import Level5Header from './Level5Header';
 import Level5ProctoredCamera from './Level5ProctoredCamera';
 import Level5ViolationLogs from './Level5ViolationLogs';
 import Level5InterviewChat from './Level5InterviewChat';
+import { initTabChangeDetection } from '../utils/tabChangeDetection';
 
 interface Level5FlowProps {
   onBack: () => void;
@@ -43,6 +45,7 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
   const streamRef = useRef<MediaStream | null>(null);
   const startTimeRef = useRef<Date | null>(null);
   const violationIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const tabChangeCleanupRef = useRef<(() => void) | null>(null);
 
   const interviewQuestions = [
     "Welcome to your AI Proctored Interview! This is your final assessment. Let's begin with a professional introduction. Please tell me about yourself and your career aspirations.",
@@ -55,9 +58,10 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
 
   useEffect(() => {
     return () => {
-      console.log('Cleaning up camera stream...');
+      console.log('Level5Flow component unmounting - cleaning up all monitoring...');
       stopCamera();
       stopViolationDetection();
+      stopTabChangeDetection();
     };
   }, []);
 
@@ -84,6 +88,63 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
 
     return () => stopViolationDetection();
   }, [showCongratulations, isVideoOn, showProctoredReport]);
+
+  // Tab change detection effect
+  useEffect(() => {
+    if (!showCongratulations && !showProctoredReport) {
+      console.log('Starting tab change detection for proctored interview...');
+      startTabChangeDetection();
+    } else {
+      console.log('Stopping tab change detection - interview not active');
+      stopTabChangeDetection();
+    }
+
+    return () => {
+      stopTabChangeDetection();
+    };
+  }, [showCongratulations, showProctoredReport]);
+
+  const startTabChangeDetection = () => {
+    // Clean up any existing detection first
+    stopTabChangeDetection();
+    
+    console.log('Initializing tab change and keyboard shortcut detection');
+    
+    const cleanup = initTabChangeDetection({
+      onViolation: (type, message) => {
+        // Only process violations if interview is still active
+        if (!showCongratulations && !showProctoredReport) {
+          console.log('Tab violation detected during active interview:', message);
+          handleViolation({
+            id: Date.now(),
+            type: type as 'warning' | 'error',
+            message,
+            timestamp: new Date()
+          });
+        } else {
+          console.log('Ignoring tab violation - interview not active');
+        }
+      },
+      detectTabChange: true,
+      detectKeyboardShortcuts: true,
+      preventDefaultActions: true
+    });
+    
+    tabChangeCleanupRef.current = cleanup;
+  };
+
+  const stopTabChangeDetection = () => {
+    if (tabChangeCleanupRef.current) {
+      console.log('Cleaning up tab change detection...');
+      tabChangeCleanupRef.current();
+      tabChangeCleanupRef.current = null;
+    }
+  };
+
+  const handleViolation = (violation: ViolationLog) => {
+    console.log('Violation received:', violation);
+    setViolationLogs(prev => [violation, ...prev].slice(0, 15));
+  };
 
   const startViolationDetection = () => {
     // Clear any existing interval
@@ -284,8 +345,12 @@ const Level5Flow: React.FC<Level5FlowProps> = ({ onBack, userName }) => {
     }
     
     // Stop all monitoring and camera
+    console.log('Stopping all monitoring systems...');
     stopViolationDetection();
+    stopTabChangeDetection();
     stopCamera();
+    
+    // Show the report
     setShowProctoredReport(true);
   };
 
