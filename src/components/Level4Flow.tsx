@@ -499,7 +499,6 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
           experience: userDetails.experience
         }}
         violationLogs={violationLogs}
-        interviewDuration={interviewDuration}
         onBack={handleBackFromReport}
         uploadUrl={uploadUrl}
         userName={userName}
@@ -549,7 +548,6 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
               {/* Camera Feed */}
               <div className="rounded-2xl overflow-hidden shadow-lg">
                 <VideoFeed
-                  ref={videoRef}
                   onVideoStatusChange={handleVideoStatusChange}
                   onViolation={handleViolation}
                   isActive={true}
