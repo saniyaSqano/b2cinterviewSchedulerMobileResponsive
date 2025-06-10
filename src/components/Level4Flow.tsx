@@ -471,7 +471,6 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
         }}
         violationLogs={violationLogs}
         onBack={handleBackFromReport}
-        userName={userName}
       />
     );
   }
@@ -520,7 +519,6 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
                 <VideoFeed
                   onStatusChange={handleVideoStatusChange}
                   onViolation={handleViolation}
-                  isActive={true}
                 />
               </div>
 
