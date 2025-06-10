@@ -1,10 +1,11 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Video, VideoOff, Mic, MicOff, Download, Square, Circle, Upload, Check, User, Mail, Phone, Award, Star, TrendingUp, Clock, Play, Pause, X } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ArrowLeft, Circle, Square, Check, Download, Upload, Volume2, Play, Pause, X } from 'lucide-react';
 import VideoFeed from './VideoFeed';
-import SelfPracticeReport from './SelfPracticeReport';
 import ProctoredInterviewReport from './ProctoredInterviewReport';
+import ElevenLabsWidget from './ElevenLabsWidget';
+import { ViolationReport } from '../utils/types';
+import { uploadMockVideo } from '../utils/mockApi';
 import { initFaceDetection, detectFaces } from '../utils/faceDetection';
-import { uploadMockVideo } from '../utils/s3Service';
 import { initTabChangeDetection } from '../utils/tabChangeDetection';
 import jsPDF from 'jspdf';
 
@@ -41,6 +42,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   const [recordingBlobUrl, setRecordingBlobUrl] = useState<string>('');
   const [isPlaying, setIsPlaying] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(true);
   
   // Store user details from localStorage
   const [userDetails, setUserDetails] = useState({
@@ -91,6 +93,8 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
     setInterviewStartTime(startTime);
     startTimeRef.current = startTime;
   }, []);
+
+  // No need for the speech effect as we're using the Convai widget
 
   useEffect(() => {
     if (!showProctoredReport && startTimeRef.current) {
@@ -508,6 +512,14 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
                 <div className="text-sm text-gray-600">Question</div>
                 <div className="text-lg font-semibold text-gray-900">{currentQuestionIndex + 1} of {questions.length}</div>
               </div>
+              
+              <button
+                onClick={() => setAudioEnabled(!audioEnabled)}
+                className={`p-2 rounded-lg ${audioEnabled ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-600'}`}
+                title={audioEnabled ? 'Disable voice' : 'Enable voice'}
+              >
+                <Volume2 className="w-5 h-5" />
+              </button>
             </div>
           </div>
         </div>
@@ -676,6 +688,14 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
                 <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-4">
                   <p className="text-gray-800 leading-relaxed">{questions[currentQuestionIndex]}</p>
                 </div>
+                
+                {/* ElevenLabs Convai widget for AI-powered text-to-speech */}
+                {audioEnabled && (
+                  <div className="bg-white rounded-xl p-4 mb-4 border border-blue-200">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">AI Interview Assistant</h4>
+                    <ElevenLabsWidget text={questions[currentQuestionIndex]} />
+                  </div>
+                )}
                 
                 <div className="flex justify-between items-center">
                   <button
