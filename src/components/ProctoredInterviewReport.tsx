@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { ArrowLeft, Download, Clock, User, Mail, Phone, Award, AlertTriangle, CheckCircle } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import jsPDF from 'jspdf';
 
 interface CandidateDetails {
@@ -39,19 +39,31 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
   totalQuestions,
   answeredQuestions
 }) => {
-  // Process violation data for pie chart
+  // Process violation data for pie chart and table
   const processViolationData = () => {
-    const violationCounts: { [key: string]: number } = {};
+    const violationCounts: { [key: string]: { count: number, type: 'warning' | 'error', timestamps: Date[] } } = {};
     
     violationLogs.forEach(log => {
       const key = log.message;
-      violationCounts[key] = (violationCounts[key] || 0) + 1;
+      if (!violationCounts[key]) {
+        violationCounts[key] = { count: 0, type: log.type, timestamps: [] };
+      }
+      violationCounts[key].count += 1;
+      violationCounts[key].timestamps.push(log.timestamp);
     });
 
-    return Object.entries(violationCounts).map(([name, value]) => ({
+    return Object.entries(violationCounts).map(([name, data]) => ({
       name: name.length > 30 ? name.substring(0, 30) + '...' : name,
-      value,
-      fullName: name
+      value: data.count,
+      fullName: name,
+      type: data.type,
+      timestamps: data.timestamps,
+      impact: data.type === 'error' ? 'High' : 'Medium',
+      recommendation: name.toLowerCase().includes('multiple') 
+        ? 'Ensure you are alone during the interview' 
+        : name.toLowerCase().includes('tab') || name.toLowerCase().includes('keyboard')
+        ? 'Avoid using shortcuts and stay focused on the interview'
+        : 'Stay visible in the camera frame'
     }));
   };
 
@@ -91,146 +103,162 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
 
   const generatePDF = () => {
     try {
-      console.log('Starting PDF generation...');
+      console.log('Starting enhanced PDF generation...');
       const doc = new jsPDF();
       
-      // Header
-      doc.setFontSize(20);
-      doc.setFont('helvetica', 'bold');
-      doc.text('AI Proctored Interview Report', 20, 20);
+      // Set colors for PDF
+      const primaryColor = [102, 51, 153]; // Purple
+      const secondaryColor = [79, 70, 229]; // Indigo
+      const errorColor = [239, 68, 68]; // Red
+      const warningColor = [245, 158, 11]; // Yellow
+      const successColor = [34, 197, 94]; // Green
       
-      // Candidate Information
-      doc.setFontSize(16);
+      // Header with color
+      doc.setTextColor(...primaryColor);
+      doc.setFontSize(24);
       doc.setFont('helvetica', 'bold');
-      doc.text('Candidate Information', 20, 40);
+      doc.text('AI Proctored Interview Report', 20, 25);
       
+      // Reset to black for body text
+      doc.setTextColor(0, 0, 0);
+      
+      // Candidate Information Section
+      doc.setTextColor(...secondaryColor);
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Candidate Information', 20, 45);
+      
+      doc.setTextColor(0, 0, 0);
       doc.setFontSize(12);
       doc.setFont('helvetica', 'normal');
-      doc.text(`Name: ${candidateDetails.fullName}`, 20, 50);
-      doc.text(`Email: ${candidateDetails.email}`, 20, 60);
-      doc.text(`Phone: ${candidateDetails.phoneNumber}`, 20, 70);
-      doc.text(`Skills: ${candidateDetails.skills}`, 20, 80);
-      doc.text(`Experience: ${candidateDetails.experience}`, 20, 90);
+      doc.text(`Name: ${candidateDetails.fullName}`, 20, 55);
+      doc.text(`Email: ${candidateDetails.email}`, 20, 65);
+      doc.text(`Phone: ${candidateDetails.phoneNumber}`, 20, 75);
+      doc.text(`Skills: ${candidateDetails.skills}`, 20, 85);
+      doc.text(`Experience: ${candidateDetails.experience}`, 20, 95);
       
-      // Interview Details
-      doc.setFontSize(16);
+      // Interview Details Section
+      doc.setTextColor(...secondaryColor);
+      doc.setFontSize(18);
       doc.setFont('helvetica', 'bold');
-      doc.text('Interview Details', 20, 110);
+      doc.text('Interview Details', 20, 115);
       
+      doc.setTextColor(0, 0, 0);
       doc.setFontSize(12);
       doc.setFont('helvetica', 'normal');
-      doc.text(`Date: ${interviewStartTime.toLocaleDateString()}`, 20, 120);
-      doc.text(`Duration: ${duration} minutes`, 20, 130);
-      doc.text(`Questions: ${answeredQuestions}/${totalQuestions}`, 20, 140);
+      doc.text(`Date: ${interviewStartTime.toLocaleDateString()}`, 20, 125);
+      doc.text(`Duration: ${duration} minutes`, 20, 135);
+      doc.text(`Questions Answered: ${answeredQuestions}/${totalQuestions}`, 20, 145);
       
-      // AI Recommendation
-      doc.setFontSize(16);
+      // AI Recommendation Section with colored background
+      doc.setTextColor(...secondaryColor);
+      doc.setFontSize(18);
       doc.setFont('helvetica', 'bold');
-      doc.text('AI Recommendation', 20, 160);
+      doc.text('AI Recommendation', 20, 165);
       
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'normal');
-      doc.text(`Score: ${score}/100`, 20, 170);
-      doc.text(`Recommendation: ${recommendation}`, 20, 180);
-      
-      // Face Detection Analysis
-      doc.setFontSize(16);
+      // Score with color coding
+      doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
-      doc.text('Face Detection Analysis', 20, 200);
-      
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'normal');
-      
-      const errorViolations = violationLogs.filter(log => log.type === 'error').length;
-      const warningViolations = violationLogs.filter(log => log.type === 'warning').length;
-      
-      let securityStatus = 'Excellent';
-      if (errorViolations > 0) {
-        securityStatus = 'Poor';
-      } else if (warningViolations > 0) {
-        securityStatus = 'Fair';
+      if (score >= 85) {
+        doc.setTextColor(...successColor);
+      } else if (score >= 70) {
+        doc.setTextColor(...secondaryColor);
+      } else if (score >= 50) {
+        doc.setTextColor(...warningColor);
+      } else {
+        doc.setTextColor(...errorColor);
       }
+      doc.text(`Overall Score: ${score}/100`, 20, 175);
+      doc.text(`Recommendation: ${recommendation}`, 20, 185);
       
-      doc.text(`Security Monitoring Status for ${candidateDetails.fullName} - ${securityStatus}`, 20, 210);
+      // Security Violations Table
+      doc.setTextColor(...secondaryColor);
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Security Violations Summary', 20, 205);
       
-      // Violation summary
-      const multipleFaceViolations = violationLogs.filter(v => 
-        v.message.toLowerCase().includes('multiple') || v.message.toLowerCase().includes('face')
-      );
-      const noFaceViolations = violationLogs.filter(v => 
-        v.message.toLowerCase().includes('no face') || v.message.toLowerCase().includes('not visible')
-      );
-      
-      if (multipleFaceViolations.length > 0) {
-        doc.text(`Multiple people detected: ${multipleFaceViolations.length} time(s) - High - Potential security concern`, 20, 220);
-      }
-      
-      if (noFaceViolations.length > 0) {
-        doc.text(`No face detected: ${noFaceViolations.length} time(s) - Medium - Engagement concern`, 20, 230);
-      }
-      
-      if (multipleFaceViolations.length === 0 && noFaceViolations.length === 0) {
-        doc.text('No issues detected: 0 time(s) - None', 20, 220);
-      }
-      
-      // Violation Details Table
       if (violationData.length > 0) {
-        doc.setFontSize(16);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Security Violations', 20, 250);
+        // Table headers with colored background
+        doc.setFillColor(240, 240, 240);
+        doc.rect(20, 215, 170, 10, 'F');
         
+        doc.setTextColor(0, 0, 0);
         doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        
-        // Table headers
-        doc.text('Issue', 20, 260);
-        doc.text('Occurrences', 100, 260);
-        doc.text('Impact', 140, 260);
-        doc.text('Recommendation', 170, 260);
+        doc.setFont('helvetica', 'bold');
+        doc.text('Violation Type', 25, 222);
+        doc.text('Count', 80, 222);
+        doc.text('Impact', 110, 222);
+        doc.text('Recommendation', 140, 222);
         
         // Table data
-        let yPos = 270;
-        violationData.forEach((item, index) => {
-          if (yPos > 270) { // Add new page if needed
+        let yPos = 232;
+        violationData.forEach((violation, index) => {
+          if (yPos > 270) {
             doc.addPage();
             yPos = 20;
           }
           
-          const issue = item.fullName.length > 25 ? item.fullName.substring(0, 25) + '...' : item.fullName;
-          doc.text(issue, 20, yPos);
-          doc.text(item.value.toString(), 100, yPos);
+          // Alternate row colors
+          if (index % 2 === 0) {
+            doc.setFillColor(248, 248, 248);
+            doc.rect(20, yPos - 7, 170, 10, 'F');
+          }
           
-          const impact = item.value > 3 ? 'High' : item.value > 1 ? 'Medium' : 'Low';
-          doc.text(impact, 140, yPos);
+          doc.setFont('helvetica', 'normal');
+          doc.setFontSize(9);
           
-          const recommendation = item.fullName.toLowerCase().includes('multiple') 
-            ? 'Ensure you are alone' 
-            : 'Stay visible in camera';
-          doc.text(recommendation, 170, yPos);
+          // Color code the violation type
+          if (violation.type === 'error') {
+            doc.setTextColor(...errorColor);
+          } else {
+            doc.setTextColor(...warningColor);
+          }
           
-          yPos += 10;
+          const violationType = violation.fullName.length > 25 
+            ? violation.fullName.substring(0, 25) + '...' 
+            : violation.fullName;
+          doc.text(violationType, 25, yPos);
+          
+          doc.setTextColor(0, 0, 0);
+          doc.text(violation.value.toString(), 80, yPos);
+          doc.text(violation.impact, 110, yPos);
+          
+          const recommendation = violation.recommendation.length > 20 
+            ? violation.recommendation.substring(0, 20) + '...' 
+            : violation.recommendation;
+          doc.text(recommendation, 140, yPos);
+          
+          yPos += 12;
         });
+      } else {
+        doc.setTextColor(...successColor);
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'normal');
+        doc.text('No security violations detected - Excellent compliance!', 20, 225);
       }
       
-      // Generate filename
+      // Add footer with timestamp
+      doc.setTextColor(128, 128, 128);
+      doc.setFontSize(8);
+      doc.text(`Report generated on: ${new Date().toLocaleString()}`, 20, 285);
+      
+      // Generate filename with timestamp
       const timestamp = new Date().toISOString().split('T')[0];
-      const filename = `interview-report-${candidateDetails.fullName.replace(/\s+/g, '-')}-${timestamp}.pdf`;
+      const filename = `proctored-interview-report-${candidateDetails.fullName.replace(/\s+/g, '-')}-${timestamp}.pdf`;
       
-      console.log('Saving PDF with filename:', filename);
-      
-      // Save the PDF
+      console.log('Saving colored PDF with filename:', filename);
       doc.save(filename);
       
-      console.log('PDF generated and download initiated successfully');
+      console.log('Enhanced PDF with colors generated successfully');
     } catch (error) {
-      console.error('Error generating PDF:', error);
+      console.error('Error generating enhanced PDF:', error);
       alert('There was an error generating the PDF report. Please try again.');
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-indigo-50 to-blue-50 p-6">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
@@ -353,6 +381,79 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
           </div>
         </div>
 
+        {/* Security Violations Table */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+          <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+            <AlertTriangle className="w-5 h-5 mr-2 text-purple-600" />
+            Security Violations Table
+          </h2>
+          
+          {violationData.length > 0 ? (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="font-semibold">Violation Type</TableHead>
+                    <TableHead className="font-semibold">Occurrences</TableHead>
+                    <TableHead className="font-semibold">Impact Level</TableHead>
+                    <TableHead className="font-semibold">First Detected</TableHead>
+                    <TableHead className="font-semibold">Recommendation</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {violationData.map((violation, index) => (
+                    <TableRow key={index} className="hover:bg-gray-50">
+                      <TableCell className="font-medium">
+                        <div className="flex items-center space-x-2">
+                          <div className={`w-3 h-3 rounded-full ${
+                            violation.type === 'error' ? 'bg-red-500' : 'bg-yellow-500'
+                          }`} />
+                          <span>{violation.fullName}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className={`px-2 py-1 rounded-full text-sm font-medium ${
+                          violation.value > 3 
+                            ? 'bg-red-100 text-red-800' 
+                            : violation.value > 1 
+                            ? 'bg-yellow-100 text-yellow-800' 
+                            : 'bg-green-100 text-green-800'
+                        }`}>
+                          {violation.value}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <span className={`px-2 py-1 rounded-full text-sm font-medium ${
+                          violation.impact === 'High'
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {violation.impact}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-sm text-gray-600">
+                        {violation.timestamps[0]?.toLocaleTimeString([], { 
+                          hour: '2-digit', 
+                          minute: '2-digit' 
+                        })}
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {violation.recommendation}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">Perfect Security Compliance</h3>
+              <p className="text-gray-600">No security violations detected during the interview</p>
+            </div>
+          )}
+        </div>
+
         {/* Violation Analysis with Pie Chart */}
         <div className="bg-white rounded-2xl shadow-lg p-6">
           <h2 className="text-xl font-bold text-gray-800 mb-4">Security Violation Analysis</h2>
@@ -445,3 +546,5 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
 };
 
 export default ProctoredInterviewReport;
+
+```
