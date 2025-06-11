@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 
 // Declare the custom element for TypeScript
@@ -52,7 +53,7 @@ const ElevenLabsWidget: React.FC<ElevenLabsWidgetProps> = ({ text }) => {
 
   return (
     <div 
-      className="elevenlabs-widget-container" 
+      className="elevenlabs-widget-container bg-[#f1f7fe]/90 backdrop-blur-sm rounded-xl p-4 border border-blue-200/30" 
       ref={containerRef}
       style={{
         width: '100%',
