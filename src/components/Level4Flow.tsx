@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Circle, Square, Check, Download, Upload, Volume2, Play, Pause, X } from 'lucide-react';
+import { ArrowLeft, Circle, Square, Check, Download, Upload, Volume2, Play, Pause, X, Phone } from 'lucide-react';
 import VideoFeed from './VideoFeed';
 import ProctoredInterviewReport from './ProctoredInterviewReport';
 import ElevenLabsWidget from './ElevenLabsWidget';
@@ -725,7 +725,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
               </div>
             </div>
 
-            {/* Right Column - Violation Logs */}
+            {/* Right Column - Violation Logs and Help */}
             <div className="space-y-6">
               <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50 h-fit">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Violation Monitoring</h3>
@@ -771,6 +771,23 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
                   )}
                 </div>
               </div>
+
+              {/* Need Help Section */}
+              <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50">
+                <div className="flex items-center space-x-4 mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                    <div className="w-6 h-6 bg-white rounded-full opacity-80"></div>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Need help?</h3>
+                  </div>
+                </div>
+                
+                <button className="w-full bg-black hover:bg-gray-800 text-white rounded-full py-4 px-6 flex items-center justify-center space-x-3 transition-colors duration-200">
+                  <Phone className="w-5 h-5" />
+                  <span className="font-medium text-lg">Start a call</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -780,3 +797,5 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
 };
 
 export default Level4Flow;
+
+</edits_to_apply>
