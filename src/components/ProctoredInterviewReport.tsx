@@ -3,14 +3,7 @@ import { ArrowLeft, Download, Clock, User, Mail, Phone, Award, AlertTriangle, Ch
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
 import jsPDF from 'jspdf';
-
-interface CandidateDetails {
-  fullName: "Aditya Joshi";
-  email: string;
-  phoneNumber: string;
-  skills: string;
-  experience: string;
-}
+import { CandidateDetails } from '../utils/types';
 
 interface ViolationLog {
   id: number;
