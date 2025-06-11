@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 // Declare the custom element for TypeScript
 declare global {
@@ -7,6 +7,7 @@ declare global {
       'elevenlabs-convai': React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement> & {
         'agent-id'?: string;
         'data-text'?: string;
+        'style'?: React.CSSProperties;
       }, HTMLElement>;
     }
   }
@@ -17,9 +18,12 @@ interface ElevenLabsWidgetProps {
 }
 
 /**
- * A simple component that embeds the ElevenLabs Convai widget directly
+ * An enhanced component that embeds the ElevenLabs Convai widget directly
+ * with improved display and size handling
  */
 const ElevenLabsWidget: React.FC<ElevenLabsWidgetProps> = ({ text }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  
   useEffect(() => {
     // Add the script tag if it doesn't exist
     if (!document.querySelector('script[src="https://unpkg.com/@elevenlabs/convai-widget-embed"]')) {
@@ -27,15 +31,44 @@ const ElevenLabsWidget: React.FC<ElevenLabsWidgetProps> = ({ text }) => {
       script.src = 'https://unpkg.com/@elevenlabs/convai-widget-embed';
       script.async = true;
       script.type = 'text/javascript';
+      
+      // Force re-render of the widget after script loads
+      script.onload = () => {
+        if (containerRef.current) {
+          // Clear and re-add the widget
+          const currentHTML = containerRef.current.innerHTML;
+          containerRef.current.innerHTML = '';
+          setTimeout(() => {
+            if (containerRef.current) {
+              containerRef.current.innerHTML = currentHTML;
+            }
+          }, 100);
+        }
+      };
+      
       document.body.appendChild(script);
     }
   }, []);
 
   return (
-    <div className="elevenlabs-widget-container">
+    <div 
+      className="elevenlabs-widget-container" 
+      ref={containerRef}
+      style={{
+        width: '100%',
+        minHeight: '200px',
+        display: 'flex',
+        justifyContent: 'center'
+      }}
+    >
       <elevenlabs-convai 
         agent-id="agent_01jxcr8nwqe798sf3jjx0h717k" 
         data-text={text}
+        style={{
+          width: '100%',
+          maxWidth: '100%',
+          overflow: 'hidden'
+        }}
       ></elevenlabs-convai>
     </div>
   );

@@ -41,27 +41,27 @@ interface InterviewReportProps {
 }
 
 const InterviewReport: React.FC<InterviewReportProps> = ({
-  candidateDetails,
+  candidateDetails: _candidateDetails, // Original prop renamed to avoid conflicts
   skillAssessment,
   violationLogs,
   onBack,
   reportType = 'ai_proctor'
 }) => {
-  // Try to retrieve stored user data from localStorage
-  const [storedUserData, setStoredUserData] = useState<{email: string, fullName: string} | null>(null);
+  // Hardcoded candidate information as requested
+  const candidateDetails = {
+    fullName: 'Aditya Joshi',
+    email: 'adi@iqan.ai',
+    phoneNumber: '+91 XXXXXXXXX',
+    skills: 'Python, Javascript, Datascience',
+    experience: '10+ Years'
+  };
+  // Using hardcoded data, no need to retrieve from localStorage
+  const [storedUserData, setStoredUserData] = useState<{email: string, fullName: string}>({ 
+    email: 'adi@iqan.ai', 
+    fullName: 'Aditya Joshi' 
+  });
   
-  useEffect(() => {
-    try {
-      const storedData = localStorage.getItem('currentUserData');
-      if (storedData) {
-        const parsedData = JSON.parse(storedData);
-        console.log('Retrieved user data from localStorage:', parsedData);
-        setStoredUserData(parsedData);
-      }
-    } catch (error) {
-      console.error('Error retrieving user data from localStorage:', error);
-    }
-  }, []);
+  // No need for localStorage effect as we're using hardcoded data
   // Report states
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const [isUploading, setIsUploading] = useState(false);

@@ -4,6 +4,7 @@ import VideoFeed from './VideoFeed';
 import ProctoredInterviewReport from './ProctoredInterviewReport';
 import ElevenLabsWidget from './ElevenLabsWidget';
 import ElevenLabsConvai from './ElevenLabsConvai';
+import HelpCallButton from './HelpCallButton';
 import { ViolationReport } from '../utils/types';
 import { uploadMockVideo } from '../utils/mockApi';
 import { initFaceDetection, detectFaces } from '../utils/faceDetection';
@@ -96,16 +97,20 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
   }, []);
 
   useEffect(() => {
-    if (!showProctoredReport && startTimeRef.current) {
-      const interval = setInterval(() => {
+    // Update interview duration every minute
+    if (!showProctoredReport && startTimeRef.current && !isComplete) {
+      const intervalId = setInterval(() => {
         const now = new Date();
-        const duration = Math.floor((now.getTime() - startTimeRef.current!.getTime()) / (1000 * 60));
-        setInterviewDuration(duration);
-      }, 60000);
-
-      return () => clearInterval(interval);
+        const durationInMinutes = Math.floor((now.getTime() - startTimeRef.current.getTime()) / (1000 * 60));
+        setInterviewDuration(durationInMinutes);
+      }, 60000); // Update every minute
+      
+      return () => {
+        clearInterval(intervalId);
+        console.log('Interview duration timer stopped');
+      };
     }
-  }, [showProctoredReport]);
+  }, [showProctoredReport, isComplete]);
 
   useEffect(() => {
     if (isVideoOn) {
@@ -142,9 +147,12 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
     });
   }, []);
 
-  const handleViolation = (violation: ViolationLog) => {
-    console.log('Violation received:', violation);
-    setViolationLogs(prev => [violation, ...prev].slice(0, 15));
+  const handleViolation = (violation: { type: 'warning' | 'error'; message: string; timestamp: Date; id: number; details?: string }) => {
+    // Only log violations if the interview is not complete
+    if (!isComplete) {
+      console.log(`Violation detected: ${violation.message}`);
+      setViolationLogs(prev => [...prev, violation]);
+    }
   };
   
   useEffect(() => {
@@ -322,24 +330,143 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
           });
         }
         
-        alert('Proctored interview recording has been stopped. Video player will open automatically.');
+        // Don't show alert when ending interview for report generation
+        if (!isComplete) {
+          alert('Proctored interview recording has been stopped. Video player will open automatically.');
+        }
+        
+        // Save the final interview state for the report
+        const endTime = new Date();
+        if (startTimeRef.current) {
+          const finalDuration = Math.floor((endTime.getTime() - startTimeRef.current.getTime()) / (1000 * 60));
+          setInterviewDuration(finalDuration);
+        }
+        
       } catch (error) {
         console.error('Error stopping recording:', error);
       }
     }
   };
 
+  // Function to stop all camera streams and resources
+  const stopAllCameraStreams = () => {
+    console.log('Stopping all camera streams and resources...');
+    
+    // Stop all video tracks from streamRef
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => {
+        track.stop();
+        console.log(`Stopped ${track.kind} track from streamRef`);
+      });
+      // Clear the streamRef
+      streamRef.current = null;
+    }
+    
+    // Stop any video tracks from videoRef
+    if (videoRef.current && videoRef.current.srcObject instanceof MediaStream) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach(track => {
+        track.stop();
+        console.log(`Stopped ${track.kind} track from videoRef`);
+      });
+      // Clear the video source
+      videoRef.current.srcObject = null;
+    }
+    
+    // Stop any video tracks from faceDetectionVideoRef
+    if (faceDetectionVideoRef.current && faceDetectionVideoRef.current.srcObject instanceof MediaStream) {
+      const stream = faceDetectionVideoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach(track => {
+        track.stop();
+        console.log(`Stopped ${track.kind} track from faceDetectionVideoRef`);
+      });
+      // Clear the video source
+      faceDetectionVideoRef.current.srcObject = null;
+    }
+    
+    // Set video state to off
+    setIsVideoOn(false);
+    
+    // Clear any animation frames that might be running
+    if (window.requestAnimationFrame) {
+      // Cancel all possible animation frame IDs (a bit brute force but effective)
+      for (let i = 0; i < 1000; i++) {
+        window.cancelAnimationFrame(i);
+      }
+    }
+    
+    // Force garbage collection of any tensors that might be in use
+    try {
+      // Access TensorFlow through the global namespace in a type-safe way
+      const tfjs = (window as any).tf;
+      if (tfjs && typeof tfjs.dispose === 'function') {
+        tfjs.dispose();
+        console.log('TensorFlow resources disposed');
+      }
+    } catch (e) {
+      console.log('Error disposing TensorFlow resources:', e);
+    }
+    
+    console.log('All camera streams and resources stopped');
+  };
+  
   const handleEndInterview = () => {
     console.log('Ending proctored interview and generating comprehensive report...');
     
+    // Mark the interview as complete first to stop all ongoing processes
+    setIsComplete(true);
+    
+    // Calculate final interview duration
     if (startTimeRef.current) {
       const endTime = new Date();
       const finalDuration = Math.floor((endTime.getTime() - startTimeRef.current.getTime()) / (1000 * 60));
       setInterviewDuration(finalDuration);
     }
     
-    stopRecording();
-    setShowProctoredReport(true);
+    // Stop recording if it's active
+    if (isRecording) {
+      stopRecording();
+    }
+    
+    // Stop all camera streams and resources
+    stopAllCameraStreams();
+    
+    // Finalize violation logs (prevent any new logs from being added)
+    const finalViolationLogs = [...violationLogs];
+    
+    // Calculate final score before showing report
+    const calculateFinalScore = () => {
+      // Base score calculation logic
+      const baseScore = 100;
+      const violationPenalties = {
+        warning: 5,
+        error: 10
+      };
+      
+      // Count violations by type
+      const warningCount = finalViolationLogs.filter(log => log.type === 'warning').length;
+      const errorCount = finalViolationLogs.filter(log => log.type === 'error').length;
+      
+      // Calculate penalty
+      const totalPenalty = (warningCount * violationPenalties.warning) + (errorCount * violationPenalties.error);
+      
+      // Ensure score doesn't go below 0
+      return Math.max(0, baseScore - totalPenalty);
+    };
+    
+    // Force stop any ongoing timers or intervals
+    for (let i = 0; i < 1000; i++) {
+      window.clearInterval(i);
+      window.clearTimeout(i);
+    }
+    
+    // Set a small delay to ensure recording is properly stopped before showing the report
+    setTimeout(() => {
+      // Show the proctored report
+      setShowProctoredReport(true);
+      
+      console.log('Interview completed. Report generated successfully.');
+    }, 1000);
   };
 
   const handleBackFromReport = () => {
@@ -461,6 +588,27 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
     setIsPlaying(false);
   };
 
+  // Effect to handle cleanup when showing the report
+  useEffect(() => {
+    if (showProctoredReport) {
+      // This ensures all resources are cleaned up when showing the report
+      stopAllCameraStreams();
+      
+      // Force clear any intervals that might be running
+      const intervalIds = [];
+      for (let i = 0; i < 1000; i++) {
+        intervalIds.push(window.clearInterval(i));
+      }
+      
+      console.log('All processes stopped for report view');
+      
+      return () => {
+        // Cleanup when unmounting
+        intervalIds.forEach(id => window.clearInterval(id));
+      };
+    }
+  }, [showProctoredReport]);
+  
   // Show proctored interview report
   if (showProctoredReport) {
     return (
@@ -688,13 +836,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
                   <p className="text-gray-800 leading-relaxed">{questions[currentQuestionIndex]}</p>
                 </div>
                 
-                {/* ElevenLabs Convai widget for AI-powered text-to-speech */}
-                {audioEnabled && (
-                  <div className="bg-white rounded-xl p-4 mb-4 border border-blue-200">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">AI Interview Assistant</h4>
-                    <ElevenLabsWidget text={questions[currentQuestionIndex]} />
-                  </div>
-                )}
+                {/* ElevenLabs Convai widget moved to right column below violation logs */}
                 
                 <div className="flex justify-between items-center">
                   <button
@@ -708,9 +850,9 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
                   {currentQuestionIndex === questions.length - 1 ? (
                     <button
                       onClick={handleEndInterview}
-                      className="px-6 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-all"
+                      className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-all flex items-center space-x-2"
                     >
-                      End Interview
+                      <span>End Interview & Generate Report</span>
                     </button>
                   ) : (
                     <button
@@ -726,33 +868,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
 
             {/* Right Column - AI Assistant and Violation Logs */}
             <div className="space-y-6">
-              {/* AI Assistant Section - Now at the top */}
-              <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <div className="w-4 h-4 bg-white rounded-full opacity-80"></div>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="text-base font-semibold text-gray-900">Need help?</h3>
-                    <p className="text-sm text-gray-600 truncate">AI Assistant is here to help</p>
-                  </div>
-                </div>
-                
-                {/* ElevenLabs Conversational AI Widget */}
-                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 mb-4">
-                  <ElevenLabsConvai 
-                    text="I'm your AI interview assistant. I can help you practice and provide guidance during your interview preparation. How can I assist you today?"
-                    autoPlay={false}
-                  />
-                </div>
-                
-                <button className="w-full bg-black hover:bg-gray-800 text-white rounded-full py-3 px-6 flex items-center justify-center space-x-2 transition-colors duration-200">
-                  <Phone className="w-4 h-4" />
-                  <span className="font-medium">Start a call</span>
-                </button>
-              </div>
-
-              {/* Violation Monitoring Section - Now at the bottom */}
+              {/* Violation Monitoring Section - Now at the top */}
               <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Violation Monitoring</h3>
                 
@@ -796,6 +912,32 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
                     ))
                   )}
                 </div>
+              </div>
+              
+              {/* Need help call button - Now at the bottom of violation logs */}
+              <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50 mt-6">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <div className="w-4 h-4 bg-white rounded-full opacity-80"></div>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    {/*<h3 className="text-base font-semibold text-gray-900">Need help?</h3>
+                    <p className="text-sm text-gray-600 truncate">AI Assistant is here to help</p>*/}
+                  </div>
+                </div>
+                
+                <button className="w-full bg-black hover:bg-gray-800 text-white rounded-full py-3 px-6 flex items-center justify-center space-x-2 transition-colors duration-200">
+                  <Phone className="w-4 h-4" />
+                  <span className="font-medium">Start a call</span>
+                </button>
+                
+                {/* Add ElevenLabs widget here */}
+                {audioEnabled && (
+                  <div className="mt-4 bg-white rounded-xl p-4 border border-blue-200">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">AI Interview Assistant</h4>
+                    <ElevenLabsWidget text={questions[currentQuestionIndex]} />
+                  </div>
+                )}
               </div>
             </div>
           </div>
