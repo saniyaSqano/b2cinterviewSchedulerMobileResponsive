@@ -3,18 +3,8 @@ import React from 'react';
 import { User, Mail, Phone } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 
-interface CandidateDetailsProps {
-  candidateDetails?: {
-    fullName: string;
-    email: string;
-    phoneNumber: string;
-    skills: string;
-    experience: string;
-  };
-}
-
-const CandidateDetails: React.FC<CandidateDetailsProps> = ({ candidateDetails }) => {
-  // Use hardcoded candidate information
+const CandidateDetails: React.FC = () => {
+  // Hardcoded candidate information
   const displayDetails = {
     fullName: 'Aditya Joshi',
     email: 'adi@sqano.com',
