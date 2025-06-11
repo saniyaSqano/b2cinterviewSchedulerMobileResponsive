@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ArrowLeft, Trophy, Star, Award, Brain, Users, Sparkles, Target, Rocket, Code, Globe, CheckCircle, Clock, TrendingUp } from 'lucide-react';
 import ParticleBackground from '../components/ParticleBackground';
@@ -189,49 +190,6 @@ const LevelsContent = () => {
         <div className="absolute top-1/4 right-1/4 w-2 h-2 bg-blue-400/30 rounded-full animate-pulse" style={{ animationDelay: '2s' }}></div>
         <div className="absolute bottom-1/3 left-1/4 w-1 h-1 bg-indigo-400/40 rounded-full animate-pulse" style={{ animationDelay: '4s' }}></div>
         <div className="absolute top-2/3 right-1/3 w-1.5 h-1.5 bg-purple-400/35 rounded-full animate-pulse" style={{ animationDelay: '6s' }}></div>
-      </div>
-
-      {/* Simplified Header */}
-      <div className="relative z-20 bg-white/95 backdrop-blur-md border-b border-gray-200/50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <button 
-                onClick={handleLogout}
-                className="p-2.5 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-              >
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
-              </button>
-              <div>
-                <p className="text-sm text-gray-600 font-medium">Professional Development Platform</p>
-              </div>
-            </div>
-            
-            {/* Professional User Profile Section */}
-            <div className="flex items-center space-x-6">
-              <div className="flex items-center space-x-4 bg-white rounded-xl px-5 py-3 border border-gray-200/70 shadow-sm">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
-                    <Trophy className="w-4 h-4 text-white" />
-                  </div>
-                  <div>
-                    <span className="text-gray-900 font-bold text-lg">{getTotalCredits()}</span>
-                    <span className="text-gray-600 text-sm ml-1">Credits</span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center space-x-3 bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-200/70">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-semibold text-sm">{getUserDisplayName().charAt(0)}</span>
-                </div>
-                <div>
-                  <span className="text-gray-900 font-semibold">{getUserDisplayName()}</span>
-                  <div className="text-xs text-gray-500">Level {currentLevel + 1}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Enhanced Hero Section with ProctoVerse as Main Title */}
