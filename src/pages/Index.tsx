@@ -7,15 +7,10 @@ import Level3Flow from '../components/Level3Flow';
 import Level4Flow from '../components/Level4Flow';
 import GamethonFlow from '../components/GamethonFlow';
 import InteractiveRoadmap from '../components/InteractiveRoadmap';
-import ProtectedRoute from '../components/ProtectedRoute';
 import { useUser } from '../contexts/UserContext';
 
 const Index = () => {
-  return (
-    <ProtectedRoute>
-      <LevelsContent />
-    </ProtectedRoute>
-  );
+  return <LevelsContent />;
 };
 
 const LevelsContent = () => {
@@ -390,3 +385,5 @@ const LevelsContent = () => {
 };
 
 export default Index;
+
+}
