@@ -773,25 +773,28 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
                 </div>
 
                 {/* AI Assistant Section */}
-                <div className="border-t border-gray-200 pt-6">
-                  <div className="flex items-center space-x-4 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                      <div className="w-6 h-6 bg-white rounded-full opacity-80"></div>
+                <div className="border-t border-gray-200 pt-6 space-y-4">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="w-4 h-4 bg-white rounded-full opacity-80"></div>
                     </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">Need help?</h3>
-                      <p className="text-sm text-gray-600">AI Assistant is here to help</p>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-base font-semibold text-gray-900">Need help?</h3>
+                      <p className="text-sm text-gray-600 truncate">AI Assistant is here to help</p>
                     </div>
                   </div>
                   
                   {/* ElevenLabs Conversational AI Widget */}
-                  <div className="mb-4">
-                    <ElevenLabsConvai />
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    <ElevenLabsConvai 
+                      text="I'm your AI interview assistant. I can help you practice and provide guidance during your interview preparation. How can I assist you today?"
+                      autoPlay={false}
+                    />
                   </div>
                   
-                  <button className="w-full bg-black hover:bg-gray-800 text-white rounded-full py-4 px-6 flex items-center justify-center space-x-3 transition-colors duration-200">
-                    <Phone className="w-5 h-5" />
-                    <span className="font-medium text-lg">Start a call</span>
+                  <button className="w-full bg-black hover:bg-gray-800 text-white rounded-full py-3 px-6 flex items-center justify-center space-x-2 transition-colors duration-200 mt-3">
+                    <Phone className="w-4 h-4" />
+                    <span className="font-medium">Start a call</span>
                   </button>
                 </div>
               </div>
@@ -804,3 +807,5 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
 };
 
 export default Level4Flow;
+
+}
