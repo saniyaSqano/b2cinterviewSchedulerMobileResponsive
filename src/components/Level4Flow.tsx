@@ -3,6 +3,7 @@ import { ArrowLeft, Circle, Square, Check, Download, Upload, Volume2, Play, Paus
 import VideoFeed from './VideoFeed';
 import ProctoredInterviewReport from './ProctoredInterviewReport';
 import ElevenLabsWidget from './ElevenLabsWidget';
+import ElevenLabsConvai from './ElevenLabsConvai';
 import { ViolationReport } from '../utils/types';
 import { uploadMockVideo } from '../utils/mockApi';
 import { initFaceDetection, detectFaces } from '../utils/faceDetection';
@@ -725,12 +726,12 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
               </div>
             </div>
 
-            {/* Right Column - Violation Logs and Help */}
+            {/* Right Column - Violation Logs and AI Assistant */}
             <div className="space-y-6">
               <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50 h-fit">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Violation Monitoring</h3>
                 
-                <div className="space-y-3 max-h-96 overflow-y-auto">
+                <div className="space-y-3 max-h-96 overflow-y-auto mb-6">
                   {violationLogs.length === 0 ? (
                     <div className="text-center py-8">
                       <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -770,23 +771,29 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
                     ))
                   )}
                 </div>
-              </div>
 
-              {/* Need Help Section */}
-              <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50">
-                <div className="flex items-center space-x-4 mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                    <div className="w-6 h-6 bg-white rounded-full opacity-80"></div>
+                {/* AI Assistant Section */}
+                <div className="border-t border-gray-200 pt-6">
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                      <div className="w-6 h-6 bg-white rounded-full opacity-80"></div>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">Need help?</h3>
+                      <p className="text-sm text-gray-600">AI Assistant is here to help</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Need help?</h3>
+                  
+                  {/* ElevenLabs Conversational AI Widget */}
+                  <div className="mb-4">
+                    <ElevenLabsConvai />
                   </div>
+                  
+                  <button className="w-full bg-black hover:bg-gray-800 text-white rounded-full py-4 px-6 flex items-center justify-center space-x-3 transition-colors duration-200">
+                    <Phone className="w-5 h-5" />
+                    <span className="font-medium text-lg">Start a call</span>
+                  </button>
                 </div>
-                
-                <button className="w-full bg-black hover:bg-gray-800 text-white rounded-full py-4 px-6 flex items-center justify-center space-x-3 transition-colors duration-200">
-                  <Phone className="w-5 h-5" />
-                  <span className="font-medium text-lg">Start a call</span>
-                </button>
               </div>
             </div>
           </div>
@@ -797,3 +804,5 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
 };
 
 export default Level4Flow;
+
+}
