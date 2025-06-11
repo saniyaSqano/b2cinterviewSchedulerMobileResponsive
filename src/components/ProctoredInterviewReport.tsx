@@ -284,43 +284,6 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
           </div>
         </div>
 
-        {/* Candidate Information */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-            <User className="w-5 h-5 mr-2 text-purple-600" />
-            Candidate Information
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-3">
-              <div className="flex items-center space-x-2">
-                <User className="w-4 h-4 text-gray-500" />
-                <span className="text-gray-600">Name:</span>
-                <span className="font-medium">{candidateDetails.fullName}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Mail className="w-4 h-4 text-gray-500" />
-                <span className="text-gray-600">Email:</span>
-                <span className="font-medium">{candidateDetails.email}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Phone className="w-4 h-4 text-gray-500" />
-                <span className="text-gray-600">Phone:</span>
-                <span className="font-medium">{candidateDetails.phoneNumber}</span>
-              </div>
-            </div>
-            <div className="space-y-3">
-              <div>
-                <span className="text-gray-600">Skills:</span>
-                <p className="font-medium">{candidateDetails.skills}</p>
-              </div>
-              <div>
-                <span className="text-gray-600">Experience:</span>
-                <p className="font-medium">{candidateDetails.experience}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Interview Summary */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           <div className="bg-white rounded-2xl shadow-lg p-6">
@@ -381,81 +344,8 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
           </div>
         </div>
 
-        {/* Security Violations Table */}
+        {/* Security Violations Analysis with Pie Chart - MOVED UP */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-            <AlertTriangle className="w-5 h-5 mr-2 text-purple-600" />
-            Security Violations Table
-          </h2>
-          
-          {violationData.length > 0 ? (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="font-semibold">Violation Type</TableHead>
-                    <TableHead className="font-semibold">Occurrences</TableHead>
-                    <TableHead className="font-semibold">Impact Level</TableHead>
-                    <TableHead className="font-semibold">First Detected</TableHead>
-                    <TableHead className="font-semibold">Recommendation</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {violationData.map((violation, index) => (
-                    <TableRow key={index} className="hover:bg-gray-50">
-                      <TableCell className="font-medium">
-                        <div className="flex items-center space-x-2">
-                          <div className={`w-3 h-3 rounded-full ${
-                            violation.type === 'error' ? 'bg-red-500' : 'bg-yellow-500'
-                          }`} />
-                          <span>{violation.fullName}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className={`px-2 py-1 rounded-full text-sm font-medium ${
-                          violation.value > 3 
-                            ? 'bg-red-100 text-red-800' 
-                            : violation.value > 1 
-                            ? 'bg-yellow-100 text-yellow-800' 
-                            : 'bg-green-100 text-green-800'
-                        }`}>
-                          {violation.value}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <span className={`px-2 py-1 rounded-full text-sm font-medium ${
-                          violation.impact === 'High'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {violation.impact}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-sm text-gray-600">
-                        {violation.timestamps[0]?.toLocaleTimeString([], { 
-                          hour: '2-digit', 
-                          minute: '2-digit' 
-                        })}
-                      </TableCell>
-                      <TableCell className="text-sm">
-                        {violation.recommendation}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">Perfect Security Compliance</h3>
-              <p className="text-gray-600">No security violations detected during the interview</p>
-            </div>
-          )}
-        </div>
-
-        {/* Violation Analysis with Pie Chart */}
-        <div className="bg-white rounded-2xl shadow-lg p-6">
           <h2 className="text-xl font-bold text-gray-800 mb-4">Security Violation Analysis</h2>
           
           {violationData.length > 0 ? (
@@ -539,6 +429,116 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
               <p className="text-gray-600">No security violations detected during the interview</p>
             </div>
           )}
+        </div>
+
+        {/* Security Violations Table */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+          <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+            <AlertTriangle className="w-5 h-5 mr-2 text-purple-600" />
+            Security Violations Table
+          </h2>
+          
+          {violationData.length > 0 ? (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="font-semibold">Violation Type</TableHead>
+                    <TableHead className="font-semibold">Occurrences</TableHead>
+                    <TableHead className="font-semibold">Impact Level</TableHead>
+                    <TableHead className="font-semibold">First Detected</TableHead>
+                    <TableHead className="font-semibold">Recommendation</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {violationData.map((violation, index) => (
+                    <TableRow key={index} className="hover:bg-gray-50">
+                      <TableCell className="font-medium">
+                        <div className="flex items-center space-x-2">
+                          <div className={`w-3 h-3 rounded-full ${
+                            violation.type === 'error' ? 'bg-red-500' : 'bg-yellow-500'
+                          }`} />
+                          <span>{violation.fullName}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className={`px-2 py-1 rounded-full text-sm font-medium ${
+                          violation.value > 3 
+                            ? 'bg-red-100 text-red-800' 
+                            : violation.value > 1 
+                            ? 'bg-yellow-100 text-yellow-800' 
+                            : 'bg-green-100 text-green-800'
+                        }`}>
+                          {violation.value}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <span className={`px-2 py-1 rounded-full text-sm font-medium ${
+                          violation.impact === 'High'
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {violation.impact}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-sm text-gray-600">
+                        {violation.timestamps[0]?.toLocaleTimeString([], { 
+                          hour: '2-digit', 
+                          minute: '2-digit' 
+                        })}
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {violation.recommendation}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">Perfect Security Compliance</h3>
+              <p className="text-gray-600">No security violations detected during the interview</p>
+            </div>
+          )}
+        </div>
+
+        {/* Candidate Information - MOVED TO BOTTOM */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+          <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+            <User className="w-5 h-5 mr-2 text-purple-600" />
+            Candidate Information
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <User className="w-4 h-4 text-gray-500" />
+                <span className="text-gray-600">Name:</span>
+                <span className="font-medium">{candidateDetails.fullName}</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Mail className="w-4 h-4 text-gray-500" />
+                <span className="text-gray-600">Email:</span>
+                <span className="font-medium">{candidateDetails.email}</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Phone className="w-4 h-4 text-gray-500" />
+                <span className="text-gray-600">Phone:</span>
+                <span className="font-medium">{candidateDetails.phoneNumber}</span>
+              </div>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <span className="text-gray-600">Skills:</span>
+                <p className="font-medium">{candidateDetails.skills}</p>
+              </div>
+              <div>
+                <span className="text-gray-600">Experience:</span>
+                <p className="font-medium">{candidateDetails.experience}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
