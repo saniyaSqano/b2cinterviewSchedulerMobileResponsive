@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { HARDCODED_CANDIDATE } from '../data/candidateData';
 import { ArrowLeft, Circle, Square, Check, Download, Upload, Volume2, Play, Pause, X, Phone } from 'lucide-react';
 import VideoFeed from './VideoFeed';
 import ProctoredInterviewReport from './ProctoredInterviewReport';
@@ -46,13 +47,13 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(true);
   
-  // Store user details from localStorage
+  // Use hardcoded candidate details instead of dynamic values
   const [userDetails, setUserDetails] = useState({
-    fullName: userName,
-    email: "",
-    phoneNumber: "",
-    skills: "",
-    experience: ""
+    fullName: HARDCODED_CANDIDATE.fullName,
+    email: HARDCODED_CANDIDATE.email,
+    phoneNumber: HARDCODED_CANDIDATE.phoneNumber,
+    skills: HARDCODED_CANDIDATE.skills,
+    experience: HARDCODED_CANDIDATE.experience
   });
   
   // Load user data from localStorage when component mounts

@@ -115,20 +115,7 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
       // Reset to black for body text
       doc.setTextColor(0, 0, 0);
       
-      // Candidate Information Section
-      doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
-      doc.setFontSize(18);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Candidate Information', 20, 45);
-      
-      doc.setTextColor(0, 0, 0);
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'normal');
-      doc.text('Name: ' + candidateDetails.fullName, 20, 55);
-      doc.text('Email: ' + candidateDetails.email, 20, 65);
-      doc.text('Phone: ' + candidateDetails.phoneNumber, 20, 75);
-      doc.text('Skills: ' + candidateDetails.skills, 20, 85);
-      doc.text('Experience: ' + candidateDetails.experience, 20, 95);
+      // Candidate Information Section removed
       
       // Interview Details Section
       doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
@@ -497,42 +484,7 @@ const ProctoredInterviewReport: React.FC<ProctoredInterviewReportProps> = ({
           )}
         </div>
 
-        {/* Candidate Information - MOVED TO BOTTOM */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-            <User className="w-5 h-5 mr-2 text-purple-600" />
-            Candidate Information
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-3">
-              <div className="flex items-center space-x-2">
-                <User className="w-4 h-4 text-gray-500" />
-                <span className="text-gray-600">Name:</span>
-                <span className="font-medium">{candidateDetails.fullName}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Mail className="w-4 h-4 text-gray-500" />
-                <span className="text-gray-600">Email:</span>
-                <span className="font-medium">{candidateDetails.email}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Phone className="w-4 h-4 text-gray-500" />
-                <span className="text-gray-600">Phone:</span>
-                <span className="font-medium">{candidateDetails.phoneNumber}</span>
-              </div>
-            </div>
-            <div className="space-y-3">
-              <div>
-                <span className="text-gray-600">Skills:</span>
-                <p className="font-medium">{candidateDetails.skills}</p>
-              </div>
-              <div>
-                <span className="text-gray-600">Experience:</span>
-                <p className="font-medium">{candidateDetails.experience}</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Candidate Information section removed */}
       </div>
     </div>
   );

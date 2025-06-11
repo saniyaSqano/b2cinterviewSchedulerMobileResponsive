@@ -50,14 +50,14 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
   // Hardcoded candidate information as requested
   const candidateDetails = {
     fullName: 'Aditya Joshi',
-    email: 'adi@iqan.ai',
+    email: 'adi@sqano.com',
     phoneNumber: '+91 XXXXXXXXX',
-    skills: 'Python, Javascript, Datascience',
-    experience: '10+ Years'
+    skills: 'Python, Javascript',
+    experience: '10+'
   };
   // Using hardcoded data, no need to retrieve from localStorage
   const [storedUserData, setStoredUserData] = useState<{email: string, fullName: string}>({ 
-    email: 'adi@iqan.ai', 
+    email: 'adi@sqano.com', 
     fullName: 'Aditya Joshi' 
   });
   
@@ -224,24 +224,8 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
       
       let yPos = 45;
       
-      // Add candidate details section
-      pdf.setFontSize(16);
-      pdf.setTextColor(colors.primary[0], colors.primary[1], colors.primary[2]);
-      pdf.text('Candidate Details', 20, yPos);
-      yPos += 10;
-      
-      pdf.setFontSize(12);
-      pdf.setTextColor(0, 0, 0);
-      pdf.text(`Name: ${candidateDetails.fullName}`, 20, yPos);
-      yPos += 7;
-      pdf.text(`Email: ${candidateDetails.email}`, 20, yPos);
-      yPos += 7;
-      pdf.text(`Phone: ${candidateDetails.phoneNumber}`, 20, yPos);
-      yPos += 7;
-      pdf.text(`Skills: ${candidateDetails.skills}`, 20, yPos);
-      yPos += 7;
-      pdf.text(`Experience: ${candidateDetails.experience} years`, 20, yPos);
-      yPos += 15;
+      // Candidate details section removed
+      yPos = 45;
       
       // Add skill assessment section
       pdf.setFontSize(16);
@@ -576,44 +560,10 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
             </CardContent>
           </Card>
 
-          {/* Candidate Details and Detailed Skills */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Candidate Details */}
-            <Card className="bg-white shadow-xl animate-fade-in" style={{ animationDelay: '1000ms' }}>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-xl">
-                  <User className="w-6 h-6 text-blue-600" />
-                  Candidate Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 gap-4">
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-500 mb-1">Full Name</p>
-                    <p className="font-semibold text-lg">{candidateDetails.fullName}</p>
-                  </div>
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-500 mb-1">Email</p>
-                    <p className="font-semibold">{candidateDetails.email}</p>
-                  </div>
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-500 mb-1">Phone</p>
-                    <p className="font-semibold">{candidateDetails.phoneNumber}</p>
-                  </div>
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-500 mb-1">Skills</p>
-                    <p className="font-semibold">{candidateDetails.skills}</p>
-                  </div>
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <p className="text-sm text-gray-500 mb-1">Experience</p>
-                    <p className="font-semibold">{candidateDetails.experience}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
+          {/* Detailed Skills Assessment */}
+          <div className="grid grid-cols-1 gap-8">
             {/* Detailed Skill Assessment */}
-            <Card className="bg-white shadow-xl animate-fade-in" style={{ animationDelay: '1200ms' }}>
+            <Card className="bg-white shadow-xl animate-fade-in" style={{ animationDelay: '800ms' }}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-xl">
                   <Star className="w-6 h-6 text-yellow-600" />
