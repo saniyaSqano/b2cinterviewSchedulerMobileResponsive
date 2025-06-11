@@ -4,8 +4,8 @@ import { User, Mail, Phone } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 
 const CandidateDetails: React.FC = () => {
-  // Hardcoded candidate information
-  const displayDetails = {
+  // Hardcoded candidate information - completely ignores any props
+  const candidateInfo = {
     fullName: 'Aditya Joshi',
     email: 'adi@sqano.com',
     phoneNumber: '+91 XXXXXXXXX',
@@ -26,35 +26,35 @@ const CandidateDetails: React.FC = () => {
           <User className="w-4 h-4 text-gray-500" />
           <div>
             <p className="text-sm text-gray-500">Name:</p>
-            <p className="text-gray-900 font-medium">{displayDetails.fullName}</p>
+            <p className="text-gray-900 font-medium">{candidateInfo.fullName}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <Mail className="w-4 h-4 text-gray-500" />
           <div>
             <p className="text-sm text-gray-500">Email:</p>
-            <p className="text-gray-900 font-medium">{displayDetails.email}</p>
+            <p className="text-gray-900 font-medium">{candidateInfo.email}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <Phone className="w-4 h-4 text-gray-500" />
           <div>
             <p className="text-sm text-gray-500">Phone:</p>
-            <p className="text-gray-900 font-medium">{displayDetails.phoneNumber}</p>
+            <p className="text-gray-900 font-medium">{candidateInfo.phoneNumber}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <User className="w-4 h-4 text-gray-500" />
           <div>
             <p className="text-sm text-gray-500">Skills:</p>
-            <p className="text-gray-900 font-medium">{displayDetails.skills}</p>
+            <p className="text-gray-900 font-medium">{candidateInfo.skills}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <User className="w-4 h-4 text-gray-500" />
           <div>
             <p className="text-sm text-gray-500">Experience:</p>
-            <p className="text-gray-900 font-medium">{displayDetails.experience}</p>
+            <p className="text-gray-900 font-medium">{candidateInfo.experience}</p>
           </div>
         </div>
       </CardContent>
