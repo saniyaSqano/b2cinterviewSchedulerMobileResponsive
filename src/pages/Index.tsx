@@ -385,5 +385,3 @@ const LevelsContent = () => {
 };
 
 export default Index;
-
-}
