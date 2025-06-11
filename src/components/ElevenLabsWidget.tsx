@@ -53,11 +53,11 @@ const ElevenLabsWidget: React.FC<ElevenLabsWidgetProps> = ({ text }) => {
 
   return (
     <div 
-      className="elevenlabs-widget-container bg-[#f1f7fe]/90 backdrop-blur-sm rounded-xl p-4 border border-blue-200/30" 
+      className="elevenlabs-widget-container bg-[#f1f7fe]/90 backdrop-blur-sm rounded-xl p-8 border border-blue-200/30" 
       ref={containerRef}
       style={{
         width: '100%',
-        minHeight: '200px',
+        minHeight: '400px',
         display: 'flex',
         justifyContent: 'center',
       }}
