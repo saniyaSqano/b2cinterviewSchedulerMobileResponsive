@@ -196,7 +196,7 @@ const LevelsContent = () => {
         <div className="absolute top-2/3 right-1/3 w-1.5 h-1.5 bg-purple-400/35 rounded-full animate-pulse" style={{ animationDelay: '6s' }}></div>
       </div>
 
-      {/* Professional Header */}
+      {/* Simplified Header */}
       <div className="relative z-20 bg-white/95 backdrop-blur-md border-b border-gray-200/50 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-5">
           <div className="flex items-center justify-between">
@@ -208,9 +208,6 @@ const LevelsContent = () => {
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
               </button>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">
-                  ProctoVerse
-                </h1>
                 <p className="text-sm text-gray-600 font-medium">Professional Development Platform</p>
               </div>
             </div>
@@ -242,15 +239,23 @@ const LevelsContent = () => {
         </div>
       </div>
 
-      {/* Professional Hero Section */}
+      {/* Enhanced Hero Section with ProctoVerse as Main Title */}
       <div className="relative z-10">
         <div className="max-w-6xl mx-auto px-6 pt-16 pb-12 text-center">
-          <div className="inline-flex items-center px-6 py-3 bg-white/90 backdrop-blur-sm rounded-full text-gray-700 text-sm font-medium mb-8 border border-gray-200/50 shadow-sm">
-            <Brain className="w-4 h-4 mr-2 text-blue-600" />
-            AI-Powered Professional Development
+          {/* Main Application Title */}
+          <div className="mb-8">
+            <h1 className="text-7xl md:text-8xl font-bold mb-6 leading-tight">
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent animate-pulse-glow">
+                ProctoVerse
+              </span>
+            </h1>
+            <div className="inline-flex items-center px-6 py-3 bg-white/90 backdrop-blur-sm rounded-full text-gray-700 text-sm font-medium border border-gray-200/50 shadow-sm">
+              <Brain className="w-4 h-4 mr-2 text-blue-600" />
+              AI-Powered Professional Development
+            </div>
           </div>
           
-          <h2 className="text-5xl md:text-6xl font-bold mb-6 text-gray-900 leading-tight">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900 leading-tight">
             Accelerate Your
             <br />
             <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
@@ -385,3 +390,5 @@ const LevelsContent = () => {
 };
 
 export default Index;
+
+</edits_to_apply>
