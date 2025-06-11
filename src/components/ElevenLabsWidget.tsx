@@ -58,7 +58,7 @@ const ElevenLabsWidget: React.FC<ElevenLabsWidgetProps> = ({ text }) => {
         width: '100%',
         minHeight: '200px',
         display: 'flex',
-        justifyContent: 'center'
+        justifyContent: 'center',
       }}
     >
       <elevenlabs-convai 
@@ -67,7 +67,8 @@ const ElevenLabsWidget: React.FC<ElevenLabsWidgetProps> = ({ text }) => {
         style={{
           width: '100%',
           maxWidth: '100%',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          
         }}
       ></elevenlabs-convai>
     </div>

@@ -631,7 +631,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative">
+    <div className="min-h-screen bg-[#f1f7fe] relative">
       {/* Header */}
       <div className="bg-white/95 backdrop-blur-md border-b border-gray-200/50 shadow-sm relative z-20">
         <div className="max-w-7xl mx-auto px-6 py-4">
@@ -731,28 +731,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
                         <span>Download</span>
                       </button>
 
-                      <button
-                        onClick={uploadRecordingToS3}
-                        disabled={isUploading}
-                        className="px-4 py-3 bg-purple-500 hover:bg-purple-600 text-white rounded-xl font-medium transition-all flex items-center space-x-2 disabled:bg-gray-400"
-                      >
-                        {isUploading ? (
-                          <>
-                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            <span>Uploading...</span>
-                          </>
-                        ) : uploadSuccess ? (
-                          <>
-                            <Check className="w-4 h-4" />
-                            <span>Uploaded</span>
-                          </>
-                        ) : (
-                          <>
-                            <Upload className="w-4 h-4" />
-                            <span>Upload to S3</span>
-                          </>
-                        )}
-                      </button>
+                    
                     </>
                   )}
                 </div>
@@ -914,31 +893,14 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
                 </div>
               </div>
               
-              {/* Need help call button - Now at the bottom of violation logs */}
-              <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50 mt-6">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <div className="w-4 h-4 bg-white rounded-full opacity-80"></div>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    {/*<h3 className="text-base font-semibold text-gray-900">Need help?</h3>
-                    <p className="text-sm text-gray-600 truncate">AI Assistant is here to help</p>*/}
-                  </div>
+              {/* Help section removed as requested */}
+
+              {/* Add ElevenLabs widget here */}
+              {audioEnabled && (
+                <div className="mt-4 bg-white rounded-xl p-4 border border-blue-200"> 
+                  <ElevenLabsWidget text={questions[currentQuestionIndex]} />
                 </div>
-                
-                <button className="w-full bg-black hover:bg-gray-800 text-white rounded-full py-3 px-6 flex items-center justify-center space-x-2 transition-colors duration-200">
-                  <Phone className="w-4 h-4" />
-                  <span className="font-medium">Start a call</span>
-                </button>
-                
-                {/* Add ElevenLabs widget here */}
-                {audioEnabled && (
-                  <div className="mt-4 bg-white rounded-xl p-4 border border-blue-200">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">AI Interview Assistant</h4>
-                    <ElevenLabsWidget text={questions[currentQuestionIndex]} />
-                  </div>
-                )}
-              </div>
+              )}
             </div>
           </div>
         </div>
