@@ -390,5 +390,3 @@ const LevelsContent = () => {
 };
 
 export default Index;
-
-</edits_to_apply>
