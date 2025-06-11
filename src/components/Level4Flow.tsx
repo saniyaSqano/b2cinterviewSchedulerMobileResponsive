@@ -685,7 +685,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
                 />
               </div>
 
-              <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50">
+              <div className="bg-[#f1f7fe]/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/30">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">Recording Controls</h3>
                   <div className="flex items-center space-x-2">
@@ -752,7 +752,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
               </div>
 
               {showVideoPlayer && recordingBlobUrl && (
-                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50">
+                <div className="bg-[#f1f7fe]/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/30">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900">Recording Playback</h3>
                     <button
@@ -803,7 +803,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
                 </div>
               )}
 
-              <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50">
+              <div className="bg-[#f1f7fe]/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/30">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-900">Current Question</h3>
                   <div className="text-sm text-gray-600">
@@ -848,7 +848,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
             {/* Right Column - AI Assistant and Violation Logs */}
             <div className="space-y-6">
               {/* Violation Monitoring Section - Now at the top */}
-              <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/50">
+              <div className="bg-[#f1f7fe]/90 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-200/30">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Violation Monitoring</h3>
                 
                 <div className="space-y-3 max-h-96 overflow-y-auto">
@@ -897,7 +897,7 @@ const Level4Flow: React.FC<Level4FlowProps> = ({ onBack, userName }) => {
 
               {/* Add ElevenLabs widget here */}
               {audioEnabled && (
-                <div className="mt-4 bg-white rounded-xl p-4 border border-blue-200"> 
+                <div className="mt-4 bg-[#f1f7fe] rounded-xl p-4 border border-blue-200/30"> 
                   <ElevenLabsWidget text={questions[currentQuestionIndex]} />
                 </div>
               )}
