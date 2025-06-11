@@ -28,42 +28,42 @@ const CandidateDetails: React.FC<CandidateDetailsProps> = ({ candidateDetails })
       <CardHeader>
         <CardTitle className="text-gray-900 flex items-center gap-2">
           <User className="w-5 h-5" />
-          Candidate Details
+          Candidate Information
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center gap-3">
           <User className="w-4 h-4 text-gray-500" />
           <div>
-            <p className="text-sm text-gray-500">Full Name</p>
+            <p className="text-sm text-gray-500">Name:</p>
             <p className="text-gray-900 font-medium">{displayDetails.fullName}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <Mail className="w-4 h-4 text-gray-500" />
           <div>
-            <p className="text-sm text-gray-500">Email</p>
+            <p className="text-sm text-gray-500">Email:</p>
             <p className="text-gray-900 font-medium">{displayDetails.email}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <Phone className="w-4 h-4 text-gray-500" />
           <div>
-            <p className="text-sm text-gray-500">Phone</p>
+            <p className="text-sm text-gray-500">Phone:</p>
             <p className="text-gray-900 font-medium">{displayDetails.phoneNumber}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <User className="w-4 h-4 text-gray-500" />
           <div>
-            <p className="text-sm text-gray-500">Skills</p>
+            <p className="text-sm text-gray-500">Skills:</p>
             <p className="text-gray-900 font-medium">{displayDetails.skills}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           <User className="w-4 h-4 text-gray-500" />
           <div>
-            <p className="text-sm text-gray-500">Experience</p>
+            <p className="text-sm text-gray-500">Experience:</p>
             <p className="text-gray-900 font-medium">{displayDetails.experience}</p>
           </div>
         </div>
