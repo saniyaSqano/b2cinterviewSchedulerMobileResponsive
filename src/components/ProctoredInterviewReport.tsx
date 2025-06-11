@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import jsPDF from 'jspdf';
 
 interface CandidateDetails {
-  fullName: string;
+  fullName: "Aditya Joshi";
   email: string;
   phoneNumber: string;
   skills: string;
