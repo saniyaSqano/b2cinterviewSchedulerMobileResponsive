@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ArrowRight, Target, Award, Rocket, Brain, TrendingUp, Code, Upload } from 'lucide-react';
+import { ArrowRight, Target, Award, Rocket, Brain, TrendingUp, Code, Upload, Sparkles, Star, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,9 +11,6 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
 interface FormData {
-  name: string;
-  email: string;
-  phone: string;
   skills: string;
   experience: string;
   cv: File | null;
@@ -25,9 +22,6 @@ const WelcomeScreen = () => {
   const { setUser } = useUser();
   const { createUser, fetchUser, loading } = useAiProctoUser();
   const [formData, setFormData] = useState<FormData>({
-    name: '',
-    email: '',
-    phone: '',
     skills: '',
     experience: '',
     cv: null,
@@ -43,49 +37,20 @@ const WelcomeScreen = () => {
     updateFormData('cv', file);
   };
 
-  const canSubmit = formData.email && formData.jobDescription;
+  const canSubmit = formData.jobDescription.trim().length > 0;
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
 
     try {
-      // First try to fetch existing user
-      const existingUser = await fetchUser(formData.email);
+      // Generate a unique email for anonymous users
+      const anonymousEmail = `user_${Date.now()}@proctoverse.ai`;
       
-      if (existingUser) {
-        // User already exists, just set them in context and proceed
-        setUser({
-          name: formData.name || 'User',
-          email: formData.email,
-          phone: formData.phone,
-          skills: formData.skills,
-          experience: formData.experience,
-          jobDescription: formData.jobDescription,
-          experienceLevel: 3,
-          confidenceLevel: 5
-        });
-        
-        toast.success('Welcome back! Starting your assessment! 🚀');
-        navigate('/levels');
-        return;
-      }
-
-      // User doesn't exist, create new user
-      await createUser({
-        email: formData.email,
-        full_name: formData.name || 'User',
-        phone_number: formData.phone,
-        skills: formData.skills,
-        cv_file_name: formData.cv?.name,
-        job_description: formData.jobDescription,
-        policies_accepted: true
-      });
-      
-      // Set user in context
+      // Set user in context with anonymous data
       setUser({
-        name: formData.name || 'User',
-        email: formData.email,
-        phone: formData.phone,
+        name: 'User',
+        email: anonymousEmail,
+        phone: '',
         skills: formData.skills,
         experience: formData.experience,
         jobDescription: formData.jobDescription,
@@ -96,40 +61,22 @@ const WelcomeScreen = () => {
       toast.success('Profile created! Starting your assessment! 🚀');
       navigate('/levels');
     } catch (error: any) {
-      // Handle duplicate email error specifically
-      if (error?.code === '23505' || error?.message?.includes('duplicate key')) {
-        // User already exists, just proceed with the form data
-        setUser({
-          name: formData.name || 'User',
-          email: formData.email,
-          phone: formData.phone,
-          skills: formData.skills,
-          experience: formData.experience,
-          jobDescription: formData.jobDescription,
-          experienceLevel: 3,
-          confidenceLevel: 5
-        });
-        
-        toast.success('Welcome back! Starting your assessment! 🚀');
-        navigate('/levels');
-      } else {
-        toast.error('Failed to create profile. Please try again.');
-        console.error('Form submission error:', error);
-      }
+      toast.error('Failed to create profile. Please try again.');
+      console.error('Form submission error:', error);
     }
   };
 
   return (
     <div className="min-h-screen flex">
-      {/* Left Side - ProctoVerse Information */}
+      {/* Left Side - Enhanced ProctoVerse Information */}
       <div className="flex-1 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 relative overflow-hidden flex items-center justify-center p-12">
-        {/* Background Elements */}
+        {/* Enhanced Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-white/10 to-cyan-300/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }}></div>
           <div className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-r from-pink-300/20 to-purple-300/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '10s' }}></div>
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-r from-blue-300/20 to-indigo-300/20 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '12s' }}></div>
           
-          {/* Floating icons */}
+          {/* Enhanced floating elements */}
           <div className="absolute top-16 right-1/4 animate-bounce" style={{ animationDelay: '1s', animationDuration: '4s' }}>
             <Target className="w-8 h-8 text-white/40" />
           </div>
@@ -139,193 +86,180 @@ const WelcomeScreen = () => {
           <div className="absolute top-1/3 right-1/6 animate-bounce" style={{ animationDelay: '3s', animationDuration: '3.5s' }}>
             <Rocket className="w-7 h-7 text-white/40" />
           </div>
+          <div className="absolute top-2/3 left-1/4 animate-bounce" style={{ animationDelay: '4s', animationDuration: '4.5s' }}>
+            <Star className="w-5 h-5 text-white/40" />
+          </div>
+          <div className="absolute bottom-1/3 right-1/3 animate-bounce" style={{ animationDelay: '5s', animationDuration: '6s' }}>
+            <Sparkles className="w-6 h-6 text-white/40" />
+          </div>
         </div>
 
         <div className="relative z-10 text-white max-w-2xl">
-          {/* Main Title */}
-          <h1 className="text-7xl md:text-8xl font-bold mb-8 leading-tight">
-            <span className="bg-gradient-to-r from-white via-cyan-200 to-white bg-clip-text text-transparent">
-              ProctoVerse
-            </span>
-          </h1>
+          {/* Enhanced Main Title */}
+          <div className="text-center mb-8">
+            <h1 className="text-8xl md:text-9xl font-bold mb-8 leading-tight">
+              <span className="bg-gradient-to-r from-white via-cyan-200 to-white bg-clip-text text-transparent animate-pulse">
+                ProctoVerse
+              </span>
+            </h1>
+            
+            <div className="inline-flex items-center px-6 py-3 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-medium border border-white/30 shadow-lg mb-8">
+              <Brain className="w-4 h-4 mr-2 text-cyan-200" />
+              AI-Powered Career Acceleration Platform
+            </div>
+          </div>
           
-          <h2 className="text-4xl md:text-5xl font-bold mb-8 leading-tight">
-            Accelerate Your
+          <h2 className="text-5xl md:text-6xl font-bold mb-8 leading-tight text-center">
+            Transform Your
             <br />
-            <span className="bg-gradient-to-r from-cyan-200 to-white bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-cyan-200 via-white to-cyan-200 bg-clip-text text-transparent">
               Tech Career
             </span>
           </h2>
           
-          <p className="text-xl text-white/90 leading-relaxed mb-12">
+          <p className="text-xl text-white/90 leading-relaxed mb-12 text-center">
             Join thousands of professionals advancing with AI-powered interview preparation, 
             personalized learning paths, and industry-standard assessments.
           </p>
 
-          {/* Features Grid */}
-          <div className="grid grid-cols-2 gap-6 mb-12">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                <Brain className="w-6 h-6 text-white" />
+          {/* Enhanced Features Grid */}
+          <div className="grid grid-cols-2 gap-8 mb-12">
+            <div className="flex items-center space-x-4 bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+              <div className="w-14 h-14 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-xl flex items-center justify-center shadow-lg">
+                <Brain className="w-7 h-7 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-white">AI-Powered Matching</h3>
+                <h3 className="font-bold text-white text-lg">AI-Powered Matching</h3>
                 <p className="text-sm text-white/80">Intelligent job recommendations</p>
               </div>
             </div>
             
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                <TrendingUp className="w-6 h-6 text-white" />
+            <div className="flex items-center space-x-4 bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+              <div className="w-14 h-14 bg-gradient-to-r from-green-400 to-emerald-400 rounded-xl flex items-center justify-center shadow-lg">
+                <TrendingUp className="w-7 h-7 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-white">Real-time Updates</h3>
-                <p className="text-sm text-white/80">Instant notifications</p>
+                <h3 className="font-bold text-white text-lg">Real-time Feedback</h3>
+                <p className="text-sm text-white/80">Instant performance insights</p>
               </div>
             </div>
             
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                <Rocket className="w-6 h-6 text-white" />
+            <div className="flex items-center space-x-4 bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+              <div className="w-14 h-14 bg-gradient-to-r from-purple-400 to-pink-400 rounded-xl flex items-center justify-center shadow-lg">
+                <Rocket className="w-7 h-7 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-white">Career Growth</h3>
+                <h3 className="font-bold text-white text-lg">Career Growth</h3>
                 <p className="text-sm text-white/80">Connect with industry experts</p>
               </div>
             </div>
             
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                <Code className="w-6 h-6 text-white" />
+            <div className="flex items-center space-x-4 bg-white/10 backdrop-blur-sm rounded-2xl p-4 border border-white/20">
+              <div className="w-14 h-14 bg-gradient-to-r from-orange-400 to-red-400 rounded-xl flex items-center justify-center shadow-lg">
+                <Code className="w-7 h-7 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-white">Tech Skills Enhancement</h3>
+                <h3 className="font-bold text-white text-lg">Skill Enhancement</h3>
                 <p className="text-sm text-white/80">Personalized learning paths</p>
               </div>
             </div>
           </div>
 
-          {/* Stats */}
-          <div className="flex justify-between items-center">
+          {/* Enhanced Stats */}
+          <div className="flex justify-between items-center bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
             <div className="text-center">
-              <div className="text-3xl font-bold text-white mb-1">10,000+</div>
-              <div className="text-white/80 text-sm">Professionals</div>
+              <div className="text-4xl font-bold text-white mb-2 flex items-center justify-center">
+                <Sparkles className="w-8 h-8 mr-2 text-cyan-200" />
+                10,000+
+              </div>
+              <div className="text-white/80 text-sm font-medium">Professionals</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-white mb-1">95%</div>
-              <div className="text-white/80 text-sm">Success Rate</div>
+              <div className="text-4xl font-bold text-white mb-2 flex items-center justify-center">
+                <CheckCircle className="w-8 h-8 mr-2 text-green-300" />
+                95%
+              </div>
+              <div className="text-white/80 text-sm font-medium">Success Rate</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-white mb-1">500+</div>
-              <div className="text-white/80 text-sm">Companies</div>
+              <div className="text-4xl font-bold text-white mb-2 flex items-center justify-center">
+                <Award className="w-8 h-8 mr-2 text-yellow-300" />
+                500+
+              </div>
+              <div className="text-white/80 text-sm font-medium">Companies</div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Right Side - Form */}
+      {/* Right Side - Simplified Form */}
       <div className="flex-1 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-12">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Get Started Today</h2>
-            <p className="text-gray-600">Tell us about yourself to begin your personalized journey</p>
+            <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <Rocket className="w-10 h-10 text-white" />
+            </div>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Get Started Today</h2>
+            <p className="text-gray-600 text-lg">Begin your personalized career journey</p>
           </div>
 
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/70 p-8">
+          <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/70 p-8">
             <div className="space-y-6">
               <div>
-                <Label htmlFor="name" className="text-sm font-semibold text-gray-700 mb-2 block">
-                  Full Name (Optional)
-                </Label>
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="Enter your full name"
-                  value={formData.name}
-                  onChange={(e) => updateFormData('name', e.target.value)}
-                  className="h-12 bg-white border-2 border-gray-200 focus:border-blue-400 rounded-lg"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="email" className="text-sm font-semibold text-gray-700 mb-2 block">
-                  Email Address *
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={formData.email}
-                  onChange={(e) => updateFormData('email', e.target.value)}
-                  className="h-12 bg-white border-2 border-gray-200 focus:border-blue-400 rounded-lg"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="phone" className="text-sm font-semibold text-gray-700 mb-2 block">
-                  Phone Number (Optional)
-                </Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="Enter your phone number"
-                  value={formData.phone}
-                  onChange={(e) => updateFormData('phone', e.target.value)}
-                  className="h-12 bg-white border-2 border-gray-200 focus:border-blue-400 rounded-lg"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="skills" className="text-sm font-semibold text-gray-700 mb-2 block">
-                  Skills (Optional)
+                <Label htmlFor="skills" className="text-sm font-bold text-gray-700 mb-3 block flex items-center">
+                  <Code className="w-4 h-4 mr-2 text-blue-600" />
+                  Technical Skills (Optional)
                 </Label>
                 <Textarea
                   id="skills"
-                  placeholder="List your technical skills, programming languages, frameworks..."
+                  placeholder="e.g., React, Node.js, Python, AWS, Machine Learning..."
                   value={formData.skills}
                   onChange={(e) => updateFormData('skills', e.target.value)}
-                  className="min-h-[80px] bg-white border-2 border-gray-200 focus:border-blue-400 rounded-lg resize-none"
+                  className="min-h-[100px] bg-white border-2 border-gray-200 focus:border-blue-500 rounded-xl resize-none text-gray-700 placeholder-gray-400"
                 />
               </div>
 
               <div>
-                <Label htmlFor="experience" className="text-sm font-semibold text-gray-700 mb-2 block">
-                  Experience (Optional)
+                <Label htmlFor="experience" className="text-sm font-bold text-gray-700 mb-3 block flex items-center">
+                  <Award className="w-4 h-4 mr-2 text-purple-600" />
+                  Experience & Achievements (Optional)
                 </Label>
                 <Textarea
                   id="experience"
-                  placeholder="Describe your work experience and achievements..."
+                  placeholder="Describe your work experience, projects, and key achievements..."
                   value={formData.experience}
                   onChange={(e) => updateFormData('experience', e.target.value)}
-                  className="min-h-[80px] bg-white border-2 border-gray-200 focus:border-blue-400 rounded-lg resize-none"
+                  className="min-h-[100px] bg-white border-2 border-gray-200 focus:border-purple-500 rounded-xl resize-none text-gray-700 placeholder-gray-400"
                 />
               </div>
 
               <div>
-                <Label htmlFor="jobDescription" className="text-sm font-semibold text-gray-700 mb-2 block">
-                  Job Description *
+                <Label htmlFor="jobDescription" className="text-sm font-bold text-gray-700 mb-3 block flex items-center">
+                  <Target className="w-4 h-4 mr-2 text-green-600" />
+                  Target Job Description *
                 </Label>
                 <Textarea
                   id="jobDescription"
-                  placeholder="Paste the job description you're targeting..."
+                  placeholder="Paste the job description you're targeting or describe your dream role..."
                   value={formData.jobDescription}
                   onChange={(e) => updateFormData('jobDescription', e.target.value)}
-                  className="min-h-[100px] bg-white border-2 border-gray-200 focus:border-blue-400 rounded-lg resize-none"
+                  className="min-h-[120px] bg-white border-2 border-gray-200 focus:border-green-500 rounded-xl resize-none text-gray-700 placeholder-gray-400"
                 />
               </div>
 
               <div>
-                <Label htmlFor="cv" className="text-sm font-semibold text-gray-700 mb-2 block">
+                <Label htmlFor="cv" className="text-sm font-bold text-gray-700 mb-3 block flex items-center">
+                  <Upload className="w-4 h-4 mr-2 text-indigo-600" />
                   Upload CV/Resume (Optional)
                 </Label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-400 transition-all duration-300 bg-white/50">
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 hover:border-indigo-400 transition-all duration-300 bg-gradient-to-r from-indigo-50/50 to-blue-50/50">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <Button
                         type="button"
                         onClick={() => document.getElementById('cv-upload')?.click()}
                         variant="outline"
-                        className="px-4 py-2 text-sm"
+                        className="px-6 py-2 text-sm font-medium border-2 border-indigo-200 text-indigo-600 hover:bg-indigo-50"
                       >
                         Choose File
                       </Button>
@@ -348,15 +282,31 @@ const WelcomeScreen = () => {
               <Button
                 onClick={handleSubmit}
                 disabled={!canSubmit || loading}
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3 text-lg rounded-lg font-semibold shadow-lg transition-all duration-300 hover:scale-105 disabled:hover:scale-100"
+                className="w-full bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 text-white py-4 text-lg rounded-xl font-bold shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-2xl disabled:hover:scale-100 disabled:opacity-50"
               >
-                {loading ? 'Setting up...' : 'Start Free Assessment'}
-                {!loading && <ArrowRight className="w-5 h-5 ml-2" />}
+                {loading ? (
+                  <div className="flex items-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                    Setting up...
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center">
+                    <Rocket className="w-5 h-5 mr-2" />
+                    Start Free Assessment
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </div>
+                )}
               </Button>
 
-              <p className="text-center text-sm text-gray-500">
-                🌟 No credit card required • Instant results
-              </p>
+              <div className="text-center space-y-2">
+                <p className="text-sm text-gray-500 flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 mr-1 text-yellow-500" />
+                  No signup required • Instant results
+                </p>
+                <p className="text-xs text-gray-400">
+                  Join thousands of professionals advancing their careers
+                </p>
+              </div>
             </div>
           </div>
         </div>
