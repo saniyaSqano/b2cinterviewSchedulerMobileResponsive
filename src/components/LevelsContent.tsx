@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Trophy, Star, Award, Brain, Users, Sparkles, CheckCircle, Clock, TrendingUp } from 'lucide-react';
 import AssessmentFlow from './AssessmentFlow';
@@ -193,19 +194,15 @@ const LevelsContent = () => {
               Your Professional Journey
             </div>
           </div>
-          
-        
         </div>
 
         {/* Roadmap Section */}
-
-          <InteractiveRoadmap
-            currentLevel={currentLevel}
-            completedLevels={completedLevels}
-            onStepClick={handleCardClick}
-            levelCredits={levelCredits}
-          />
-        </div>
+        <InteractiveRoadmap
+          currentLevel={currentLevel}
+          completedLevels={completedLevels}
+          onStepClick={handleCardClick}
+          levelCredits={levelCredits}
+        />
 
         {/* Achievement Section */}
         {completedLevels.length > 0 && (
