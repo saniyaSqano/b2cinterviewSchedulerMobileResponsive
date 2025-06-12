@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ArrowRight, Target, Award, Rocket, Brain, TrendingUp, Code, Upload, Sparkles, Star, CheckCircle, User, Settings, LogOut, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -68,8 +67,8 @@ const WelcomeScreen = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-white/20 shadow-sm">
+      {/* Sticky Header */}
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm border-b border-white/20 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
