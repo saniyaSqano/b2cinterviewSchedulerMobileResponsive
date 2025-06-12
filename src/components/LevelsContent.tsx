@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Trophy, Star, Award, Brain, Users, Sparkles, CheckCircle, Clock, TrendingUp, User, LogOut } from 'lucide-react';
 import AssessmentFlow from './AssessmentFlow';
@@ -179,8 +180,8 @@ const LevelsContent = () => {
       {/* Animated Background with Particles */}
       <ParticleBackground />
       
-      {/* Sticky Header */}
-      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-blue-200/50 shadow-sm">
+      {/* Fixed Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-blue-200/50 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Left side - Logo and title */}
@@ -251,7 +252,8 @@ const LevelsContent = () => {
         </div>
       </header>
       
-      <div className="relative z-10 pt-8">
+      {/* Main content with top padding to account for fixed header */}
+      <div className="relative z-10 pt-32">
         {/* Roadmap Section */}
         <InteractiveRoadmap
           currentLevel={currentLevel}
