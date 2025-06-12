@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Trophy, Star, Award, Brain, Users, Sparkles, CheckCircle, Clock, TrendingUp } from 'lucide-react';
 import AssessmentFlow from './AssessmentFlow';
