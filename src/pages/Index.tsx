@@ -29,7 +29,7 @@ interface FormData {
 const Index = () => {
   const { user } = useUser();
   
-  // If user exists, show the levels content, otherwise show welcome info
+  // If user exists, show the levels content, otherwise show welcome screen
   if (user) {
     return <LevelsContent />;
   }
@@ -83,7 +83,6 @@ const WelcomeScreen = () => {
         });
         
         toast.success('Welcome back! Starting your assessment! 🚀');
-        navigate('/levels');
         return;
       }
 
@@ -111,7 +110,6 @@ const WelcomeScreen = () => {
       });
       
       toast.success('Profile created! Starting your assessment! 🚀');
-      navigate('/levels');
     } catch (error: any) {
       // Handle duplicate email error specifically
       if (error?.code === '23505' || error?.message?.includes('duplicate key')) {
@@ -128,7 +126,6 @@ const WelcomeScreen = () => {
         });
         
         toast.success('Welcome back! Starting your assessment! 🚀');
-        navigate('/levels');
       } else {
         toast.error('Failed to create profile. Please try again.');
         console.error('Form submission error:', error);
