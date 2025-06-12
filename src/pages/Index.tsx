@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { useNavigate } from 'react-router-dom';
 import ParticleBackground from '../components/ParticleBackground';
 import AssessmentFlow from '../components/AssessmentFlow';
 import ChatFlow from '../components/ChatFlow';
@@ -38,7 +37,6 @@ const Index = () => {
 };
 
 const WelcomeScreen = () => {
-  const navigate = useNavigate();
   const { setUser } = useUser();
   const { createUser, fetchUser, loading } = useAiProctoUser();
   const [formData, setFormData] = useState<FormData>({
@@ -60,7 +58,7 @@ const WelcomeScreen = () => {
     updateFormData('cv', file);
   };
 
-  const canSubmit = formData.name && formData.email && formData.phone && formData.skills && formData.experience;
+  const canSubmit = formData.email && formData.jobDescription;
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
@@ -72,7 +70,7 @@ const WelcomeScreen = () => {
       if (existingUser) {
         // User already exists, just set them in context and proceed
         setUser({
-          name: formData.name,
+          name: formData.name || 'User',
           email: formData.email,
           phone: formData.phone,
           skills: formData.skills,
@@ -89,7 +87,7 @@ const WelcomeScreen = () => {
       // User doesn't exist, create new user
       await createUser({
         email: formData.email,
-        full_name: formData.name,
+        full_name: formData.name || 'User',
         phone_number: formData.phone,
         skills: formData.skills,
         cv_file_name: formData.cv?.name,
@@ -99,7 +97,7 @@ const WelcomeScreen = () => {
       
       // Set user in context
       setUser({
-        name: formData.name,
+        name: formData.name || 'User',
         email: formData.email,
         phone: formData.phone,
         skills: formData.skills,
@@ -115,7 +113,7 @@ const WelcomeScreen = () => {
       if (error?.code === '23505' || error?.message?.includes('duplicate key')) {
         // User already exists, just proceed with the form data
         setUser({
-          name: formData.name,
+          name: formData.name || 'User',
           email: formData.email,
           phone: formData.phone,
           skills: formData.skills,
@@ -249,7 +247,7 @@ const WelcomeScreen = () => {
             <div className="space-y-6">
               <div>
                 <Label htmlFor="name" className="text-sm font-semibold text-gray-700 mb-2 block">
-                  Full Name *
+                  Full Name (Optional)
                 </Label>
                 <Input
                   id="name"
@@ -277,7 +275,7 @@ const WelcomeScreen = () => {
 
               <div>
                 <Label htmlFor="phone" className="text-sm font-semibold text-gray-700 mb-2 block">
-                  Phone Number *
+                  Phone Number (Optional)
                 </Label>
                 <Input
                   id="phone"
@@ -291,7 +289,7 @@ const WelcomeScreen = () => {
 
               <div>
                 <Label htmlFor="skills" className="text-sm font-semibold text-gray-700 mb-2 block">
-                  Skills *
+                  Skills (Optional)
                 </Label>
                 <Textarea
                   id="skills"
@@ -304,7 +302,7 @@ const WelcomeScreen = () => {
 
               <div>
                 <Label htmlFor="experience" className="text-sm font-semibold text-gray-700 mb-2 block">
-                  Experience *
+                  Experience (Optional)
                 </Label>
                 <Textarea
                   id="experience"
@@ -317,14 +315,14 @@ const WelcomeScreen = () => {
 
               <div>
                 <Label htmlFor="jobDescription" className="text-sm font-semibold text-gray-700 mb-2 block">
-                  Job Description (Optional)
+                  Job Description *
                 </Label>
                 <Textarea
                   id="jobDescription"
                   placeholder="Paste the job description you're targeting..."
                   value={formData.jobDescription}
                   onChange={(e) => updateFormData('jobDescription', e.target.value)}
-                  className="min-h-[80px] bg-white border-2 border-gray-200 focus:border-blue-400 rounded-lg resize-none"
+                  className="min-h-[100px] bg-white border-2 border-gray-200 focus:border-blue-400 rounded-lg resize-none"
                 />
               </div>
 
