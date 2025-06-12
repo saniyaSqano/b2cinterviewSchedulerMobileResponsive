@@ -125,7 +125,7 @@ const WelcomeScreen = () => {
             </div>
           </div>
 
-          <div className="relative z-10 text-white max-w-xl">
+          <div className="relative z-10 text-white max-w-xl -mt-16">
             {/* Main Title */}
             <div className="text-center mb-6">
               <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">

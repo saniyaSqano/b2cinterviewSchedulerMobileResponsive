@@ -63,32 +63,6 @@ export type Database = {
         }
         Relationships: []
       }
-      ai_procto_answer: {
-        Row: {
-          answer_id: number
-          attempt_id: number | null
-          payload: Json | null
-        }
-        Insert: {
-          answer_id?: number
-          attempt_id?: number | null
-          payload?: Json | null
-        }
-        Update: {
-          answer_id?: number
-          attempt_id?: number | null
-          payload?: Json | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "ai_procto_answer_attempt_id_fkey"
-            columns: ["attempt_id"]
-            isOneToOne: false
-            referencedRelation: "ai_procto_attempt"
-            referencedColumns: ["attempt_id"]
-          },
-        ]
-      }
       ai_procto_attempt: {
         Row: {
           attempt_id: number
