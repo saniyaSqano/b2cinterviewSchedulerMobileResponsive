@@ -176,149 +176,226 @@ const LevelsContent = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 relative overflow-hidden">
-      {/* Animated Background with Particles */}
-      <ParticleBackground />
+    <div className="min-h-screen bg-gradient-to-br from-purple-800 via-purple-700 to-purple-900 relative overflow-hidden">
+      {/* Animated geometric shapes in background */}
+      <div className="absolute top-20 right-20 w-64 h-64 bg-gradient-to-br from-green-400 to-emerald-500 rounded-3xl transform rotate-45 opacity-20"></div>
+      <div className="absolute bottom-40 right-40 w-48 h-48 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl transform -rotate-12 opacity-15"></div>
+      <div className="absolute top-1/3 right-10 w-32 h-32 bg-gradient-to-br from-green-300 to-emerald-400 rounded-xl transform rotate-12 opacity-25"></div>
       
-      {/* Fixed Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-blue-200/50 shadow-sm">
+      {/* Header Navigation */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-purple-800/90 backdrop-blur-md border-b border-purple-600/30 shadow-lg">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            {/* Left side - Logo and title */}
+            {/* Logo and Brand */}
             <div className="flex items-center space-x-4">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center">
-                <Brain className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-green-400 rounded-xl flex items-center justify-center">
+                <Brain className="w-7 h-7 text-purple-800 font-bold" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                <h1 className="text-2xl font-bold text-white">
                   ProctoVerse
                 </h1>
-                <p className="text-sm text-gray-600">AI-Powered Learning Platform</p>
+                <p className="text-sm text-purple-200">AI-Powered Learning Platform</p>
               </div>
             </div>
 
-            {/* Center - Progress indicator */}
-            <div className="hidden md:flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <Trophy className="w-5 h-5 text-blue-500" />
-                <span className="text-sm font-medium text-gray-700">
-                  Level {currentLevel + 1} of 5
-                </span>
-              </div>
-              <div className="w-px h-6 bg-gray-300"></div>
-              <div className="flex items-center space-x-2">
-                <Star className="w-5 h-5 text-yellow-500" />
-                <span className="text-sm font-medium text-gray-700">
-                  {getTotalCredits()} Credits
-                </span>
-              </div>
-            </div>
-
-            {/* Right side - User info and logout */}
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-indigo-400 rounded-full flex items-center justify-center">
-                  <User className="w-4 h-4 text-white" />
+            {/* Navigation Menu */}
+            <nav className="hidden md:flex items-center space-x-8">
+              <a href="#" className="text-purple-200 hover:text-white transition-colors text-sm font-medium">
+                Solutions
+              </a>
+              <a href="#" className="text-purple-200 hover:text-white transition-colors text-sm font-medium">
+                Resources
+              </a>
+              <a href="#" className="text-purple-200 hover:text-white transition-colors text-sm font-medium">
+                About
+              </a>
+              <div className="flex items-center space-x-4 ml-6">
+                <div className="flex items-center space-x-2">
+                  <Star className="w-4 h-4 text-yellow-400" />
+                  <span className="text-sm font-medium text-white">
+                    {getTotalCredits()} Credits
+                  </span>
                 </div>
-                <span className="text-sm font-medium text-gray-700 hidden sm:block">
-                  Welcome, {getUserDisplayName()}
-                </span>
+                <div className="w-px h-6 bg-purple-600"></div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full flex items-center justify-center">
+                    <User className="w-4 h-4 text-purple-800" />
+                  </div>
+                  <span className="text-sm font-medium text-white">
+                    {getUserDisplayName()}
+                  </span>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="p-2 text-purple-200 hover:text-white hover:bg-purple-700 rounded-lg transition-colors"
+                  title="Logout"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            </nav>
+
+            {/* Mobile menu button */}
+            <div className="md:hidden flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <Star className="w-4 h-4 text-yellow-400" />
+                <span className="text-xs text-white">{getTotalCredits()}</span>
               </div>
               <button
                 onClick={handleLogout}
-                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                title="Logout"
+                className="p-2 text-purple-200 hover:text-white rounded-lg"
               >
-                <LogOut className="w-5 h-5" />
+                <LogOut className="w-4 h-4" />
               </button>
-            </div>
-          </div>
-
-          {/* Mobile progress indicator */}
-          <div className="md:hidden mt-3 flex items-center justify-center space-x-6">
-            <div className="flex items-center space-x-2">
-              <Trophy className="w-4 h-4 text-blue-500" />
-              <span className="text-xs font-medium text-gray-700">
-                Level {currentLevel + 1}/5
-              </span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Star className="w-4 h-4 text-yellow-500" />
-              <span className="text-xs font-medium text-gray-700">
-                {getTotalCredits()} Credits
-              </span>
             </div>
           </div>
         </div>
       </header>
-      
-      {/* Main content with top padding to account for fixed header */}
-      <div className="relative z-10 pt-32">
-        {/* Roadmap Section */}
-        <InteractiveRoadmap
-          currentLevel={currentLevel}
-          completedLevels={completedLevels}
-          onStepClick={handleCardClick}
-          levelCredits={levelCredits}
-        />
 
-        {/* Achievement Section */}
-        {completedLevels.length > 0 && (
-          <div className="max-w-5xl mx-auto px-6 mt-16">
-            <div className="bg-white/80 backdrop-blur-md rounded-3xl p-8 border border-blue-200/50 shadow-lg">
-              <h3 className="text-slate-800 font-bold text-xl mb-6 flex items-center justify-center">
-                <Award className="w-6 h-6 mr-2 text-blue-500" />
+      {/* Hero Section */}
+      <div className="relative z-10 pt-32 pb-20">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h1 className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-green-400 to-emerald-400 mb-6 leading-tight">
+              AI learning made smart, secure, and seamless
+            </h1>
+            <p className="text-xl text-purple-200 mb-8 max-w-3xl mx-auto leading-relaxed">
+              Master your skills with our comprehensive AI-powered platform. Progress through levels, earn credits, and unlock your potential.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button 
+                onClick={() => handleCardClick(currentLevel)}
+                className="px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all duration-300 shadow-lg hover:shadow-xl"
+              >
+                Continue Learning
+              </button>
+              <button className="px-8 py-4 bg-transparent border-2 border-purple-400 text-purple-200 rounded-xl font-semibold hover:bg-purple-400 hover:text-purple-900 transition-all duration-300">
+                View Progress
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Progress Section */}
+      <div className="relative z-10 bg-white/5 backdrop-blur-sm border-y border-purple-600/20">
+        <div className="max-w-7xl mx-auto px-6 py-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-200 to-white mb-4">
+              A new standard in AI-powered learning
+            </h2>
+            <p className="text-lg text-purple-200 max-w-4xl mx-auto">
+              Our AI learning platform is the ideal solution for individuals and organizations seeking comprehensive, 
+              scalable, and flexible skill development. It reduces learning time, increases retention, and delivers 
+              measurable results through personalized AI guidance.
+            </p>
+          </div>
+
+          {/* Level Progress Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-purple-400/20">
+              <div className="flex items-center justify-between mb-4">
+                <Trophy className="w-8 h-8 text-yellow-400" />
+                <span className="text-sm font-medium text-purple-200">Current Level</span>
+              </div>
+              <div className="text-3xl font-bold text-white mb-2">{currentLevel + 1}</div>
+              <div className="text-sm text-purple-200">of 5 levels</div>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-purple-400/20">
+              <div className="flex items-center justify-between mb-4">
+                <CheckCircle className="w-8 h-8 text-green-400" />
+                <span className="text-sm font-medium text-purple-200">Completed</span>
+              </div>
+              <div className="text-3xl font-bold text-white mb-2">{completedLevels.length}</div>
+              <div className="text-sm text-purple-200">modules completed</div>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-purple-400/20">
+              <div className="flex items-center justify-between mb-4">
+                <Star className="w-8 h-8 text-yellow-400" />
+                <span className="text-sm font-medium text-purple-200">Credits Earned</span>
+              </div>
+              <div className="text-3xl font-bold text-white mb-2">{getTotalCredits()}</div>
+              <div className="text-sm text-purple-200">total credits</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Interactive Roadmap */}
+      <div className="relative z-10 py-20">
+        <div className="max-w-7xl mx-auto px-6">
+          <InteractiveRoadmap
+            currentLevel={currentLevel}
+            completedLevels={completedLevels}
+            onStepClick={handleCardClick}
+            levelCredits={levelCredits}
+          />
+        </div>
+      </div>
+
+      {/* Achievement Section */}
+      {completedLevels.length > 0 && (
+        <div className="relative z-10 py-20">
+          <div className="max-w-5xl mx-auto px-6">
+            <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-purple-400/20 shadow-2xl">
+              <h3 className="text-white font-bold text-2xl mb-6 flex items-center justify-center">
+                <Award className="w-6 h-6 mr-2 text-yellow-400" />
                 Achievement Overview
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {completedLevels.map((level) => (
-                  <div key={level} className="flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl px-4 py-3 border border-blue-200/50">
-                    <span className="text-slate-600 text-sm font-medium">Module {level + 1}</span>
+                  <div key={level} className="flex items-center justify-between bg-gradient-to-r from-purple-600/30 to-purple-700/30 rounded-xl px-4 py-3 border border-purple-400/20">
+                    <span className="text-purple-200 text-sm font-medium">Module {level + 1}</span>
                     <div className="flex items-center space-x-1">
-                      <Star className="w-4 h-4 text-blue-500" />
-                      <span className="text-slate-800 font-bold">{levelCredits[level as keyof typeof levelCredits]}</span>
+                      <Star className="w-4 h-4 text-yellow-400" />
+                      <span className="text-white font-bold">{levelCredits[level as keyof typeof levelCredits]}</span>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Footer CTA */}
-        <div className="text-center mt-20 pb-16">
-          <div className="max-w-5xl mx-auto bg-white/80 backdrop-blur-md rounded-3xl p-12 border border-blue-200/50 shadow-lg">
+      {/* Footer CTA */}
+      <div className="relative z-10 py-20">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="bg-white/10 backdrop-blur-md rounded-3xl p-12 border border-purple-400/20 shadow-2xl text-center">
             <div className="flex items-center justify-center mb-6">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mr-4 animate-spin-slow">
-                <Sparkles className="w-8 h-8 text-white" />
+              <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-green-400 rounded-2xl flex items-center justify-center mr-4 animate-spin-slow">
+                <Sparkles className="w-8 h-8 text-purple-800" />
               </div>
               <div className="text-left">
-                <h3 className="text-2xl font-bold text-slate-800">Continue Your Journey</h3>
-                <p className="text-slate-600">Unlock your potential with AI-powered learning</p>
+                <h3 className="text-2xl font-bold text-white">Continue Your Journey</h3>
+                <p className="text-purple-200">Unlock your potential with AI-powered learning</p>
               </div>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
               <div className="text-center">
-                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3 animate-pulse">
-                  <CheckCircle className="w-6 h-6 text-green-600" />
+                <div className="w-12 h-12 bg-green-400/20 rounded-xl flex items-center justify-center mx-auto mb-3 animate-pulse">
+                  <CheckCircle className="w-6 h-6 text-green-400" />
                 </div>
-                <div className="font-semibold text-slate-800 mb-1">Certified Training</div>
-                <div className="text-sm text-slate-600">Industry-recognized certifications</div>
+                <div className="font-semibold text-white mb-1">Certified Training</div>
+                <div className="text-sm text-purple-200">Industry-recognized certifications</div>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3 animate-bounce-subtle">
-                  <Brain className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 bg-blue-400/20 rounded-xl flex items-center justify-center mx-auto mb-3 animate-bounce-subtle">
+                  <Brain className="w-6 h-6 text-blue-400" />
                 </div>
-                <div className="font-semibold text-slate-800 mb-1">AI-Powered Learning</div>
-                <div className="text-sm text-slate-600">Personalized feedback and guidance</div>
+                <div className="font-semibold text-white mb-1">AI-Powered Learning</div>
+                <div className="text-sm text-purple-200">Personalized feedback and guidance</div>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mx-auto mb-3 animate-wiggle">
-                  <TrendingUp className="w-6 h-6 text-indigo-600" />
+                <div className="w-12 h-12 bg-yellow-400/20 rounded-xl flex items-center justify-center mx-auto mb-3 animate-wiggle">
+                  <TrendingUp className="w-6 h-6 text-yellow-400" />
                 </div>
-                <div className="font-semibold text-slate-800 mb-1">Career Growth</div>
-                <div className="text-sm text-slate-600">Proven results and outcomes</div>
+                <div className="font-semibold text-white mb-1">Career Growth</div>
+                <div className="text-sm text-purple-200">Proven results and outcomes</div>
               </div>
             </div>
           </div>
