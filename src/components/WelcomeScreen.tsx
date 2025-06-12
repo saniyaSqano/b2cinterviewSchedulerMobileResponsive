@@ -68,7 +68,7 @@ const WelcomeScreen = () => {
       });
       
       toast.success('Profile created! Starting your assessment! 🚀');
-      navigate('/levels');
+      navigate('/freeassessment');
     } catch (error: any) {
       toast.error('Failed to create profile. Please try again.');
       console.error('Form submission error:', error);

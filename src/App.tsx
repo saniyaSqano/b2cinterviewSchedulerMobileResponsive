@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { UserProvider } from "./contexts/UserContext";
 import WelcomeScreen from "./components/WelcomeScreen";
+import FreeAssessment from "./components/FreeAssessment";
 import LevelsContent from "./components/LevelsContent";
 import NotFound from "./pages/NotFound";
 
@@ -22,6 +23,7 @@ const App: React.FC = () => (
           <Routes>
             <Route path="/" element={<Navigate to="/user" replace />} />
             <Route path="/user" element={<WelcomeScreen />} />
+            <Route path="/freeassessment" element={<FreeAssessment />} />
             <Route path="/levels" element={<LevelsContent />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
