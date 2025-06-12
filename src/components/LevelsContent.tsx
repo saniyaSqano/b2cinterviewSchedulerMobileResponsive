@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Trophy, Star, Award, Brain, Users, Sparkles, CheckCircle, Clock, TrendingUp } from 'lucide-react';
 import AssessmentFlow from './AssessmentFlow';
@@ -5,7 +6,6 @@ import ChatFlow from './ChatFlow';
 import Level3Flow from './Level3Flow';
 import Level4Flow from './Level4Flow';
 import GamethonFlow from './GamethonFlow';
-import InteractiveRoadmap from './InteractiveRoadmap';
 import ParticleBackground from './ParticleBackground';
 import { useUser } from '../contexts/UserContext';
 
@@ -205,23 +205,6 @@ const LevelsContent = () => {
           <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed mb-10">
             Continue your journey through our structured learning path designed to master professional skills
           </p>
-        </div>
-
-        {/* Roadmap Section */}
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold text-slate-800 mb-4">Your Learning Roadmap</h3>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Progress through each level to unlock new challenges and build expertise
-            </p>
-          </div>
-          
-          <InteractiveRoadmap
-            currentLevel={currentLevel}
-            completedLevels={completedLevels}
-            onStepClick={handleCardClick}
-            levelCredits={levelCredits}
-          />
         </div>
 
         {/* Achievement Section */}
