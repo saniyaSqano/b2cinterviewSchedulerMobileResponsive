@@ -104,8 +104,8 @@ const WelcomeScreen = () => {
         </div>
       </header>
 
-      {/* Main Content - Fixed Height */}
-      <div className="flex h-[calc(100vh-3.5rem)]">
+      {/* Main Content */}
+      <div className="flex min-h-[calc(100vh-3.5rem)]">
         {/* Left Side - Enhanced ProctoVerse Information */}
         <div className="flex-1 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 relative overflow-hidden flex items-center justify-center p-6">
           {/* Background Elements */}
