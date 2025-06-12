@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Lightbulb, Clock, CheckCircle } from 'lucide-react';
 import { Button } from './ui/button';
@@ -26,19 +27,45 @@ const MCQTest: React.FC<MCQTestProps> = ({ totalQuestions, timeFrame, onBack, on
   const [timeRemaining, setTimeRemaining] = useState(timeFrame * 60);
   const [isComplete, setIsComplete] = useState(false);
 
-  // Sample MCQ questions - in a real app, these would come from an API
-  const questions: MCQQuestion[] = Array.from({ length: totalQuestions }, (_, index) => ({
-    id: index + 1,
-    question: `What is the output of the following JavaScript code snippet? (Question ${index + 1})`,
-    options: [
-      'undefined',
-      'null',
-      'ReferenceError',
-      '0'
-    ],
-    hint: 'Think about how JavaScript handles variable declarations and scope.',
-    correctAnswer: 2
-  }));
+  // 3 sample technical questions
+  const questions: MCQQuestion[] = [
+    {
+      id: 1,
+      question: "What is the time complexity of searching for an element in a balanced binary search tree?",
+      options: [
+        "O(n)",
+        "O(log n)", 
+        "O(n log n)",
+        "O(1)"
+      ],
+      hint: "Think about how you traverse a balanced tree by eliminating half the nodes at each step.",
+      correctAnswer: 1
+    },
+    {
+      id: 2,
+      question: "Which of the following is NOT a principle of Object-Oriented Programming?",
+      options: [
+        "Encapsulation",
+        "Inheritance",
+        "Recursion",
+        "Polymorphism"
+      ],
+      hint: "Consider which concept is more related to algorithm design rather than OOP structure.",
+      correctAnswer: 2
+    },
+    {
+      id: 3,
+      question: "In JavaScript, what will be the output of: console.log(typeof null)?",
+      options: [
+        "null",
+        "undefined",
+        "object",
+        "boolean"
+      ],
+      hint: "This is a well-known quirk in JavaScript's type system that has historical reasons.",
+      correctAnswer: 2
+    }
+  ];
 
   // Timer effect
   useEffect(() => {

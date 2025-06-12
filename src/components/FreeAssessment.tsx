@@ -9,7 +9,7 @@ const FreeAssessment = () => {
   const navigate = useNavigate();
 
   const handleBeginQuiz = () => {
-    navigate('/levels');
+    navigate('/mcq-test');
   };
 
   return (

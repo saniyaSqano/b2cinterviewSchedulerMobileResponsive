@@ -9,6 +9,7 @@ import { UserProvider } from "./contexts/UserContext";
 import WelcomeScreen from "./components/WelcomeScreen";
 import FreeAssessment from "./components/FreeAssessment";
 import LevelsContent from "./components/LevelsContent";
+import MCQTestPage from "./components/MCQTestPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App: React.FC = () => (
             <Route path="/" element={<Navigate to="/user" replace />} />
             <Route path="/user" element={<WelcomeScreen />} />
             <Route path="/freeassessment" element={<FreeAssessment />} />
+            <Route path="/mcq-test" element={<MCQTestPage />} />
             <Route path="/levels" element={<LevelsContent />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
