@@ -1,6 +1,5 @@
-
 import React, { useState } from 'react';
-import { Trophy, Star, Award, Brain, Users, Sparkles, CheckCircle, Clock, TrendingUp } from 'lucide-react';
+import { Trophy, Star, Award, Brain, Users, Sparkles, CheckCircle, Clock, TrendingUp, User, LogOut } from 'lucide-react';
 import AssessmentFlow from './AssessmentFlow';
 import ChatFlow from './ChatFlow';
 import Level3Flow from './Level3Flow';
@@ -180,7 +179,79 @@ const LevelsContent = () => {
       {/* Animated Background with Particles */}
       <ParticleBackground />
       
-      <div className="relative z-10">
+      {/* Sticky Header */}
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-blue-200/50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            {/* Left side - Logo and title */}
+            <div className="flex items-center space-x-4">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center">
+                <Brain className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                  ProctoVerse
+                </h1>
+                <p className="text-sm text-gray-600">AI-Powered Learning Platform</p>
+              </div>
+            </div>
+
+            {/* Center - Progress indicator */}
+            <div className="hidden md:flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <Trophy className="w-5 h-5 text-blue-500" />
+                <span className="text-sm font-medium text-gray-700">
+                  Level {currentLevel + 1} of 5
+                </span>
+              </div>
+              <div className="w-px h-6 bg-gray-300"></div>
+              <div className="flex items-center space-x-2">
+                <Star className="w-5 h-5 text-yellow-500" />
+                <span className="text-sm font-medium text-gray-700">
+                  {getTotalCredits()} Credits
+                </span>
+              </div>
+            </div>
+
+            {/* Right side - User info and logout */}
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-purple-400 to-indigo-400 rounded-full flex items-center justify-center">
+                  <User className="w-4 h-4 text-white" />
+                </div>
+                <span className="text-sm font-medium text-gray-700 hidden sm:block">
+                  Welcome, {getUserDisplayName()}
+                </span>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                title="Logout"
+              >
+                <LogOut className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile progress indicator */}
+          <div className="md:hidden mt-3 flex items-center justify-center space-x-6">
+            <div className="flex items-center space-x-2">
+              <Trophy className="w-4 h-4 text-blue-500" />
+              <span className="text-xs font-medium text-gray-700">
+                Level {currentLevel + 1}/5
+              </span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Star className="w-4 h-4 text-yellow-500" />
+              <span className="text-xs font-medium text-gray-700">
+                {getTotalCredits()} Credits
+              </span>
+            </div>
+          </div>
+        </div>
+      </header>
+      
+      <div className="relative z-10 pt-8">
         {/* Roadmap Section */}
         <InteractiveRoadmap
           currentLevel={currentLevel}
