@@ -180,20 +180,6 @@ const LevelsContent = () => {
       <ParticleBackground />
       
       {/* Header Section */}
-      <div className="relative z-10">
-        <div className="max-w-6xl mx-auto px-6 pt-12 pb-8 text-center">
-          <div className="mb-8">
-            <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight">
-              <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 bg-clip-text text-transparent animate-shimmer">
-                ProctoVerse
-              </span>
-            </h1>
-            <div className="inline-flex items-center px-6 py-3 bg-white/80 backdrop-blur-md rounded-full text-slate-700 text-sm font-medium border border-blue-200/50 shadow-lg">
-              <Brain className="w-4 h-4 mr-2 text-blue-500" />
-              Your Professional Journey
-            </div>
-          </div>
-        </div>
 
         {/* Roadmap Section */}
         <InteractiveRoadmap
