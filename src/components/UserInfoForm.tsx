@@ -60,39 +60,19 @@ const UserInfoForm: React.FC = () => {
     } else {
       // Handle form submission and redirect to assessment
       try {
-        // First try to fetch existing user
-        const existingUser = await fetchUser(formData.email);
-        
-        if (existingUser) {
-          // User already exists, just set them in context and proceed
-          setUser({
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            skills: formData.skills,
-            experience: formData.experience,
-            jobDescription: formData.jobDescription,
-            experienceLevel: formData.experienceLevel[0],
-            confidenceLevel: formData.confidenceLevel[0]
-          });
-          
-          toast.success('Welcome back! Starting your free assessment! 🚀');
-          navigate('/levels');
-          return;
-        }
-
-        // User doesn't exist, create new user
-        await createUser({
-          email: formData.email,
-          full_name: formData.name,
-          phone_number: formData.phone,
-          skills: formData.skills,
+        // Create procto user data (only the fields that belong to ai_procto_user table)
+        const proctoUserData = {
+          technical_skills: formData.skills,
+          experience: formData.experience,
+          target_job_description: formData.jobDescription,
           cv_file_name: formData.cv?.name,
-          job_description: formData.jobDescription,
-          policies_accepted: true
-        });
+          // TODO: Upload CV file to storage and get URL
+          cv_file_url: null
+        };
+
+        await createUser(proctoUserData);
         
-        // Set user in context
+        // Set user in context for the assessment
         setUser({
           name: formData.name,
           email: formData.email,
@@ -107,7 +87,7 @@ const UserInfoForm: React.FC = () => {
         toast.success('Profile created! Starting your free assessment! 🚀');
         navigate('/levels');
       } catch (error: any) {
-        // Handle duplicate email error specifically
+        // Handle errors gracefully
         if (error?.code === '23505' || error?.message?.includes('duplicate key')) {
           // User already exists, just proceed with the form data
           setUser({

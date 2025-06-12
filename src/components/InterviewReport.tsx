@@ -55,57 +55,39 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
     skills: 'Python, Javascript',
     experience: '10+'
   };
+  
   // Using hardcoded data, no need to retrieve from localStorage
   const [storedUserData, setStoredUserData] = useState<{email: string, fullName: string}>({ 
     email: 'adi@sqano.com', 
     fullName: 'Aditya Joshi' 
   });
   
-  // No need for localStorage effect as we're using hardcoded data
   // Report states
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [uploadUrl, setUploadUrl] = useState<string | null>(null);
   
-  // Function to save report URL to Supabase
+  // Function to save report URL to database (simplified for ai_procto_user table)
   const saveReportToDatabase = async (reportUrl: string, reportType: string) => {
     try {
-      // Use stored user data if available, otherwise fall back to candidateDetails
-      const email = storedUserData?.email || candidateDetails.email;
-      const fullName = storedUserData?.fullName || candidateDetails.fullName;
+      // Get the current authenticated user
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) {
+        throw new Error('User must be authenticated to save report');
+      }
       
       console.log('Saving report to database...', { 
         reportUrl, 
         reportType, 
-        email, 
-        fullName
+        userId: authUser.id
       });
       
-      if (!email) {
-        throw new Error('Cannot save report: No email address provided');
-      }
-      
-      // Map report type to column name
-      const columnMap: Record<string, string> = {
-        'ai_proctor': 'ai_proctor_report',
-        'pitch_perfect': 'pitch_perfect_report',
-        'assessment': 'assessment_report',
-        'self_practice': 'self_practice_report'
-      };
-      
-      const columnName = columnMap[reportType];
-      console.log('Column mapping details:', { reportType, mappedColumn: columnName });
-      
-      if (!columnName) {
-        throw new Error(`Unknown report type: ${reportType}`);
-      }
-      
-      // Check if the user exists by email
+      // Check if the user has a procto record
       const { data: existingUser, error: fetchError } = await supabase
         .from('ai_procto_user')
         .select('*')
-        .eq('email', email)
+        .eq('user_id', authUser.id)
         .single();
         
       if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 is 'not found'
@@ -116,30 +98,18 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
       let result;
       
       if (!existingUser) {
-        // User doesn't exist, create a new user with the report URL
-        console.log('User not found, creating new user with report...');
-        
-        // No need to generate a user_id anymore since we're using email as the primary identifier
-        console.log('Creating new user with email:', email);
-        
-        console.log('Creating new user with report data:', {
-          email,
-          columnName,
-          reportUrl,
-          dynamicInsert: { [columnName]: reportUrl }
-        });
-        
-        // No longer need to generate a user_id as it's been removed from the database schema
+        // User doesn't exist, create a new user with minimal data
+        console.log('User not found, creating new procto user...');
         
         const userData = {
-          email: email,
-          full_name: fullName,
-          policies_accepted: true,
-          [columnName]: reportUrl,
-          created_at: new Date().toISOString()
+          user_id: authUser.id,
+          technical_skills: 'Report Generated',
+          experience: 'See attached report',
+          target_job_description: 'Various roles',
+          cv_file_url: reportUrl // Store report URL in cv_file_url for now
         };
         
-        console.log('Full user data being inserted:', userData);
+        console.log('Creating procto user with report data:', userData);
         
         const { data, error } = await supabase
           .from('ai_procto_user')
@@ -148,31 +118,23 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
           .single();
           
         if (error) {
-          console.error('Error creating user with report:', error);
+          console.error('Error creating procto user with report:', error);
           throw error;
         }
         
         result = data;
       } else {
-        // If user exists, update the report URL
+        // If user exists, update the CV URL with the report
         console.log('User found, updating with report URL...');
         
-        // Create an update query using email as the identifier
-        console.log('Updating user record with:', {
-          email,
-          columnName,
-          reportUrl,
-          dynamicUpdate: { [columnName]: reportUrl }
-        });
-        
-        let updateQuery = supabase
+        const { data, error } = await supabase
           .from('ai_procto_user')
           .update({
-            [columnName]: reportUrl
+            cv_file_url: reportUrl // Store report URL in cv_file_url
           })
-          .eq('email', email);
-        
-        const { data, error } = await updateQuery.select().single();
+          .eq('user_id', authUser.id)
+          .select()
+          .single();
         
         if (error) {
           console.error('Error updating user with report:', error);
@@ -303,8 +265,6 @@ const InterviewReport: React.FC<InterviewReportProps> = ({
       // Save the report URL to the database
       try {
         console.log(`Attempting to save ${reportType} report to database with URL:`, s3Url);
-        console.log('Report type:', reportType);
-        console.log('Column mapping:', reportType === 'pitch_perfect' ? 'pitch_perfect_report' : 'other column');
         
         const savedData = await saveReportToDatabase(s3Url, reportType);
         
