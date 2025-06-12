@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Brain, Star, Users, CheckCircle, Trophy, Sparkles, TrendingUp } from 'lucide-react';
 import UserInfoForm from './UserInfoForm';
@@ -9,7 +8,7 @@ const WelcomeScreen = () => {
   const { user } = useUser();
 
   if (showForm) {
-    return <UserInfoForm onBack={() => setShowForm(false)} />;
+    return <UserInfoForm />;
   }
 
   return (
