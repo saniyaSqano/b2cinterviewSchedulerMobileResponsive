@@ -3,36 +3,33 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../integrations/supabase/client';
 
 interface AiProctoUser {
-  user_id: number;
-  email: string;
-  full_name?: string;
-  phone_number?: string;
-  skills?: string;
+  id: string;
+  user_id: string;
+  technical_skills?: string;
+  experience?: string;
+  target_job_description?: string;
   cv_file_name?: string;
   cv_file_url?: string;
-  job_description?: string;
-  policies_accepted: boolean;
   created_at: string;
+  updated_at: string;
 }
 
 interface CreateUserData {
-  email: string;
-  full_name?: string;
-  phone_number?: string;
-  skills?: string;
+  technical_skills?: string;
+  experience?: string;
+  target_job_description?: string;
   cv_file_name?: string;
   cv_file_url?: string;
-  job_description?: string;
-  policies_accepted?: boolean;
 }
 
-export const useAiProctoUser = (email?: string) => {
+export const useAiProctoUser = (userId?: string) => {
   const [user, setUser] = useState<AiProctoUser | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchUser = async (userEmail: string) => {
-    if (!userEmail) return;
+  const fetchUser = async (targetUserId?: string) => {
+    const userIdToFetch = targetUserId || userId;
+    if (!userIdToFetch) return;
     
     setLoading(true);
     setError(null);
@@ -41,7 +38,7 @@ export const useAiProctoUser = (email?: string) => {
       const { data, error } = await supabase
         .from('ai_procto_user')
         .select('*')
-        .eq('email', userEmail)
+        .eq('user_id', userIdToFetch)
         .single();
 
       if (error) {
@@ -70,10 +67,16 @@ export const useAiProctoUser = (email?: string) => {
     setError(null);
     
     try {
+      // Get the current authenticated user
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) {
+        throw new Error('User must be authenticated');
+      }
+
       console.log('Creating user with data:', userData);
       
       // First try to fetch existing user
-      const existingUser = await fetchUser(userData.email);
+      const existingUser = await fetchUser(authUser.id);
       if (existingUser) {
         console.log('User already exists:', existingUser);
         setUser(existingUser);
@@ -82,7 +85,7 @@ export const useAiProctoUser = (email?: string) => {
       
       const userDataForInsert = { 
         ...userData, 
-        policies_accepted: userData.policies_accepted ?? true
+        user_id: authUser.id
       };
       
       console.log('Sending to Supabase:', userDataForInsert);
@@ -97,7 +100,7 @@ export const useAiProctoUser = (email?: string) => {
         // Handle duplicate key error gracefully
         if (error.code === '23505') {
           console.log('User already exists, fetching existing user');
-          const existingUser = await fetchUser(userData.email);
+          const existingUser = await fetchUser(authUser.id);
           if (existingUser) {
             setUser(existingUser);
             return existingUser;
@@ -125,15 +128,21 @@ export const useAiProctoUser = (email?: string) => {
     }
   };
 
-  const updateUser = async (userEmail: string, updateData: Partial<CreateUserData>) => {
+  const updateUser = async (updateData: Partial<CreateUserData>) => {
     setLoading(true);
     setError(null);
     
     try {
+      // Get the current authenticated user
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (!authUser) {
+        throw new Error('User must be authenticated');
+      }
+
       const { data, error } = await supabase
         .from('ai_procto_user')
         .update(updateData)
-        .eq('email', userEmail)
+        .eq('user_id', authUser.id)
         .select()
         .single();
 
@@ -151,10 +160,10 @@ export const useAiProctoUser = (email?: string) => {
   };
 
   useEffect(() => {
-    if (email) {
-      fetchUser(email);
+    if (userId) {
+      fetchUser(userId);
     }
-  }, [email]);
+  }, [userId]);
 
   return {
     user,
@@ -163,6 +172,6 @@ export const useAiProctoUser = (email?: string) => {
     fetchUser,
     createUser,
     updateUser,
-    refetch: () => email && fetchUser(email)
+    refetch: () => userId && fetchUser(userId)
   };
 };

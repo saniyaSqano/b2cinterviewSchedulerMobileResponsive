@@ -63,186 +63,47 @@ export type Database = {
         }
         Relationships: []
       }
-      ai_procto_attempt: {
-        Row: {
-          attempt_id: number
-          attempt_no: number | null
-          created_at: string | null
-          passed: boolean | null
-          score_num: number | null
-          session_id: number | null
-          stage_id: number | null
-        }
-        Insert: {
-          attempt_id?: number
-          attempt_no?: number | null
-          created_at?: string | null
-          passed?: boolean | null
-          score_num?: number | null
-          session_id?: number | null
-          stage_id?: number | null
-        }
-        Update: {
-          attempt_id?: number
-          attempt_no?: number | null
-          created_at?: string | null
-          passed?: boolean | null
-          score_num?: number | null
-          session_id?: number | null
-          stage_id?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "ai_procto_attempt_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "ai_procto_session"
-            referencedColumns: ["session_id"]
-          },
-          {
-            foreignKeyName: "ai_procto_attempt_stage_id_fkey"
-            columns: ["stage_id"]
-            isOneToOne: false
-            referencedRelation: "ai_procto_stage"
-            referencedColumns: ["stage_id"]
-          },
-        ]
-      }
-      ai_procto_report: {
-        Row: {
-          attempt_id: number | null
-          created_at: string | null
-          report_id: number
-          report_json: Json | null
-        }
-        Insert: {
-          attempt_id?: number | null
-          created_at?: string | null
-          report_id?: number
-          report_json?: Json | null
-        }
-        Update: {
-          attempt_id?: number | null
-          created_at?: string | null
-          report_id?: number
-          report_json?: Json | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "ai_procto_report_attempt_id_fkey"
-            columns: ["attempt_id"]
-            isOneToOne: false
-            referencedRelation: "ai_procto_attempt"
-            referencedColumns: ["attempt_id"]
-          },
-        ]
-      }
-      ai_procto_session: {
-        Row: {
-          session_id: number
-          started_at: string | null
-          user_id: number | null
-        }
-        Insert: {
-          session_id?: number
-          started_at?: string | null
-          user_id?: number | null
-        }
-        Update: {
-          session_id?: number
-          started_at?: string | null
-          user_id?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "ai_procto_session_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "ai_procto_user"
-            referencedColumns: ["user_id"]
-          },
-        ]
-      }
-      ai_procto_stage: {
-        Row: {
-          code: string
-          coins: number
-          label: string
-          stage_id: number
-        }
-        Insert: {
-          code: string
-          coins: number
-          label: string
-          stage_id: number
-        }
-        Update: {
-          code?: string
-          coins?: number
-          label?: string
-          stage_id?: number
-        }
-        Relationships: []
-      }
       ai_procto_user: {
         Row: {
-          created_at: string | null
+          created_at: string
           cv_file_name: string | null
           cv_file_url: string | null
-          email: string
-          full_name: string | null
-          job_description: string | null
-          phone_number: string | null
-          policies_accepted: boolean | null
-          skills: string | null
-          user_id: number
+          experience: string | null
+          id: string
+          target_job_description: string | null
+          technical_skills: string | null
+          updated_at: string
+          user_id: string
         }
         Insert: {
-          created_at?: string | null
+          created_at?: string
           cv_file_name?: string | null
           cv_file_url?: string | null
-          email: string
-          full_name?: string | null
-          job_description?: string | null
-          phone_number?: string | null
-          policies_accepted?: boolean | null
-          skills?: string | null
-          user_id?: number
+          experience?: string | null
+          id?: string
+          target_job_description?: string | null
+          technical_skills?: string | null
+          updated_at?: string
+          user_id: string
         }
         Update: {
-          created_at?: string | null
+          created_at?: string
           cv_file_name?: string | null
           cv_file_url?: string | null
-          email?: string
-          full_name?: string | null
-          job_description?: string | null
-          phone_number?: string | null
-          policies_accepted?: boolean | null
-          skills?: string | null
-          user_id?: number
-        }
-        Relationships: []
-      }
-      ai_procto_wallet: {
-        Row: {
-          balance: number | null
-          user_id: number
-        }
-        Insert: {
-          balance?: number | null
-          user_id: number
-        }
-        Update: {
-          balance?: number | null
-          user_id?: number
+          experience?: string | null
+          id?: string
+          target_job_description?: string | null
+          technical_skills?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "ai_procto_wallet_user_id_fkey"
+            foreignKeyName: "ai_procto_user_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: true
-            referencedRelation: "ai_procto_user"
-            referencedColumns: ["user_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
           },
         ]
       }

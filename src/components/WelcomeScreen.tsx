@@ -11,10 +11,10 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
 interface FormData {
-  skills: string;
+  technical_skills: string;
   experience: string;
   cv: File | null;
-  jobDescription: string;
+  target_job_description: string;
 }
 
 const WelcomeScreen = () => {
@@ -22,10 +22,10 @@ const WelcomeScreen = () => {
   const { setUser } = useUser();
   const { createUser, fetchUser, loading } = useAiProctoUser();
   const [formData, setFormData] = useState<FormData>({
-    skills: '',
+    technical_skills: '',
     experience: '',
     cv: null,
-    jobDescription: ''
+    target_job_description: ''
   });
 
   const updateFormData = (field: keyof FormData, value: string | File | null) => {
@@ -37,23 +37,32 @@ const WelcomeScreen = () => {
     updateFormData('cv', file);
   };
 
-  const canSubmit = formData.jobDescription.trim().length > 0;
+  const canSubmit = formData.target_job_description.trim().length > 0;
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
 
     try {
-      // Generate a unique email for anonymous users
-      const anonymousEmail = `user_${Date.now()}@proctoverse.ai`;
+      // Create the procto user record with the form data
+      const proctoUserData = {
+        technical_skills: formData.technical_skills,
+        experience: formData.experience,
+        target_job_description: formData.target_job_description,
+        cv_file_name: formData.cv?.name || null,
+        // TODO: Upload CV file to storage and get URL
+        cv_file_url: null
+      };
+
+      await createUser(proctoUserData);
       
-      // Set user in context with anonymous data
+      // Set user in context for the assessment
       setUser({
         name: 'User',
-        email: anonymousEmail,
+        email: 'user@proctoverse.ai',
         phone: '',
-        skills: formData.skills,
+        skills: formData.technical_skills,
         experience: formData.experience,
-        jobDescription: formData.jobDescription,
+        jobDescription: formData.target_job_description,
         experienceLevel: 3,
         confidenceLevel: 5
       });
@@ -243,8 +252,8 @@ const WelcomeScreen = () => {
                   <Textarea
                     id="skills"
                     placeholder="e.g., React, Node.js, Python, AWS..."
-                    value={formData.skills}
-                    onChange={(e) => updateFormData('skills', e.target.value)}
+                    value={formData.technical_skills}
+                    onChange={(e) => updateFormData('technical_skills', e.target.value)}
                     className="min-h-[80px] bg-white border-2 border-gray-200 focus:border-blue-500 rounded-lg resize-none text-gray-700"
                   />
                 </div>
@@ -271,8 +280,8 @@ const WelcomeScreen = () => {
                   <Textarea
                     id="jobDescription"
                     placeholder="Paste the job description or describe your target role..."
-                    value={formData.jobDescription}
-                    onChange={(e) => updateFormData('jobDescription', e.target.value)}
+                    value={formData.target_job_description}
+                    onChange={(e) => updateFormData('target_job_description', e.target.value)}
                     className="min-h-[100px] bg-white border-2 border-gray-200 focus:border-green-500 rounded-lg resize-none text-gray-700"
                   />
                 </div>
