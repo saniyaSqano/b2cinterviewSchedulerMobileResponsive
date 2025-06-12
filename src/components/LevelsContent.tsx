@@ -176,59 +176,59 @@ const LevelsContent = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-800 via-purple-700 to-purple-900 relative overflow-hidden">
-      {/* Animated geometric shapes in background */}
-      <div className="absolute top-20 right-20 w-64 h-64 bg-gradient-to-br from-green-400 to-emerald-500 rounded-3xl transform rotate-45 opacity-20"></div>
-      <div className="absolute bottom-40 right-40 w-48 h-48 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl transform -rotate-12 opacity-15"></div>
-      <div className="absolute top-1/3 right-10 w-32 h-32 bg-gradient-to-br from-green-300 to-emerald-400 rounded-xl transform rotate-12 opacity-25"></div>
+    <div className="min-h-screen bg-gray-50 relative overflow-hidden">
+      {/* Subtle background elements */}
+      <div className="absolute top-20 right-20 w-64 h-64 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-3xl transform rotate-45 opacity-30"></div>
+      <div className="absolute bottom-40 right-40 w-48 h-48 bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl transform -rotate-12 opacity-20"></div>
+      <div className="absolute top-1/3 right-10 w-32 h-32 bg-gradient-to-br from-purple-100 to-blue-100 rounded-xl transform rotate-12 opacity-25"></div>
       
       {/* Header Navigation */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-purple-800/90 backdrop-blur-md border-b border-purple-600/30 shadow-lg">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Logo and Brand */}
             <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-green-400 rounded-xl flex items-center justify-center">
-                <Brain className="w-7 h-7 text-purple-800 font-bold" />
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                <Brain className="w-7 h-7 text-white font-bold" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-white">
+                <h1 className="text-2xl font-bold text-gray-900">
                   ProctoVerse
                 </h1>
-                <p className="text-sm text-purple-200">AI-Powered Learning Platform</p>
+                <p className="text-sm text-gray-600">AI-Powered Learning Platform</p>
               </div>
             </div>
 
             {/* Navigation Menu */}
             <nav className="hidden md:flex items-center space-x-8">
-              <a href="#" className="text-purple-200 hover:text-white transition-colors text-sm font-medium">
+              <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium">
                 Solutions
               </a>
-              <a href="#" className="text-purple-200 hover:text-white transition-colors text-sm font-medium">
+              <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium">
                 Resources
               </a>
-              <a href="#" className="text-purple-200 hover:text-white transition-colors text-sm font-medium">
+              <a href="#" className="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium">
                 About
               </a>
               <div className="flex items-center space-x-4 ml-6">
                 <div className="flex items-center space-x-2">
-                  <Star className="w-4 h-4 text-yellow-400" />
-                  <span className="text-sm font-medium text-white">
+                  <Star className="w-4 h-4 text-yellow-500" />
+                  <span className="text-sm font-medium text-gray-900">
                     {getTotalCredits()} Credits
                   </span>
                 </div>
-                <div className="w-px h-6 bg-purple-600"></div>
+                <div className="w-px h-6 bg-gray-300"></div>
                 <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full flex items-center justify-center">
-                    <User className="w-4 h-4 text-purple-800" />
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                    <User className="w-4 h-4 text-white" />
                   </div>
-                  <span className="text-sm font-medium text-white">
+                  <span className="text-sm font-medium text-gray-900">
                     {getUserDisplayName()}
                   </span>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="p-2 text-purple-200 hover:text-white hover:bg-purple-700 rounded-lg transition-colors"
+                  className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
                   title="Logout"
                 >
                   <LogOut className="w-4 h-4" />
@@ -239,12 +239,12 @@ const LevelsContent = () => {
             {/* Mobile menu button */}
             <div className="md:hidden flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <Star className="w-4 h-4 text-yellow-400" />
-                <span className="text-xs text-white">{getTotalCredits()}</span>
+                <Star className="w-4 h-4 text-yellow-500" />
+                <span className="text-xs text-gray-900">{getTotalCredits()}</span>
               </div>
               <button
                 onClick={handleLogout}
-                className="p-2 text-purple-200 hover:text-white rounded-lg"
+                className="p-2 text-gray-600 hover:text-gray-900 rounded-lg"
               >
                 <LogOut className="w-4 h-4" />
               </button>
@@ -257,20 +257,20 @@ const LevelsContent = () => {
       <div className="relative z-10 pt-32 pb-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h1 className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-green-400 to-emerald-400 mb-6 leading-tight">
+            <h1 className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 mb-6 leading-tight">
               AI learning made smart, secure, and seamless
             </h1>
-            <p className="text-xl text-purple-200 mb-8 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
               Master your skills with our comprehensive AI-powered platform. Progress through levels, earn credits, and unlock your potential.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button 
                 onClick={() => handleCardClick(currentLevel)}
-                className="px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-purple-800 transition-all duration-300 shadow-lg hover:shadow-xl"
+                className="px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl"
               >
                 Continue Learning
               </button>
-              <button className="px-8 py-4 bg-transparent border-2 border-purple-400 text-purple-200 rounded-xl font-semibold hover:bg-purple-400 hover:text-purple-900 transition-all duration-300">
+              <button className="px-8 py-4 bg-transparent border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-100 hover:border-gray-400 transition-all duration-300">
                 View Progress
               </button>
             </div>
@@ -279,13 +279,13 @@ const LevelsContent = () => {
       </div>
 
       {/* Progress Section */}
-      <div className="relative z-10 bg-white/5 backdrop-blur-sm border-y border-purple-600/20">
+      <div className="relative z-10 bg-white/80 backdrop-blur-sm border-y border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-16">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-200 to-white mb-4">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
               A new standard in AI-powered learning
             </h2>
-            <p className="text-lg text-purple-200 max-w-4xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-4xl mx-auto">
               Our AI learning platform is the ideal solution for individuals and organizations seeking comprehensive, 
               scalable, and flexible skill development. It reduces learning time, increases retention, and delivers 
               measurable results through personalized AI guidance.
@@ -294,31 +294,31 @@ const LevelsContent = () => {
 
           {/* Level Progress Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-purple-400/20">
+            <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-gray-200 shadow-sm">
               <div className="flex items-center justify-between mb-4">
-                <Trophy className="w-8 h-8 text-yellow-400" />
-                <span className="text-sm font-medium text-purple-200">Current Level</span>
+                <Trophy className="w-8 h-8 text-yellow-500" />
+                <span className="text-sm font-medium text-gray-600">Current Level</span>
               </div>
-              <div className="text-3xl font-bold text-white mb-2">{currentLevel + 1}</div>
-              <div className="text-sm text-purple-200">of 5 levels</div>
+              <div className="text-3xl font-bold text-gray-900 mb-2">{currentLevel + 1}</div>
+              <div className="text-sm text-gray-600">of 5 levels</div>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-purple-400/20">
+            <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-gray-200 shadow-sm">
               <div className="flex items-center justify-between mb-4">
-                <CheckCircle className="w-8 h-8 text-green-400" />
-                <span className="text-sm font-medium text-purple-200">Completed</span>
+                <CheckCircle className="w-8 h-8 text-green-500" />
+                <span className="text-sm font-medium text-gray-600">Completed</span>
               </div>
-              <div className="text-3xl font-bold text-white mb-2">{completedLevels.length}</div>
-              <div className="text-sm text-purple-200">modules completed</div>
+              <div className="text-3xl font-bold text-gray-900 mb-2">{completedLevels.length}</div>
+              <div className="text-sm text-gray-600">modules completed</div>
             </div>
 
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-purple-400/20">
+            <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 border border-gray-200 shadow-sm">
               <div className="flex items-center justify-between mb-4">
-                <Star className="w-8 h-8 text-yellow-400" />
-                <span className="text-sm font-medium text-purple-200">Credits Earned</span>
+                <Star className="w-8 h-8 text-yellow-500" />
+                <span className="text-sm font-medium text-gray-600">Credits Earned</span>
               </div>
-              <div className="text-3xl font-bold text-white mb-2">{getTotalCredits()}</div>
-              <div className="text-sm text-purple-200">total credits</div>
+              <div className="text-3xl font-bold text-gray-900 mb-2">{getTotalCredits()}</div>
+              <div className="text-sm text-gray-600">total credits</div>
             </div>
           </div>
         </div>
@@ -340,18 +340,18 @@ const LevelsContent = () => {
       {completedLevels.length > 0 && (
         <div className="relative z-10 py-20">
           <div className="max-w-5xl mx-auto px-6">
-            <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-purple-400/20 shadow-2xl">
-              <h3 className="text-white font-bold text-2xl mb-6 flex items-center justify-center">
-                <Award className="w-6 h-6 mr-2 text-yellow-400" />
+            <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 border border-gray-200 shadow-lg">
+              <h3 className="text-gray-900 font-bold text-2xl mb-6 flex items-center justify-center">
+                <Award className="w-6 h-6 mr-2 text-yellow-500" />
                 Achievement Overview
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {completedLevels.map((level) => (
-                  <div key={level} className="flex items-center justify-between bg-gradient-to-r from-purple-600/30 to-purple-700/30 rounded-xl px-4 py-3 border border-purple-400/20">
-                    <span className="text-purple-200 text-sm font-medium">Module {level + 1}</span>
+                  <div key={level} className="flex items-center justify-between bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl px-4 py-3 border border-gray-200">
+                    <span className="text-gray-700 text-sm font-medium">Module {level + 1}</span>
                     <div className="flex items-center space-x-1">
-                      <Star className="w-4 h-4 text-yellow-400" />
-                      <span className="text-white font-bold">{levelCredits[level as keyof typeof levelCredits]}</span>
+                      <Star className="w-4 h-4 text-yellow-500" />
+                      <span className="text-gray-900 font-bold">{levelCredits[level as keyof typeof levelCredits]}</span>
                     </div>
                   </div>
                 ))}
@@ -364,38 +364,38 @@ const LevelsContent = () => {
       {/* Footer CTA */}
       <div className="relative z-10 py-20">
         <div className="max-w-5xl mx-auto px-6">
-          <div className="bg-white/10 backdrop-blur-md rounded-3xl p-12 border border-purple-400/20 shadow-2xl text-center">
+          <div className="bg-white/90 backdrop-blur-md rounded-3xl p-12 border border-gray-200 shadow-lg text-center">
             <div className="flex items-center justify-center mb-6">
-              <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-green-400 rounded-2xl flex items-center justify-center mr-4 animate-spin-slow">
-                <Sparkles className="w-8 h-8 text-purple-800" />
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl flex items-center justify-center mr-4 animate-spin-slow">
+                <Sparkles className="w-8 h-8 text-white" />
               </div>
               <div className="text-left">
-                <h3 className="text-2xl font-bold text-white">Continue Your Journey</h3>
-                <p className="text-purple-200">Unlock your potential with AI-powered learning</p>
+                <h3 className="text-2xl font-bold text-gray-900">Continue Your Journey</h3>
+                <p className="text-gray-600">Unlock your potential with AI-powered learning</p>
               </div>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
               <div className="text-center">
-                <div className="w-12 h-12 bg-green-400/20 rounded-xl flex items-center justify-center mx-auto mb-3 animate-pulse">
-                  <CheckCircle className="w-6 h-6 text-green-400" />
+                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3 animate-pulse">
+                  <CheckCircle className="w-6 h-6 text-green-600" />
                 </div>
-                <div className="font-semibold text-white mb-1">Certified Training</div>
-                <div className="text-sm text-purple-200">Industry-recognized certifications</div>
+                <div className="font-semibold text-gray-900 mb-1">Certified Training</div>
+                <div className="text-sm text-gray-600">Industry-recognized certifications</div>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 bg-blue-400/20 rounded-xl flex items-center justify-center mx-auto mb-3 animate-bounce-subtle">
-                  <Brain className="w-6 h-6 text-blue-400" />
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3 animate-bounce-subtle">
+                  <Brain className="w-6 h-6 text-blue-600" />
                 </div>
-                <div className="font-semibold text-white mb-1">AI-Powered Learning</div>
-                <div className="text-sm text-purple-200">Personalized feedback and guidance</div>
+                <div className="font-semibold text-gray-900 mb-1">AI-Powered Learning</div>
+                <div className="text-sm text-gray-600">Personalized feedback and guidance</div>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 bg-yellow-400/20 rounded-xl flex items-center justify-center mx-auto mb-3 animate-wiggle">
-                  <TrendingUp className="w-6 h-6 text-yellow-400" />
+                <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center mx-auto mb-3 animate-wiggle">
+                  <TrendingUp className="w-6 h-6 text-yellow-600" />
                 </div>
-                <div className="font-semibold text-white mb-1">Career Growth</div>
-                <div className="text-sm text-purple-200">Proven results and outcomes</div>
+                <div className="font-semibold text-gray-900 mb-1">Career Growth</div>
+                <div className="text-sm text-gray-600">Proven results and outcomes</div>
               </div>
             </div>
           </div>
