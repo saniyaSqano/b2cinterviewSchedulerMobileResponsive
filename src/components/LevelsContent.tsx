@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Trophy, Star, Award, Brain, Users, Sparkles, CheckCircle, Clock, TrendingUp } from 'lucide-react';
 import AssessmentFlow from './AssessmentFlow';
@@ -179,8 +180,7 @@ const LevelsContent = () => {
       {/* Animated Background with Particles */}
       <ParticleBackground />
       
-      {/* Header Section */}
-
+      <div className="relative z-10">
         {/* Roadmap Section */}
         <InteractiveRoadmap
           currentLevel={currentLevel}
