@@ -194,28 +194,11 @@ const LevelsContent = () => {
             </div>
           </div>
           
-          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-slate-800 leading-tight">
-            Welcome back,
-            <br />
-            <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-              {getUserDisplayName()}
-            </span>
-          </h2>
-          
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed mb-10">
-            Continue your journey through our structured learning path designed to master professional skills
-          </p>
+        
         </div>
 
         {/* Roadmap Section */}
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold text-slate-800 mb-4">Your Learning Roadmap</h3>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Progress through each level to unlock new challenges and build expertise
-            </p>
-          </div>
-          
+
           <InteractiveRoadmap
             currentLevel={currentLevel}
             completedLevels={completedLevels}
