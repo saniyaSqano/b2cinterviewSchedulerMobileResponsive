@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
-import { ArrowRight, Upload, Sparkles, Users, Brain, Target, Award, Zap, Star, Rocket, Code, Globe } from 'lucide-react';
+import { ArrowRight, Upload, Sparkles, Users, Brain, Target, Award, Zap, Star, Rocket, Code, Globe, ArrowLeft } from 'lucide-react';
 import { useAiProctoUser } from '@/hooks/useAiProctoUser';
 import { useUser } from '@/contexts/UserContext';
 import { toast } from 'sonner';
@@ -58,7 +58,7 @@ const UserInfoForm: React.FC = () => {
     if (currentStep < totalSteps) {
       setCurrentStep(prev => prev + 1);
     } else {
-      // Handle form submission and redirect to levels page
+      // Handle form submission and redirect to assessment
       try {
         // First try to fetch existing user
         const existingUser = await fetchUser(formData.email);
@@ -76,7 +76,7 @@ const UserInfoForm: React.FC = () => {
             confidenceLevel: formData.confidenceLevel[0]
           });
           
-          toast.success('Welcome back! Proceeding to your journey! 🚀');
+          toast.success('Welcome back! Starting your free assessment! 🚀');
           navigate('/levels');
           return;
         }
@@ -104,7 +104,7 @@ const UserInfoForm: React.FC = () => {
           confidenceLevel: formData.confidenceLevel[0]
         });
         
-        toast.success('Profile created successfully! Welcome to ProctoVerse! 🚀');
+        toast.success('Profile created! Starting your free assessment! 🚀');
         navigate('/levels');
       } catch (error: any) {
         // Handle duplicate email error specifically
@@ -121,7 +121,7 @@ const UserInfoForm: React.FC = () => {
             confidenceLevel: formData.confidenceLevel[0]
           });
           
-          toast.success('Welcome back! Proceeding to your journey! 🚀');
+          toast.success('Welcome back! Starting your free assessment! 🚀');
           navigate('/levels');
         } else {
           toast.error('Failed to create profile. Please try again.');
@@ -134,6 +134,8 @@ const UserInfoForm: React.FC = () => {
   const handleBack = () => {
     if (currentStep > 1) {
       setCurrentStep(prev => prev - 1);
+    } else {
+      navigate('/');
     }
   };
 
@@ -194,21 +196,18 @@ const UserInfoForm: React.FC = () => {
       <div className="w-full max-w-3xl relative z-10">
         {/* Enhanced ProctoVerse Header */}
         <div className="text-center mb-12">
-          <h1 className="text-7xl md:text-8xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 bg-clip-text text-transparent mb-6 tracking-tight">
+          <h1 className="text-6xl md:text-7xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 bg-clip-text text-transparent mb-6 tracking-tight">
             ProctoVerse
           </h1>
-          <div className="w-40 h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500 mx-auto rounded-full animate-pulse mb-8"></div>
+          <div className="w-32 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500 mx-auto rounded-full animate-pulse mb-6"></div>
           
           {/* Enhanced taglines with animations */}
-          <div className="space-y-3 mb-8">
+          <div className="space-y-2 mb-6">
             <p className="text-xl font-semibold text-gray-700">
-              🚀 Master Your Interview Skills with AI-Powered Training
+              🎯 Personalize Your Interview Training Experience
             </p>
             <p className="text-lg text-gray-600">
-              ✨ Real-time Feedback • Smart Proctoring • Personalized Learning Paths
-            </p>
-            <p className="text-md text-gray-500">
-              🎯 Practice → Analyze → Improve → Succeed
+              Help us create the perfect learning path for your success
             </p>
           </div>
           
@@ -234,7 +233,7 @@ const UserInfoForm: React.FC = () => {
         </div>
 
         {/* Enhanced Progress indicators */}
-        <div className="flex justify-center mb-10">
+        <div className="flex justify-center mb-8">
           <div className="flex space-x-3">
             {Array.from({ length: totalSteps }).map((_, index) => (
               <div key={index} className="flex flex-col items-center">
@@ -248,7 +247,7 @@ const UserInfoForm: React.FC = () => {
                   }`}
                 />
                 <span className="text-xs text-gray-500 mt-2">
-                  {index === 0 ? 'Basic Info' : index === 1 ? 'Experience' : 'Skills Assessment'}
+                  {index === 0 ? 'Basic Info' : index === 1 ? 'Professional Details' : 'Skill Level'}
                 </span>
               </div>
             ))}
@@ -259,10 +258,10 @@ const UserInfoForm: React.FC = () => {
           {currentStep === 1 && (
             <div className="space-y-8">
               <div className="text-center">
-                <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-                  Welcome to Your Journey! 🌟
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+                  Let's Get Started! 👋
                 </h2>
-                <p className="text-gray-600 text-lg">Let's start with some basic information to personalize your experience</p>
+                <p className="text-gray-600 text-lg">Tell us a bit about yourself to personalize your experience</p>
               </div>
 
               <div className="space-y-6">
@@ -314,10 +313,10 @@ const UserInfoForm: React.FC = () => {
           {currentStep === 2 && (
             <div className="space-y-8">
               <div className="text-center">
-                <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-                  Share Your Expertise 💼
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+                  Your Professional Background 💼
                 </h2>
-                <p className="text-gray-600 text-lg">Help us understand your professional background and goals</p>
+                <p className="text-gray-600 text-lg">Help us understand your expertise and career goals</p>
               </div>
 
               <div className="space-y-6">
@@ -327,7 +326,7 @@ const UserInfoForm: React.FC = () => {
                   </Label>
                   <Textarea
                     id="skills"
-                    placeholder="List your technical skills (e.g., JavaScript, React, Python, Machine Learning, etc.)"
+                    placeholder="List your technical skills, programming languages, frameworks, tools, etc."
                     value={formData.skills}
                     onChange={(e) => updateFormData('skills', e.target.value)}
                     className="min-h-[120px] text-lg bg-white/90 border-2 border-gray-200 focus:border-blue-400 rounded-xl resize-none text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md focus:shadow-lg"
@@ -340,7 +339,7 @@ const UserInfoForm: React.FC = () => {
                   </Label>
                   <Textarea
                     id="experience"
-                    placeholder="Describe your work experience, projects, and achievements"
+                    placeholder="Describe your work experience, notable projects, achievements, and career highlights"
                     value={formData.experience}
                     onChange={(e) => updateFormData('experience', e.target.value)}
                     className="min-h-[120px] text-lg bg-white/90 border-2 border-gray-200 focus:border-blue-400 rounded-xl resize-none text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md focus:shadow-lg"
@@ -348,8 +347,21 @@ const UserInfoForm: React.FC = () => {
                 </div>
 
                 <div>
+                  <Label htmlFor="jobDescription" className="text-lg font-semibold text-gray-700 mb-3 block">
+                    Target job description (optional) 🎯
+                  </Label>
+                  <Textarea
+                    id="jobDescription"
+                    placeholder="Paste the job description you're targeting for better personalized preparation"
+                    value={formData.jobDescription}
+                    onChange={(e) => updateFormData('jobDescription', e.target.value)}
+                    className="min-h-[120px] text-lg bg-white/90 border-2 border-gray-200 focus:border-blue-400 rounded-xl resize-none text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md focus:shadow-lg"
+                  />
+                </div>
+
+                <div>
                   <Label htmlFor="cv" className="text-lg font-semibold text-gray-700 mb-3 block">
-                    Upload your CV/Resume 📄
+                    Upload your CV/Resume (optional) 📄
                   </Label>
                   <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 hover:border-blue-400 transition-all duration-300 bg-white/80 backdrop-blur-sm hover:shadow-md">
                     <div className="flex items-center justify-between">
@@ -376,19 +388,6 @@ const UserInfoForm: React.FC = () => {
                     />
                   </div>
                 </div>
-
-                <div>
-                  <Label htmlFor="jobDescription" className="text-lg font-semibold text-gray-700 mb-3 block">
-                    Target job description (optional) 🎯
-                  </Label>
-                  <Textarea
-                    id="jobDescription"
-                    placeholder="Paste the job description you're targeting for better preparation"
-                    value={formData.jobDescription}
-                    onChange={(e) => updateFormData('jobDescription', e.target.value)}
-                    className="min-h-[120px] text-lg bg-white/90 border-2 border-gray-200 focus:border-blue-400 rounded-xl resize-none text-gray-800 placeholder:text-gray-400 backdrop-blur-sm transition-all duration-300 hover:shadow-md focus:shadow-lg"
-                  />
-                </div>
               </div>
             </div>
           )}
@@ -396,16 +395,16 @@ const UserInfoForm: React.FC = () => {
           {currentStep === 3 && (
             <div className="space-y-8">
               <div className="text-center">
-                <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
                   Almost Ready! 🚀
                 </h2>
-                <p className="text-gray-600 text-lg">Let's assess your current skill level to personalize your training</p>
+                <p className="text-gray-600 text-lg">Let's assess your current level to create the perfect training plan</p>
               </div>
 
               <div className="space-y-8">
                 <div>
                   <Label className="text-lg font-semibold text-gray-700 mb-4 block">
-                    Years of Experience 📈
+                    Years of Professional Experience 📈
                   </Label>
                   <div className="px-4 py-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
                     <Slider
@@ -447,26 +446,25 @@ const UserInfoForm: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="text-center bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl">
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">Ready to Begin Your Journey? 🎉</h3>
-                  <p className="text-gray-600">We'll create a personalized learning path based on your profile</p>
+                <div className="text-center bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl border border-green-200">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">🎉 Ready to Start Your Free Assessment?</h3>
+                  <p className="text-gray-600">We'll create a personalized learning path and start with a skill assessment to benchmark your current level</p>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Enhanced Navigation buttons */}
+          {/* Navigation buttons */}
           <div className="flex justify-between items-center mt-12">
             <div>
-              {currentStep > 1 && (
-                <Button
-                  onClick={handleBack}
-                  variant="outline"
-                  className="px-8 py-3 text-lg border-2 border-gray-300 hover:border-gray-400 rounded-xl bg-white text-gray-700 hover:bg-gray-50 backdrop-blur-sm transition-all duration-300 hover:scale-105"
-                >
-                  Back
-                </Button>
-              )}
+              <Button
+                onClick={handleBack}
+                variant="outline"
+                className="px-6 py-3 text-lg border-2 border-gray-300 hover:border-gray-400 rounded-xl bg-white text-gray-700 hover:bg-gray-50 backdrop-blur-sm transition-all duration-300 hover:scale-105 flex items-center space-x-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back</span>
+              </Button>
             </div>
             
             <Button
@@ -477,23 +475,23 @@ const UserInfoForm: React.FC = () => {
                 (currentStep === 3 && !canProceedStep3) ||
                 loading
               }
-              className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 disabled:from-gray-400 disabled:to-gray-500 text-white px-8 py-3 text-lg rounded-full flex items-center space-x-2 min-w-[160px] justify-center shadow-lg shadow-blue-500/25 transition-all duration-300 hover:scale-105 disabled:hover:scale-100"
+              className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 disabled:from-gray-400 disabled:to-gray-500 text-white px-8 py-3 text-lg rounded-full flex items-center space-x-2 min-w-[200px] justify-center shadow-lg shadow-blue-500/25 transition-all duration-300 hover:scale-105 disabled:hover:scale-100"
             >
               <span>
-                {loading ? 'Creating...' : currentStep === totalSteps ? 'Start Journey' : 'Continue'}
+                {loading ? 'Setting up...' : currentStep === totalSteps ? 'Start Free Assessment' : 'Continue'}
               </span>
               {!loading && <ArrowRight className="w-5 h-5" />}
             </Button>
           </div>
         </div>
 
-        {/* Enhanced bottom tagline */}
-        <div className="text-center mt-10">
+        {/* Bottom tagline */}
+        <div className="text-center mt-8">
           <p className="text-gray-600 text-lg mb-2">
-            🌟 Join thousands of successful professionals who've mastered their interviews
+            🌟 Join thousands who've aced their interviews with ProctoVerse
           </p>
           <p className="text-gray-500 text-sm">
-            Trusted by top companies • 95% success rate • AI-powered insights
+            100% Free Assessment • No Credit Card Required • Instant Results
           </p>
         </div>
       </div>

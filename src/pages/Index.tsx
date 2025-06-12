@@ -1,6 +1,7 @@
-
 import React, { useState } from 'react';
-import { ArrowLeft, Trophy, Star, Award, Brain, Users, Sparkles, Target, Rocket, Code, Globe, CheckCircle, Clock, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Trophy, Star, Award, Brain, Users, Sparkles, Target, Rocket, Code, Globe, CheckCircle, Clock, TrendingUp, ArrowRight, Play } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 import ParticleBackground from '../components/ParticleBackground';
 import AssessmentFlow from '../components/AssessmentFlow';
 import ChatFlow from '../components/ChatFlow';
@@ -11,7 +12,178 @@ import InteractiveRoadmap from '../components/InteractiveRoadmap';
 import { useUser } from '../contexts/UserContext';
 
 const Index = () => {
-  return <LevelsContent />;
+  const { user } = useUser();
+  
+  // If user exists, show the levels content, otherwise show welcome info
+  if (user) {
+    return <LevelsContent />;
+  }
+  
+  return <WelcomeInfo />;
+};
+
+const WelcomeInfo = () => {
+  const navigate = useNavigate();
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative overflow-hidden">
+      {/* Enhanced Background with Subtle Animations */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-r from-blue-400/10 to-indigo-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '8s' }}></div>
+        <div className="absolute bottom-20 right-10 w-80 h-80 bg-gradient-to-r from-purple-400/10 to-pink-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '10s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-r from-cyan-400/10 to-blue-400/10 rounded-full blur-3xl animate-pulse" style={{ animationDuration: '12s' }}></div>
+        
+        {/* Floating icons */}
+        <div className="absolute top-16 right-1/4 animate-bounce" style={{ animationDelay: '1s', animationDuration: '4s' }}>
+          <Target className="w-10 h-10 text-blue-400/50" />
+        </div>
+        <div className="absolute bottom-1/4 left-1/5 animate-bounce" style={{ animationDelay: '2s', animationDuration: '5s' }}>
+          <Award className="w-8 h-8 text-indigo-400/50" />
+        </div>
+        <div className="absolute top-1/3 right-1/6 animate-bounce" style={{ animationDelay: '3s', animationDuration: '3.5s' }}>
+          <Rocket className="w-9 h-9 text-cyan-400/50" />
+        </div>
+      </div>
+
+      <div className="relative z-10 max-w-6xl mx-auto px-6 py-16">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <h1 className="text-7xl md:text-8xl font-bold mb-6 leading-tight">
+            <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent animate-pulse-glow">
+              ProctoVerse
+            </span>
+          </h1>
+          <div className="w-40 h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500 mx-auto rounded-full animate-pulse mb-8"></div>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+            Welcome to the Future of Interview Preparation
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Master your interview skills with AI-powered training, real-time feedback, and personalized learning paths designed to help you succeed in your career.
+          </p>
+        </div>
+
+        {/* What is ProctoVerse Section */}
+        <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-12 mb-12 border border-gray-200/50 shadow-lg">
+          <h3 className="text-3xl font-bold text-gray-900 mb-8 text-center flex items-center justify-center">
+            <Brain className="w-8 h-8 mr-3 text-blue-600" />
+            What is ProctoVerse?
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <div className="space-y-6">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Target className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-2">Personalized Training</h4>
+                  <p className="text-gray-600">AI analyzes your skills and creates a customized learning path tailored to your career goals and experience level.</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Users className="w-6 h-6 text-green-600" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-2">Live Mock Interviews</h4>
+                  <p className="text-gray-600">Practice with AI-powered mock interviews that simulate real interview scenarios with instant feedback.</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="w-6 h-6 text-purple-600" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-2">Smart Proctoring</h4>
+                  <p className="text-gray-600">Advanced proctoring system ensures fair assessment while providing detailed performance analytics.</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Award className="w-6 h-6 text-indigo-600" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900 mb-2">Industry Certification</h4>
+                  <p className="text-gray-600">Earn recognized certifications that boost your profile and demonstrate your interview readiness to employers.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Learning Journey Preview */}
+        <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-12 mb-12 border border-gray-200/50 shadow-lg">
+          <h3 className="text-3xl font-bold text-gray-900 mb-8 text-center flex items-center justify-center">
+            <Rocket className="w-8 h-8 mr-3 text-indigo-600" />
+            Your Learning Journey
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+            {[
+              { title: 'Skill Assessment', icon: Brain, description: 'Evaluate current abilities' },
+              { title: 'AI Mentor Chat', icon: Users, description: 'Personalized guidance' },
+              { title: 'Pitch Builder', icon: Target, description: 'Craft your story' },
+              { title: 'Mock Interview', icon: Play, description: 'Practice with AI' },
+              { title: 'Gamethon', icon: Trophy, description: 'Final challenge' }
+            ].map((step, index) => (
+              <div key={index} className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                  <step.icon className="w-8 h-8 text-white" />
+                </div>
+                <h4 className="font-semibold text-gray-900 mb-1">{step.title}</h4>
+                <p className="text-sm text-gray-600">{step.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Success Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 shadow-sm text-center">
+            <div className="text-3xl font-bold text-blue-600 mb-1">10,000+</div>
+            <div className="text-gray-600">Professionals Trained</div>
+          </div>
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 shadow-sm text-center">
+            <div className="text-3xl font-bold text-green-600 mb-1">95%</div>
+            <div className="text-gray-600">Success Rate</div>
+          </div>
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 shadow-sm text-center">
+            <div className="text-3xl font-bold text-purple-600 mb-1">500+</div>
+            <div className="text-gray-600">Partner Companies</div>
+          </div>
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 shadow-sm text-center">
+            <div className="text-3xl font-bold text-indigo-600 mb-1">24/7</div>
+            <div className="text-gray-600">AI Support</div>
+          </div>
+        </div>
+
+        {/* Call to Action */}
+        <div className="text-center">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-12 text-white">
+            <h3 className="text-3xl font-bold mb-4">Ready to Transform Your Career?</h3>
+            <p className="text-xl mb-8 opacity-90">
+              Join thousands of professionals who've accelerated their career growth with ProctoVerse
+            </p>
+            <Button
+              onClick={() => navigate('/user-info')}
+              className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg rounded-full font-semibold shadow-lg transition-all duration-300 hover:scale-105"
+            >
+              Get Started - It's Free
+              <ArrowRight className="w-5 h-5 ml-2" />
+            </Button>
+            <div className="mt-4 text-sm opacity-80">
+              ✨ No credit card required • Start your free assessment now
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 const LevelsContent = () => {
