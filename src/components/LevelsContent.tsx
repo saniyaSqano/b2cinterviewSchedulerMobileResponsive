@@ -205,31 +205,6 @@ const LevelsContent = () => {
           <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed mb-10">
             Continue your journey through our structured learning path designed to master professional skills
           </p>
-
-          {/* Progress Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
-            <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-blue-200/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center text-white font-bold text-2xl mb-4 mx-auto animate-pulse-glow">
-                {completedLevels.length}
-              </div>
-              <div className="text-sm font-medium text-slate-500 mb-1">Modules Completed</div>
-              <div className="text-lg font-bold text-slate-700">{completedLevels.length} of 5</div>
-            </div>
-            <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-green-200/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center text-white font-bold text-2xl mb-4 mx-auto animate-bounce-subtle">
-                {Math.round((completedLevels.length / 5) * 100)}%
-              </div>
-              <div className="text-sm font-medium text-slate-500 mb-1">Overall Progress</div>
-              <div className="text-lg font-bold text-slate-700">Course Completion</div>
-            </div>
-            <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 border border-yellow-200/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-              <div className="w-16 h-16 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-xl flex items-center justify-center text-white mb-4 mx-auto animate-float">
-                <Trophy className="w-8 h-8" />
-              </div>
-              <div className="text-sm font-medium text-slate-500 mb-1">Credits Earned</div>
-              <div className="text-lg font-bold text-slate-700">{getTotalCredits()} Points</div>
-            </div>
-          </div>
         </div>
 
         {/* Roadmap Section */}
