@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from './ui/dialog';
 import jsPDF from 'jspdf';
 import { HARDCODED_CANDIDATE } from '../data/candidateData';
+import Level4Flow from './Level4Flow';
 
 interface TestReportProps {
   score: number;
@@ -37,6 +38,7 @@ const TestReport: React.FC<TestReportProps> = ({
   const passed = percentage >= 70;
   const timeEfficiency = Math.round((timeUsed / totalTime) * 100);
   const [showProctorDialog, setShowProctorDialog] = useState(false);
+  const [showLevel4Flow, setShowLevel4Flow] = useState(false);
 
   // Use hardcoded candidate details instead of localStorage
   const candidateDetails = HARDCODED_CANDIDATE;
@@ -56,12 +58,24 @@ const TestReport: React.FC<TestReportProps> = ({
   };
 
   const handleProctorDemo = () => {
-    // Navigate to AI proctor demo - you can implement this route later
-    console.log('Navigating to AI proctor demo');
     setShowProctorDialog(false);
-    // For now, just close the dialog and go back
+    setShowLevel4Flow(true);
+  };
+
+  const handleBackFromLevel4 = () => {
+    setShowLevel4Flow(false);
     onBack();
   };
+
+  // If Level 4 flow is shown, render it
+  if (showLevel4Flow) {
+    return (
+      <Level4Flow
+        onBack={handleBackFromLevel4}
+        userName={candidateDetails.fullName}
+      />
+    );
+  }
 
   const generatePdfReport = () => {
     const pdf = new jsPDF();
