@@ -37,10 +37,28 @@ const WelcomeScreen = () => {
     updateFormData('cv', file);
   };
 
-  const canSubmit = formData.target_job_description.trim().length > 0;
+  const handleStartFreeAssessment = () => {
+    // Set minimal user data for the assessment
+    setUser({
+      name: 'Guest User',
+      email: 'guest@proctoverse.ai',
+      phone: '',
+      skills: formData.technical_skills || 'General Software Development',
+      experience: formData.experience || 'Exploring career opportunities',
+      jobDescription: formData.target_job_description || 'Software Developer Position',
+      experienceLevel: 3,
+      confidenceLevel: 5
+    });
+    
+    toast.success('Starting your free assessment! 🚀');
+    navigate('/freeassessment');
+  };
 
   const handleSubmit = async () => {
-    if (!canSubmit) return;
+    if (formData.target_job_description.trim().length === 0) {
+      toast.error('Please provide a target job description to create your profile.');
+      return;
+    }
 
     try {
       // Create the procto user record with the form data
@@ -243,6 +261,37 @@ const WelcomeScreen = () => {
             </div>
 
             <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl border border-white/70 p-6">
+              {/* Quick Start Section */}
+              <div className="text-center mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
+                <h3 className="text-lg font-bold text-gray-900 mb-2">🚀 Try Our Free Assessment</h3>
+                <p className="text-gray-600 text-sm mb-4">
+                  Skip the form and jump straight into our AI-powered assessment to test your skills
+                </p>
+                <Button
+                  onClick={handleStartFreeAssessment}
+                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-3 text-base rounded-lg font-bold shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                >
+                  <Rocket className="w-4 h-4 mr-2" />
+                  Start Free Assessment Now
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
+
+              {/* Divider */}
+              <div className="flex items-center my-6">
+                <div className="flex-1 border-t border-gray-300"></div>
+                <div className="px-4 text-gray-500 text-sm font-medium">OR</div>
+                <div className="flex-1 border-t border-gray-300"></div>
+              </div>
+
+              {/* Form Section */}
+              <div className="text-center mb-4">
+                <h3 className="text-lg font-bold text-gray-900 mb-2">Personalize Your Experience</h3>
+                <p className="text-gray-600 text-sm">
+                  Fill out your details for a customized learning path
+                </p>
+              </div>
+
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="skills" className="text-sm font-bold text-gray-700 mb-2 block flex items-center">
@@ -321,7 +370,7 @@ const WelcomeScreen = () => {
 
                 <Button
                   onClick={handleSubmit}
-                  disabled={!canSubmit || loading}
+                  disabled={formData.target_job_description.trim().length === 0 || loading}
                   className="w-full bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 text-white py-3 text-base rounded-lg font-bold shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl disabled:hover:scale-100 disabled:opacity-50"
                 >
                   {loading ? (
@@ -332,7 +381,7 @@ const WelcomeScreen = () => {
                   ) : (
                     <div className="flex items-center justify-center">
                       <Rocket className="w-4 h-4 mr-2" />
-                      Start Free Assessment
+                      Create Profile & Start Assessment
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </div>
                   )}
