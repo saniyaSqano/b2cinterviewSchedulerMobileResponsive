@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ArrowRight, Play, CheckCircle, Shield, Eye, Lock, Mic, BarChart3, Users, GraduationCap, Building2, ChevronLeft, ChevronRight, Star, Globe, Mail, Twitter, Linkedin, Facebook } from 'lucide-react';
+import { ArrowRight, Play, CheckCircle, Shield, Eye, Lock, Mic, BarChart3, Users, GraduationCap, Building2, ChevronLeft, ChevronRight, Star, Globe, Mail, Twitter, Linkedin, Facebook, Brain, Camera, Clock, FileText, Award, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -13,112 +13,126 @@ const Homepage = () => {
   const features = [
     {
       icon: Eye,
-      title: "Real-Time AI Monitoring",
-      description: "Advanced facial recognition and eye tracking to ensure authentic test-taking"
+      title: "Advanced Eye Tracking",
+      description: "AI monitors eye movement patterns to detect suspicious behavior during exams and interviews"
     },
     {
-      icon: Lock,
-      title: "Browser Lockdown",
-      description: "Prevent tab switching and unauthorized applications during exams"
+      icon: Camera,
+      title: "Facial Recognition",
+      description: "Verify candidate identity and detect multiple people in frame to prevent impersonation"
     },
     {
       icon: Mic,
-      title: "Voice Detection",
-      description: "Audio analysis to detect suspicious conversations or background noise"
+      title: "Audio Intelligence",
+      description: "Real-time voice analysis detects external assistance and unauthorized conversations"
     },
     {
-      icon: Users,
-      title: "Multi-Person Detection",
-      description: "AI identifies multiple people in the frame to prevent collaboration"
+      icon: Lock,
+      title: "Secure Browser Lock",
+      description: "Prevent tab switching, copy-paste, and unauthorized application access during assessments"
     },
     {
-      icon: BarChart3,
-      title: "Detailed Reports",
-      description: "Comprehensive post-exam analytics and violation summaries"
+      icon: Brain,
+      title: "Behavior Analytics",
+      description: "AI analyzes patterns to identify cheating attempts and suspicious activities"
     },
     {
-      icon: Shield,
-      title: "Live Proctor Integration",
-      description: "Optional human oversight for high-stakes examinations"
+      icon: FileText,
+      title: "Comprehensive Reports",
+      description: "Detailed post-assessment analytics with violation timestamps and evidence"
     }
   ];
 
   const userRoles = [
     {
       icon: GraduationCap,
-      title: "Students",
-      description: "Take secure exams anytime, anywhere.",
-      details: "Experience seamless, stress-free testing with our intuitive interface designed for your success."
+      title: "Students & Candidates",
+      description: "Take secure exams and interviews with confidence.",
+      details: "Experience fair, transparent assessments with our user-friendly interface designed for your success.",
+      gradient: "from-blue-500 to-cyan-500"
     },
     {
       icon: Users,
-      title: "Educators",
-      description: "Monitor exams effortlessly with AI assistance.",
-      details: "Focus on teaching while our AI handles exam security and provides actionable insights."
+      title: "Educators & Recruiters",
+      description: "Conduct assessments with AI-powered security.",
+      details: "Focus on evaluating talent while our AI ensures assessment integrity and provides actionable insights.",
+      gradient: "from-purple-500 to-pink-500"
     },
     {
       icon: Building2,
-      title: "Institutions",
-      description: "Get insights, reports, and peace of mind.",
-      details: "Scale your assessment programs with enterprise-grade security and comprehensive analytics."
+      title: "Educational & Corporate Institutions",
+      description: "Scale your assessment programs securely.",
+      details: "Enterprise-grade security and comprehensive analytics for large-scale exam and interview programs.",
+      gradient: "from-green-500 to-emerald-500"
     }
   ];
 
   const steps = [
     {
-      title: "Schedule or Start the Exam",
-      description: "Set up your exam parameters and invite students through our intuitive dashboard"
+      icon: Clock,
+      title: "Schedule Assessment",
+      description: "Create exams or interviews with customizable security settings and invite participants"
     },
     {
-      title: "Verify Student Identity",
-      description: "AI-powered identity verification ensures the right person is taking the exam"
+      icon: Shield,
+      title: "Identity Verification",
+      description: "AI verifies participant identity through multi-factor authentication and biometric checks"
     },
     {
-      title: "AI Monitors in Real Time",
-      description: "Continuous monitoring detects suspicious behavior without interrupting the exam"
+      icon: Eye,
+      title: "Real-Time Monitoring",
+      description: "Continuous AI surveillance detects and flags suspicious behavior without interrupting the flow"
     },
     {
-      title: "Receive Detailed Report",
-      description: "Get comprehensive insights and violation reports immediately after exam completion"
+      icon: Award,
+      title: "Instant Results",
+      description: "Receive detailed security reports and assessment analytics immediately upon completion"
     }
   ];
 
   const testimonials = [
     {
-      name: "Dr. Sarah Johnson",
-      role: "Dean of Online Education",
-      institution: "Tech University",
-      quote: "Proctoverse has revolutionized our online assessment capabilities. The AI monitoring is incredibly accurate.",
-      rating: 5
+      name: "Dr. Sarah Chen",
+      role: "Director of Online Learning",
+      institution: "Stanford University",
+      quote: "Proctoverse has transformed our remote examination process. The AI detection is remarkably accurate and students appreciate the fair assessment environment.",
+      rating: 5,
+      avatar: "SC"
     },
     {
-      name: "Michael Chen",
-      role: "IT Director",
-      institution: "Global Institute",
-      quote: "Implementation was seamless, and our exam integrity scores have improved by 40%.",
-      rating: 5
+      name: "Michael Rodriguez",
+      role: "Head of Talent Acquisition",
+      institution: "Google",
+      quote: "Our remote interview integrity improved by 85% after implementing Proctoverse. The candidate experience remains smooth while ensuring authenticity.",
+      rating: 5,
+      avatar: "MR"
     },
     {
-      name: "Prof. Emily Rodriguez",
-      role: "Course Coordinator",
-      institution: "State College",
-      quote: "Students appreciate the fair and transparent proctoring process. Highly recommended!",
-      rating: 5
+      name: "Prof. Emily Watson",
+      role: "Assessment Coordinator",
+      institution: "MIT",
+      quote: "The detailed analytics and real-time monitoring have revolutionized how we conduct high-stakes examinations. Absolutely recommended!",
+      rating: 5,
+      avatar: "EW"
     }
   ];
 
   const screenshots = [
     {
       title: "Student Exam Interface",
-      description: "Clean, distraction-free exam environment"
+      description: "Clean, distraction-free environment with real-time security indicators"
     },
     {
-      title: "AI Alert Dashboard",
-      description: "Real-time monitoring and violation detection"
+      title: "AI Monitoring Dashboard",
+      description: "Live oversight with intelligent alerts and behavior analysis"
     },
     {
-      title: "Report Summary",
-      description: "Comprehensive post-exam analytics"
+      title: "Interview Assessment Portal",
+      description: "Comprehensive candidate evaluation with AI-powered insights"
+    },
+    {
+      title: "Analytics & Reports",
+      description: "Detailed security reports with violation evidence and timestamps"
     }
   ];
 
@@ -131,34 +145,37 @@ const Homepage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-lg border-b border-blue-200/50 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-                <Shield className="w-6 h-6 text-white" />
+          <div className="flex justify-between items-center h-20">
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <Shield className="w-7 h-7 text-white" />
+                </div>
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-pulse"></div>
               </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
                 Proctoverse
               </span>
             </div>
 
             <nav className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-gray-600 hover:text-blue-600 transition-colors">Features</a>
-              <a href="#how-it-works" className="text-gray-600 hover:text-blue-600 transition-colors">How it Works</a>
-              <a href="#pricing" className="text-gray-600 hover:text-blue-600 transition-colors">Pricing</a>
-              <a href="#faq" className="text-gray-600 hover:text-blue-600 transition-colors">FAQ</a>
-              <a href="#contact" className="text-gray-600 hover:text-blue-600 transition-colors">Contact</a>
+              <a href="#features" className="text-gray-700 hover:text-blue-600 transition-all duration-300 font-medium hover:scale-105">Features</a>
+              <a href="#how-it-works" className="text-gray-700 hover:text-blue-600 transition-all duration-300 font-medium hover:scale-105">How it Works</a>
+              <a href="#pricing" className="text-gray-700 hover:text-blue-600 transition-all duration-300 font-medium hover:scale-105">Pricing</a>
+              <a href="#faq" className="text-gray-700 hover:text-blue-600 transition-all duration-300 font-medium hover:scale-105">FAQ</a>
+              <a href="#contact" className="text-gray-700 hover:text-blue-600 transition-all duration-300 font-medium hover:scale-105">Contact</a>
             </nav>
 
             <div className="flex items-center space-x-4">
-              <Button variant="ghost" onClick={() => setShowLoginModal(true)}>
+              <Button variant="ghost" onClick={() => setShowLoginModal(true)} className="text-gray-700 hover:text-blue-600 hover:bg-blue-50">
                 Login
               </Button>
-              <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                Register
+              <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                Start Free Trial
               </Button>
             </div>
           </div>
@@ -166,38 +183,57 @@ const Homepage = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            AI-Powered Proctoring for the
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent block">
-              Future of Exams
+      <section className="relative py-24 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-indigo-600/10"></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="mb-8">
+            <Badge className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 border-blue-200 px-6 py-2 text-sm font-semibold">
+              🚀 Trusted by 10,000+ Institutions Worldwide
+            </Badge>
+          </div>
+          
+          <h1 className="text-6xl md:text-7xl font-bold text-gray-900 mb-8 leading-tight">
+            Secure Your
+            <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent block mt-2">
+              Exams & Interviews
             </span>
+            <span className="text-5xl md:text-6xl block mt-2">with AI Power</span>
           </h1>
           
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Ensure exam integrity with smart, scalable, and secure AI proctoring. 
-            Experience the next generation of online assessment technology.
+          <p className="text-2xl text-gray-600 mb-12 max-w-4xl mx-auto leading-relaxed">
+            Revolutionary AI proctoring for examinations and interviews. Ensure authenticity, 
+            prevent cheating, and maintain assessment integrity with cutting-edge technology.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-lg px-8 py-4">
-              Get Started
-              <ArrowRight className="w-5 h-5 ml-2" />
+          <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
+            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-xl px-12 py-6 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105">
+              Start Free Assessment
+              <ArrowRight className="w-6 h-6 ml-3" />
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-4 border-2">
-              <Play className="w-5 h-5 mr-2" />
-              Request a Demo
+            <Button size="lg" variant="outline" className="text-xl px-12 py-6 border-2 border-blue-200 hover:border-blue-400 hover:bg-blue-50 transition-all duration-300 transform hover:scale-105">
+              <Play className="w-6 h-6 mr-3" />
+              Watch Demo
             </Button>
           </div>
 
-          <div className="relative max-w-4xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-2xl p-8 border">
-              <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center">
-                <div className="text-center">
-                  <Shield className="w-16 h-16 text-blue-600 mx-auto mb-4" />
-                  <p className="text-gray-600">AI Proctoring Demo Interface</p>
+          <div className="relative max-w-5xl mx-auto">
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-blue-200/50">
+              <div className="aspect-video bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl flex items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10"></div>
+                <div className="relative text-center z-10">
+                  <div className="w-24 h-24 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl">
+                    <Eye className="w-12 h-12 text-white" />
+                  </div>
+                  <p className="text-2xl font-semibold text-gray-800">AI Proctoring in Action</p>
+                  <p className="text-gray-600 mt-2">Real-time monitoring and analysis</p>
                 </div>
+                {/* Floating elements for visual appeal */}
+                <div className="absolute top-6 left-6 w-3 h-3 bg-blue-400 rounded-full animate-bounce"></div>
+                <div className="absolute top-12 right-8 w-2 h-2 bg-purple-400 rounded-full animate-bounce delay-300"></div>
+                <div className="absolute bottom-8 left-12 w-4 h-4 bg-indigo-400 rounded-full animate-bounce delay-700"></div>
               </div>
             </div>
           </div>
@@ -205,24 +241,25 @@ const Homepage = () => {
       </section>
 
       {/* Who It's For Section */}
-      <section className="py-20 bg-white">
+      <section className="py-24 bg-white/70 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Built for Everyone</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Whether you're a student, educator, or institution, Proctoverse adapts to your needs
+          <div className="text-center mb-20">
+            <h2 className="text-5xl font-bold text-gray-900 mb-6">Perfect for Every Assessment Need</h2>
+            <p className="text-2xl text-gray-600 max-w-4xl mx-auto">
+              From academic exams to corporate interviews, Proctoverse adapts to your requirements
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {userRoles.map((role, index) => (
-              <Card key={index} className="border-2 hover:border-blue-200 transition-all duration-300 hover:shadow-lg">
-                <CardContent className="p-8 text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                    <role.icon className="w-8 h-8 text-blue-600" />
+              <Card key={index} className="group border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white/90 backdrop-blur-sm overflow-hidden">
+                <CardContent className="p-10 text-center relative">
+                  <div className={`absolute inset-0 bg-gradient-to-br ${role.gradient} opacity-5 group-hover:opacity-10 transition-opacity duration-500`}></div>
+                  <div className={`w-20 h-20 bg-gradient-to-r ${role.gradient} rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-lg group-hover:shadow-xl transition-all duration-500 group-hover:scale-110`}>
+                    <role.icon className="w-10 h-10 text-white" />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">{role.title}</h3>
-                  <p className="text-lg text-blue-600 font-semibold mb-4">{role.description}</p>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">{role.title}</h3>
+                  <p className="text-lg text-blue-600 font-semibold mb-6">{role.description}</p>
                   <p className="text-gray-600 leading-relaxed">{role.details}</p>
                 </CardContent>
               </Card>
@@ -232,23 +269,23 @@ const Homepage = () => {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 bg-gray-50">
+      <section id="features" className="py-24 bg-gradient-to-br from-slate-50 to-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Powerful Features</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Comprehensive AI-powered monitoring and security features designed for modern education
+          <div className="text-center mb-20">
+            <h2 className="text-5xl font-bold text-gray-900 mb-6">Advanced AI-Powered Features</h2>
+            <p className="text-2xl text-gray-600 max-w-4xl mx-auto">
+              Comprehensive monitoring and security features designed for modern assessment needs
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+              <Card key={index} className="group border-0 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 bg-white/90 backdrop-blur-sm">
                 <CardContent className="p-8">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center mb-6">
-                    <feature.icon className="w-6 h-6 text-white" />
+                  <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mb-8 shadow-lg group-hover:shadow-xl transition-all duration-500 group-hover:scale-110">
+                    <feature.icon className="w-8 h-8 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">{feature.title}</h3>
                   <p className="text-gray-600 leading-relaxed">{feature.description}</p>
                 </CardContent>
               </Card>
@@ -258,22 +295,27 @@ const Homepage = () => {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-20 bg-white">
+      <section id="how-it-works" className="py-24 bg-white/70 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">How It Works</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Simple, secure, and seamless proctoring in four easy steps
+          <div className="text-center mb-20">
+            <h2 className="text-5xl font-bold text-gray-900 mb-6">How Proctoverse Works</h2>
+            <p className="text-2xl text-gray-600 max-w-4xl mx-auto">
+              Simple, secure, and seamless proctoring in four intelligent steps
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {steps.map((step, index) => (
-              <div key={index} className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-2xl font-bold text-white">{index + 1}</span>
+              <div key={index} className="text-center group">
+                <div className="relative mb-8">
+                  <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto shadow-xl group-hover:shadow-2xl transition-all duration-500 group-hover:scale-110">
+                    <step.icon className="w-10 h-10 text-white" />
+                  </div>
+                  <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center shadow-lg">
+                    <span className="text-sm font-bold text-white">{index + 1}</span>
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{step.title}</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">{step.title}</h3>
                 <p className="text-gray-600 leading-relaxed">{step.description}</p>
               </div>
             ))}
@@ -282,42 +324,50 @@ const Homepage = () => {
       </section>
 
       {/* Trust & Compliance Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">Trust & Compliance</h2>
-          <p className="text-xl text-blue-100 mb-12 max-w-3xl mx-auto">
-            Your data is encrypted and your privacy is protected with industry-leading security standards
+      <section className="py-24 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 relative overflow-hidden">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-blue-600/20 to-purple-600/20"></div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-5xl font-bold text-white mb-8">Trusted & Compliant</h2>
+          <p className="text-2xl text-blue-100 mb-16 max-w-4xl mx-auto">
+            Enterprise-grade security with industry-leading compliance standards
           </p>
 
-          <div className="flex flex-wrap justify-center items-center gap-8 mb-12">
-            <Badge variant="secondary" className="bg-white/20 text-white text-lg px-6 py-3 border-white/30">
-              GDPR Compliant
+          <div className="flex flex-wrap justify-center items-center gap-8 mb-16">
+            <Badge variant="secondary" className="bg-white/20 text-white text-lg px-8 py-4 border-white/30 backdrop-blur-sm">
+              🔒 GDPR Compliant
             </Badge>
-            <Badge variant="secondary" className="bg-white/20 text-white text-lg px-6 py-3 border-white/30">
-              ISO 27001
+            <Badge variant="secondary" className="bg-white/20 text-white text-lg px-8 py-4 border-white/30 backdrop-blur-sm">
+              🏆 ISO 27001
             </Badge>
-            <Badge variant="secondary" className="bg-white/20 text-white text-lg px-6 py-3 border-white/30">
-              FERPA Certified
+            <Badge variant="secondary" className="bg-white/20 text-white text-lg px-8 py-4 border-white/30 backdrop-blur-sm">
+              🎓 FERPA Certified
             </Badge>
-            <Badge variant="secondary" className="bg-white/20 text-white text-lg px-6 py-3 border-white/30">
-              SOC 2 Type II
+            <Badge variant="secondary" className="bg-white/20 text-white text-lg px-8 py-4 border-white/30 backdrop-blur-sm">
+              ✅ SOC 2 Type II
             </Badge>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <Card key={index} className="bg-white/10 backdrop-blur-sm border-white/20">
-                <CardContent className="p-6 text-left">
-                  <div className="flex mb-4">
+              <Card key={index} className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 transition-all duration-300">
+                <CardContent className="p-8 text-left">
+                  <div className="flex mb-6">
                     {[...Array(testimonial.rating)].map((_, i) => (
                       <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
                     ))}
                   </div>
-                  <p className="text-white mb-4 italic">"{testimonial.quote}"</p>
-                  <div>
-                    <p className="text-white font-semibold">{testimonial.name}</p>
-                    <p className="text-blue-100 text-sm">{testimonial.role}</p>
-                    <p className="text-blue-200 text-sm">{testimonial.institution}</p>
+                  <p className="text-white mb-6 italic text-lg">"{testimonial.quote}"</p>
+                  <div className="flex items-center">
+                    <div className="w-12 h-12 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full flex items-center justify-center mr-4">
+                      <span className="text-white font-bold">{testimonial.avatar}</span>
+                    </div>
+                    <div>
+                      <p className="text-white font-semibold">{testimonial.name}</p>
+                      <p className="text-blue-100 text-sm">{testimonial.role}</p>
+                      <p className="text-blue-200 text-sm">{testimonial.institution}</p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -327,49 +377,54 @@ const Homepage = () => {
       </section>
 
       {/* Screenshots/Demo Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-24 bg-gradient-to-br from-slate-50 to-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">See It in Action</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <div className="text-center mb-20">
+            <h2 className="text-5xl font-bold text-gray-900 mb-6">See It in Action</h2>
+            <p className="text-2xl text-gray-600 max-w-4xl mx-auto">
               Experience the intuitive interface and powerful monitoring capabilities
             </p>
           </div>
 
           <div className="relative">
-            <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-              <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                <div className="text-center">
-                  <Eye className="w-16 h-16 text-blue-600 mx-auto mb-4" />
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+            <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-blue-200/50">
+              <div className="aspect-video bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10"></div>
+                <div className="relative text-center z-10">
+                  <div className="w-24 h-24 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl">
+                    <Eye className="w-12 h-12 text-white" />
+                  </div>
+                  <h3 className="text-3xl font-bold text-gray-900 mb-4">
                     {screenshots[currentSlide].title}
                   </h3>
-                  <p className="text-gray-600">{screenshots[currentSlide].description}</p>
+                  <p className="text-xl text-gray-600">{screenshots[currentSlide].description}</p>
                 </div>
               </div>
             </div>
 
             <button
               onClick={prevSlide}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-3 shadow-lg hover:shadow-xl transition-all"
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 backdrop-blur-sm rounded-full p-4 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110"
             >
               <ChevronLeft className="w-6 h-6 text-gray-600" />
             </button>
 
             <button
               onClick={nextSlide}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-3 shadow-lg hover:shadow-xl transition-all"
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 backdrop-blur-sm rounded-full p-4 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110"
             >
               <ChevronRight className="w-6 h-6 text-gray-600" />
             </button>
 
-            <div className="flex justify-center mt-6 space-x-2">
+            <div className="flex justify-center mt-8 space-x-3">
               {screenshots.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentSlide(index)}
-                  className={`w-3 h-3 rounded-full transition-all ${
-                    index === currentSlide ? 'bg-blue-600' : 'bg-gray-300'
+                  className={`w-4 h-4 rounded-full transition-all duration-300 ${
+                    index === currentSlide 
+                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 scale-125' 
+                      : 'bg-gray-300 hover:bg-gray-400'
                   }`}
                 />
               ))}
@@ -379,44 +434,56 @@ const Homepage = () => {
       </section>
 
       {/* CTA Banner */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">Ready to Proctor Smarter?</h2>
-          <p className="text-xl text-blue-100 mb-8">
-            Join thousands of institutions already using Proctoverse for secure online assessments
+      <section className="py-24 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 relative overflow-hidden">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-5xl font-bold text-white mb-8">Ready to Transform Your Assessments?</h2>
+          <p className="text-2xl text-blue-100 mb-12 max-w-3xl mx-auto">
+            Join thousands of institutions worldwide who trust Proctoverse for secure examinations and interviews
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-8 py-4">
-              Create Your Free Account
-              <ArrowRight className="w-5 h-5 ml-2" />
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
+            <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 text-xl px-12 py-6 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105">
+              Start Free Trial Today
+              <ArrowRight className="w-6 h-6 ml-3" />
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 text-lg px-8 py-4">
-              Book a Demo
+            <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white/10 text-xl px-12 py-6 transition-all duration-300 transform hover:scale-105">
+              Schedule Demo
             </Button>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-16">
+      <footer className="bg-gray-900 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8 mb-12">
-            <div>
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-                  <Shield className="w-6 h-6 text-white" />
+          <div className="grid md:grid-cols-4 gap-12 mb-16">
+            <div className="col-span-1">
+              <div className="flex items-center space-x-4 mb-8">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center">
+                  <Shield className="w-7 h-7 text-white" />
                 </div>
                 <span className="text-2xl font-bold">Proctoverse</span>
               </div>
-              <p className="text-gray-400 leading-relaxed">
-                The future of secure online assessment technology, powered by artificial intelligence.
+              <p className="text-gray-400 leading-relaxed mb-6">
+                The future of secure online assessments, powered by cutting-edge artificial intelligence technology.
               </p>
+              <div className="flex space-x-4">
+                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                  <Twitter className="w-6 h-6" />
+                </a>
+                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                  <Linkedin className="w-6 h-6" />
+                </a>
+                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                  <Facebook className="w-6 h-6" />
+                </a>
+              </div>
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold mb-4">Product</h3>
-              <ul className="space-y-2">
+              <h3 className="text-lg font-semibold mb-6">Product</h3>
+              <ul className="space-y-3">
                 <li><a href="#features" className="text-gray-400 hover:text-white transition-colors">Features</a></li>
                 <li><a href="#pricing" className="text-gray-400 hover:text-white transition-colors">Pricing</a></li>
                 <li><a href="#security" className="text-gray-400 hover:text-white transition-colors">Security</a></li>
@@ -425,8 +492,8 @@ const Homepage = () => {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold mb-4">Support</h3>
-              <ul className="space-y-2">
+              <h3 className="text-lg font-semibold mb-6">Support</h3>
+              <ul className="space-y-3">
                 <li><a href="#help" className="text-gray-400 hover:text-white transition-colors">Help Center</a></li>
                 <li><a href="#contact" className="text-gray-400 hover:text-white transition-colors">Contact Us</a></li>
                 <li><a href="#status" className="text-gray-400 hover:text-white transition-colors">System Status</a></li>
@@ -435,28 +502,16 @@ const Homepage = () => {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold mb-4">Stay Updated</h3>
-              <p className="text-gray-400 mb-4">Subscribe for updates and insights</p>
-              <div className="flex gap-2">
+              <h3 className="text-lg font-semibold mb-6">Stay Updated</h3>
+              <p className="text-gray-400 mb-6">Get the latest updates and insights</p>
+              <div className="flex gap-3 mb-6">
                 <Input 
                   placeholder="Enter your email" 
-                  className="bg-gray-800 border-gray-700 text-white"
+                  className="bg-gray-800 border-gray-700 text-white flex-1"
                 />
-                <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                <Button size="sm" className="bg-blue-600 hover:bg-blue-700 px-6">
                   <Mail className="w-4 h-4" />
                 </Button>
-              </div>
-              
-              <div className="flex space-x-4 mt-6">
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  <Twitter className="w-5 h-5" />
-                </a>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  <Linkedin className="w-5 h-5" />
-                </a>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                  <Facebook className="w-5 h-5" />
-                </a>
               </div>
             </div>
           </div>
