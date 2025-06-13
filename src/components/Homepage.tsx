@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ArrowRight, Play, CheckCircle, Shield, Eye, Lock, Mic, BarChart3, Users, GraduationCap, Building2, ChevronLeft, ChevronRight, Star, Globe, Mail, Twitter, Linkedin, Facebook, Brain, Camera, Clock, FileText, Award, Zap } from 'lucide-react';
+import { ArrowRight, Play, CheckCircle, Shield, Eye, Lock, Mic, BarChart3, Users, GraduationCap, Building2, ChevronLeft, ChevronRight, Star, Globe, Mail, Twitter, Linkedin, Facebook, Brain, Camera, Clock, FileText, Award, Zap, AlertTriangle, UserX, Smartphone, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -136,6 +136,14 @@ const Homepage = () => {
     }
   ];
 
+  const detectionAlerts = [
+    { icon: Eye, text: "Asked ChatGPT", color: "bg-red-500" },
+    { icon: Mic, text: "Answer Prompted", color: "bg-yellow-500" },
+    { icon: UserX, text: "Unauthorized Person", color: "bg-orange-500" },
+    { icon: Search, text: "Googled Question", color: "bg-blue-500" },
+    { icon: Smartphone, text: "Used Phone", color: "bg-purple-500" }
+  ];
+
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % screenshots.length);
   };
@@ -182,59 +190,100 @@ const Homepage = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative py-24 overflow-hidden">
+      {/* Hero Section with Stats and CTA Buttons */}
+      <section className="relative py-16 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-purple-600/10 to-indigo-600/10"></div>
         <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400/20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
         
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="mb-8">
-            <Badge className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-800 border-blue-200 px-6 py-2 text-sm font-semibold">
-              🚀 Trusted by 10,000+ Institutions Worldwide
-            </Badge>
-          </div>
-          
-          <h1 className="text-6xl md:text-7xl font-bold text-gray-900 mb-8 leading-tight">
-            Secure Your
-            <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent block mt-2">
-              Exams & Interviews
-            </span>
-            <span className="text-5xl md:text-6xl block mt-2">with AI Power</span>
-          </h1>
-          
-          <p className="text-2xl text-gray-600 mb-12 max-w-4xl mx-auto leading-relaxed">
-            Revolutionary AI proctoring for examinations and interviews. Ensure authenticity, 
-            prevent cheating, and maintain assessment integrity with cutting-edge technology.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
-            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-xl px-12 py-6 shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105">
-              Start Free Assessment
-              <ArrowRight className="w-6 h-6 ml-3" />
-            </Button>
-            <Button size="lg" variant="outline" className="text-xl px-12 py-6 border-2 border-blue-200 hover:border-blue-400 hover:bg-blue-50 transition-all duration-300 transform hover:scale-105">
-              <Play className="w-6 h-6 mr-3" />
-              Watch Demo
-            </Button>
-          </div>
-
-          <div className="relative max-w-5xl mx-auto">
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-blue-200/50">
-              <div className="aspect-video bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10"></div>
-                <div className="relative text-center z-10">
-                  <div className="w-24 h-24 bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl">
-                    <Eye className="w-12 h-12 text-white" />
-                  </div>
-                  <p className="text-2xl font-semibold text-gray-800">AI Proctoring in Action</p>
-                  <p className="text-gray-600 mt-2">Real-time monitoring and analysis</p>
-                </div>
-                {/* Floating elements for visual appeal */}
-                <div className="absolute top-6 left-6 w-3 h-3 bg-blue-400 rounded-full animate-bounce"></div>
-                <div className="absolute top-12 right-8 w-2 h-2 bg-purple-400 rounded-full animate-bounce delay-300"></div>
-                <div className="absolute bottom-8 left-12 w-4 h-4 bg-indigo-400 rounded-full animate-bounce delay-700"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Stats Bar */}
+          <div className="flex justify-center mb-8">
+            <div className="flex items-center space-x-8 bg-white/80 backdrop-blur-sm rounded-2xl px-8 py-4 shadow-xl border border-blue-200/50">
+              <div className="flex items-center space-x-2">
+                <Shield className="w-5 h-5 text-blue-600" />
+                <span className="text-blue-600 font-semibold">38 Million+ Installs</span>
               </div>
+              <div className="flex items-center space-x-2">
+                <div className="flex">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+                <span className="text-gray-700 font-semibold">4.5/5</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left Content */}
+            <div className="text-left">
+              <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+                Automated Proctoring to
+                <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent block mt-2">
+                  Prevent Exam Cheating
+                </span>
+              </h1>
+              
+              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+                Our AI tracks candidate activity remotely. So, no more cheating on online tests.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 mb-8">
+                <Button size="lg" className="bg-teal-600 hover:bg-teal-700 text-white text-lg px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                  Try Demo
+                </Button>
+                <Button size="lg" variant="outline" className="text-lg px-8 py-4 rounded-xl border-2 border-gray-300 hover:border-blue-400 hover:bg-blue-50 transition-all duration-300 transform hover:scale-105">
+                  Conduct An Exam
+                </Button>
+              </div>
+
+              <p className="text-blue-600 font-medium">₹8.50 per test</p>
+            </div>
+
+            {/* Right Visual with Detection Alerts */}
+            <div className="relative">
+              <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-blue-200/50">
+                {/* Exam Interface Mockup */}
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 mb-6 relative overflow-hidden">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-4 h-4 bg-green-500 rounded-full"></div>
+                      <Camera className="w-5 h-5 text-green-600" />
+                      <span className="text-green-700 font-medium">07:45</span>
+                    </div>
+                    <div className="flex space-x-2">
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                      <div className="w-5 h-5 border-2 border-gray-300 rounded"></div>
+                      <div className="w-5 h-5 border-2 border-gray-300 rounded"></div>
+                    </div>
+                  </div>
+                  
+                  {/* Student Illustration */}
+                  <div className="flex justify-center mb-4">
+                    <div className="w-32 h-32 bg-gradient-to-br from-green-200 to-emerald-300 rounded-full flex items-center justify-center">
+                      <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center">
+                        <Users className="w-12 h-12 text-green-600" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Detection Alerts */}
+                <div className="space-y-3">
+                  {detectionAlerts.map((alert, index) => (
+                    <div key={index} className={`flex items-center space-x-3 ${alert.color} text-white px-4 py-3 rounded-xl shadow-lg transform transition-all duration-300 hover:scale-102 animate-slide-left`} style={{animationDelay: `${index * 0.2}s`}}>
+                      <alert.icon className="w-5 h-5" />
+                      <span className="font-medium">{alert.text}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Floating Elements */}
+              <div className="absolute -top-4 -right-4 w-8 h-8 bg-blue-400 rounded-full animate-bounce"></div>
+              <div className="absolute -bottom-4 -left-4 w-6 h-6 bg-purple-400 rounded-full animate-bounce delay-300"></div>
             </div>
           </div>
         </div>
